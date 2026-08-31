@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"],
+  "exclude": [
+    "src/game/engine.ts",
+    "src/game/rng.ts",
+    "src/data/equipment.ts",
+    "src/data/locations.ts",
+    "src/components/Tavern.tsx",
+    "src/components/Blacksmith.tsx",
+    "src/components/Church.tsx",
+    "src/components/Crossroads.tsx"
+  ]
+}
