@@ -9,7 +9,7 @@ import type { BoardQuest } from "../types";
 import { DispatchModal } from "./DispatchModal";
 
 export function Plaza() {
-  const { state, now, resolve } = useGame();
+  const { state, now, resolve, ui } = useGame();
   const sway = usePointerSway(14);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [pickerOut, setPickerOut] = useState(false);
@@ -31,12 +31,13 @@ export function Plaza() {
         </div>
       </div>
 
-      <div className="quest-dock">
-        {state.board.map((q) => (
+      <div className={`quest-dock ${ui.questBoardOpen ? "open" : ""}`}>
+        {state.board.map((q, index) => (
           <BountyChit
             key={q.key}
             quest={q}
             now={now}
+            index={index}
             onOpen={() => {
               setPickerOut(false);
               setOpenKey(q.key);
@@ -54,11 +55,13 @@ export function Plaza() {
 function BountyChit({
   quest,
   now,
+  index,
   onOpen,
   onResolve,
 }: {
   quest: BoardQuest;
   now: number;
+  index: number;
   onOpen: () => void;
   onResolve: () => void;
 }) {
@@ -70,7 +73,10 @@ function BountyChit({
   const elementIcon = template.element ? ELEMENT_ICON[template.element] : null;
 
   return (
-    <article className={`bounty-chit ${stateClass} ${template.long ? "long" : ""}`}>
+    <article
+      className={`bounty-chit ${stateClass} ${template.long ? "long" : ""}`}
+      style={{ ["--chit-i" as string]: index }}
+    >
       <button
         type="button"
         className="chit-body"

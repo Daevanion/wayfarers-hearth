@@ -2,7 +2,7 @@ import { HUD_ICONS } from "../data/hud";
 import { useGame } from "../store/GameContext";
 
 export function HUD() {
-  const { state, now, openGuild, openCatalogue, openTavern, ui } = useGame();
+  const { state, now, openGuild, openCatalogue, openTavern, openQuestBoard, ui } = useGame();
   if (ui.intro) return null;
 
   const underway = state.board.filter((q) => q.status === "underway");
@@ -38,6 +38,12 @@ export function HUD() {
         <span className="quest-raid">New bounties at midnight</span>
       </div>
       <div className="hud-actions">
+        <button
+          className={`ghost tiny ${ui.questBoardOpen ? "on" : ""}`}
+          onClick={() => openQuestBoard(!ui.questBoardOpen)}
+        >
+          Quest board
+        </button>
         <button className="ghost tiny" onClick={() => openTavern(true)}>
           Tavern
         </button>

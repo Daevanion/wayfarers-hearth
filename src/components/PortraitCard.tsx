@@ -1,10 +1,9 @@
-import { useEffect, useState, type CSSProperties, type MouseEvent } from "react";
+import { useState, type CSSProperties, type MouseEvent } from "react";
 import { ELEMENT_ICON, ELEMENT_LABEL, ROLE_LABEL } from "../data/icons";
 import { CARD_BACK } from "../data/portraits";
-import { useCardZoom } from "../hooks/useCardZoom";
 import type { CardTemplate } from "../types";
 import { CardDossier } from "./CardDossier";
-import { CardZoom, ZoomButton } from "./CardZoom";
+import { CardZoom } from "./CardZoom";
 import { TraitChips } from "./StatIcons";
 
 export function PortraitCard({
@@ -33,19 +32,15 @@ export function PortraitCard({
   onHover?: (active: boolean) => void;
 }) {
   const [tilt, setTilt] = useState({ rx: 0, ry: 0, x: 50, y: 50, on: false });
-  const zoom = useCardZoom();
+  const [dossierOpen, setDossierOpen] = useState(false);
   const shown = Boolean(owned) || Boolean(reveal);
   const art = shown && template.portrait ? template.portrait : CARD_BACK;
   const shownPower = power ?? template.power;
   const elementIcon = ELEMENT_ICON[template.element];
-
-  useEffect(() => {
-    if (!zoom.open) return;
-    setTilt({ rx: 0, ry: 0, x: 50, y: 50, on: false });
-  }, [zoom.open]);
+  const clickable = Boolean(onClick || dossier);
 
   function move(e: MouseEvent<HTMLElement>) {
-    if (zoom.open) return;
+    if (dossierOpen) return;
     const frame = e.currentTarget.querySelector(".portrait-frame");
     const r = (frame ?? e.currentTarget).getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
@@ -61,8 +56,14 @@ export function PortraitCard({
 
   function leave() {
     setTilt({ rx: 0, ry: 0, x: 50, y: 50, on: false });
-    zoom.leave();
     onHover?.(false);
+  }
+
+  function openDossier(event: MouseEvent<HTMLElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (dossier) setDossierOpen(true);
+    onClick?.();
   }
 
   const style = {
@@ -83,12 +84,35 @@ export function PortraitCard({
     exhausted ? "injured" : "",
     shown ? "known" : "unknown",
     reveal && !owned ? "ledger" : "",
-    onClick ? "clickable" : "",
-    zoom.open ? "is-zoomed" : "",
+    clickable ? "clickable" : "",
+    dossierOpen ? "is-zoomed" : "",
   ].join(" ");
 
-  const picture = (
-    <img src={art} alt={shown ? template.name : "Undiscovered adventurer"} draggable={false} />
+  const frame = (
+    <div className="portrait-frame">
+      <img src={art} alt={shown ? template.name : "Undiscovered adventurer"} draggable={false} />
+      {shown ? (
+        <>
+          {elementIcon ? (
+            <span className="frame-element" title={`${ELEMENT_LABEL[template.element]} element`}>
+              <img src={elementIcon} alt={ELEMENT_LABEL[template.element]} />
+            </span>
+          ) : null}
+          <span className="frame-power" title="Power">
+            {shownPower}
+          </span>
+        </>
+      ) : null}
+      <span className="portrait-shine" aria-hidden />
+    </div>
+  );
+
+  const caption = (
+    <span className="portrait-caption">
+      <strong>{shown ? template.name : "Unknown"}</strong>
+      <em>{shown ? ROLE_LABEL[template.role] : "Unrecorded"}</em>
+      {shown && size !== "compact" ? <TraitChips traits={template.traits} compact /> : null}
+    </span>
   );
 
   return (
@@ -96,49 +120,22 @@ export function PortraitCard({
       className={className}
       style={style}
       onMouseMove={move}
-      onMouseEnter={() => {
-        zoom.enter();
-        onHover?.(true);
-      }}
+      onMouseEnter={() => onHover?.(true)}
       onMouseLeave={leave}
     >
-      <div className="portrait-frame">
-        {onClick || dossier ? (
-          <button
-            type="button"
-            className="portrait-hit"
-            onClick={() => {
-              if (dossier) zoom.pin();
-              onClick?.();
-            }}
-          >
-            {picture}
-          </button>
-        ) : (
-          picture
-        )}
-        {shown ? (
-          <>
-            {elementIcon ? (
-              <span className="frame-element" title={`${ELEMENT_LABEL[template.element]} element`}>
-                <img src={elementIcon} alt={ELEMENT_LABEL[template.element]} />
-              </span>
-            ) : null}
-            <span className="frame-power" title="Power">
-              {shownPower}
-            </span>
-          </>
-        ) : null}
-        <span className="portrait-shine" aria-hidden />
-        <ZoomButton active={zoom.open} onClick={zoom.toggle} />
-      </div>
-      <span className="portrait-caption">
-        <strong>{shown ? template.name : "Unknown"}</strong>
-        <em>{shown ? ROLE_LABEL[template.role] : "Unrecorded"}</em>
-        {shown && size !== "compact" ? <TraitChips traits={template.traits} compact /> : null}
-      </span>
-      {zoom.open ? (
-        <CardZoom onClose={zoom.close} wide={shown}>
+      {clickable ? (
+        <button type="button" className="portrait-hit" onClick={openDossier}>
+          {frame}
+          {caption}
+        </button>
+      ) : (
+        <>
+          {frame}
+          {caption}
+        </>
+      )}
+      {dossierOpen ? (
+        <CardZoom onClose={() => setDossierOpen(false)} wide={shown}>
           <CardDossier template={template} power={shownPower} shown={shown} />
         </CardZoom>
       ) : null}

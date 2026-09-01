@@ -158,6 +158,7 @@ export interface UiState {
   guildOpen: boolean;
   catalogueOpen: boolean;
   tavernOpen: boolean;
+  questBoardOpen: boolean;
   intro: IntroPhase;
   outcome: QuestOutcome | null;
   toasts: Toast[];

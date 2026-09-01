@@ -98,6 +98,14 @@ function collectMarks(template: CardTemplate): Mark[] {
   return marks;
 }
 
+const WORD_CHAR = /[a-zA-Z0-9']/;
+
+function isWordBounded(text: string, start: number, end: number): boolean {
+  const before = start > 0 ? text[start - 1] : "";
+  const after = end < text.length ? text[end] : "";
+  return !WORD_CHAR.test(before) && !WORD_CHAR.test(after);
+}
+
 function highlight(text: string, marks: Mark[]): ReactNode[] {
   const hits: { start: number; end: number; className: string }[] = [];
   const used = new Array(text.length).fill(false);
@@ -112,7 +120,7 @@ function highlight(text: string, marks: Mark[]): ReactNode[] {
       if (at < 0) break;
       const end = at + needle.length;
       const blocked = used.slice(at, end).some(Boolean);
-      if (!blocked) {
+      if (!blocked && isWordBounded(text, at, end)) {
         hits.push({ start: at, end, className: mark.className });
         used.fill(true, at, end);
       }

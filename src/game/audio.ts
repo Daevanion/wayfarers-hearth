@@ -119,7 +119,7 @@ export function sfxFromEventTarget(target: EventTarget | null): SfxKind | null {
   const el = target.closest("button, [role='tab'], [data-sfx]");
   if (!(el instanceof HTMLElement)) return null;
   if (el instanceof HTMLButtonElement && el.disabled) return null;
-  if (el.closest(".card-zoom-btn, .card-zoom-back, .card-zoom-close")) return null;
+  if (el.closest(".card-zoom-btn, .card-zoom-back, .card-zoom-close, .art-lightbox-back, .art-lightbox-close")) return null;
   if (el.closest(".portrait-card, .adv-card, .adv-portrait-wrap, .slot-face")) return "card";
   const kind = el.getAttribute("data-sfx") ?? el.closest("[data-sfx]")?.getAttribute("data-sfx");
   if (kind === "flip" || kind === "card" || kind === "tavern" || kind === "ui") return kind;

@@ -141,7 +141,7 @@ export function Guild() {
           </section>
 
           {inspecting && template ? (
-            <aside className="inspect-pane collection-inspect">
+            <aside className="inspect-pane collection-inspect menu-fade-in">
               <p className="kicker">{ROLE_LABEL[template.role]}</p>
               <h3>{template.name}</h3>
               <p className="adv-title">{template.title}</p>

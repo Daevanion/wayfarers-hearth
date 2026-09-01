@@ -27,6 +27,7 @@ interface GameApi {
   openGuild: (open: boolean) => void;
   openCatalogue: (open: boolean) => void;
   openTavern: (open: boolean) => void;
+  openQuestBoard: (open: boolean) => void;
   dismissToast: (id: string) => void;
 }
 
@@ -39,6 +40,7 @@ function emptyUi(partial: Partial<UiState> = {}): UiState {
     guildOpen: false,
     catalogueOpen: false,
     tavernOpen: false,
+    questBoardOpen: false,
     intro: null,
     outcome: null,
     toasts: [],
@@ -155,6 +157,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       openGuild: (open) => setUi((u) => ({ ...u, guildOpen: open, catalogueOpen: false, tavernOpen: false })),
       openCatalogue: (open) => setUi((u) => ({ ...u, catalogueOpen: open, guildOpen: false, tavernOpen: false })),
       openTavern: (open) => setUi((u) => ({ ...u, tavernOpen: open, guildOpen: false, catalogueOpen: false })),
+      openQuestBoard: (open) => setUi((u) => ({ ...u, questBoardOpen: open })),
       dismissToast: (id) => setUi((u) => ({ ...u, toasts: u.toasts.filter((t) => t.id !== id) })),
     };
   }, [state, ui, now, pushToast]);
