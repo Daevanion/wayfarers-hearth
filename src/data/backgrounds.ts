@@ -8,6 +8,7 @@ import oldKingsRoad from "../Assets/bg/old_kings_road.jpg";
 import mirefenCrossing from "../Assets/bg/mirefen_crossing.jpg";
 import ruinsCaldara from "../Assets/bg/ruins_caldara.jpg";
 import questboard from "../Assets/bg/questboard_bg.png";
+import goblinQuest from "../Assets/bg/goblinquest_bg.jpg";
 
 export const BACKGROUNDS = {
   town,
@@ -20,6 +21,7 @@ export const BACKGROUNDS = {
   mirefenCrossing,
   ruinsCaldara,
   questboard,
+  goblinQuest,
 } as const;
 
 const LOCATION_SCENE: Record<string, string> = {

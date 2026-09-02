@@ -77,15 +77,20 @@ export interface CritRef {
   note: string;
 }
 
+export type QuestTier = "low" | "mid" | "high" | "extreme" | "world";
+
 export interface QuestTemplate {
   id: string;
   name: string;
   flavor: string;
+  lore: string;
   durationMs: number;
-  long?: boolean;
+  tier: QuestTier;
   element: ElementId | null;
   power: number;
-  teamSize: number;
+  teamMin: number;
+  teamMax: number;
+  art: string;
   advantages: QuestModRef[];
   hazards: QuestModRef[];
   crit?: CritRef;

@@ -6,16 +6,71 @@ import { traitLabel } from "../data/traits";
 import { cardPower, clamp, grantXp, uid } from "./formulas";
 import type {
   BoardQuest,
+  CardTemplate,
   GameState,
   JournalEntry,
   OwnedCard,
   PackResult,
   QuestOutcome,
   QuestTemplate,
+  QuestTier,
 } from "../types";
 
-export const SHORT_QUESTS_PER_DAY = 4;
-export const LONG_QUESTS_PER_DAY = 2;
+export const DAILY_BY_TIER: Record<QuestTier, number> = {
+  low: 3,
+  mid: 2,
+  high: 1,
+  extreme: 1,
+  world: 0,
+};
+
+export const TIER_LABEL: Record<QuestTier, string> = {
+  low: "Low",
+  mid: "Mid",
+  high: "High",
+  extreme: "Extreme",
+  world: "World",
+};
+
+export function critTokens(tier: QuestTier): number {
+  if (tier === "extreme" || tier === "world") return 3;
+  if (tier === "high") return 2;
+  return 1;
+}
+
+export function seatsLabel(quest: QuestTemplate): string {
+  return quest.teamMin === quest.teamMax ? `${quest.teamMin}` : `${quest.teamMin}–${quest.teamMax}`;
+}
+
+export function questClock(quest: BoardQuest, now: number): { ready: boolean; remaining: number; ratio: number } {
+  const span = Math.max(1, quest.endsAt - quest.startedAt);
+  const ready = now >= quest.endsAt;
+  return {
+    ready,
+    remaining: Math.max(0, quest.endsAt - now),
+    ratio: ready ? 1 : clamp((now - quest.startedAt) / span, 0, 1),
+  };
+}
+
+/** Higher = better match for this bounty (advantages/crit/affinity first, hazards last). */
+export function cardQuestFit(card: CardTemplate, quest: QuestTemplate): number {
+  let score = 0;
+  for (const adv of quest.advantages) {
+    if (adv.type === "trait" && card.traits.includes(adv.id)) score += 120 + adv.pct;
+    if (adv.type === "role" && card.role === adv.id) score += 120 + adv.pct;
+  }
+  for (const haz of quest.hazards) {
+    if (haz.type === "trait" && card.traits.includes(haz.id)) score -= 90 + Math.abs(haz.pct);
+    if (haz.type === "role" && card.role === haz.id) score -= 90 + Math.abs(haz.pct);
+  }
+  if (quest.element && (card.element === quest.element || card.element === "wild")) score += 45;
+  if (quest.crit) {
+    if (quest.crit.type === "role" && card.role === quest.crit.id) score += 70;
+    if (quest.crit.type === "element" && (card.element === quest.crit.id || card.element === "wild")) score += 70;
+    if (quest.crit.type === "set" && card.setId === quest.crit.id) score += 55;
+  }
+  return score;
+}
 export const ELEMENT_POWER_BONUS = 1.25;
 export const SET_SYNERGY_PCT = 10;
 export const CRIT_LOOT_MULT = 1.5;
@@ -66,9 +121,13 @@ function pickSome<T>(pool: T[], count: number, rng: () => number): T[] {
 
 export function makeBoard(day: string): BoardQuest[] {
   const rng = mulberry32(hashSeed(day));
-  const shorts = pickSome(QUEST_TEMPLATES.filter((q) => !q.long), SHORT_QUESTS_PER_DAY, rng);
-  const longs = pickSome(QUEST_TEMPLATES.filter((q) => q.long), LONG_QUESTS_PER_DAY, rng);
-  return [...shorts, ...longs].map((q) => ({
+  const picked: QuestTemplate[] = [];
+  for (const tier of ["low", "mid", "high", "extreme", "world"] as QuestTier[]) {
+    const count = DAILY_BY_TIER[tier];
+    if (count <= 0) continue;
+    picked.push(...pickSome(QUEST_TEMPLATES.filter((q) => q.tier === tier), count, rng));
+  }
+  return picked.map((q) => ({
     key: `${day}-${q.id}`,
     templateId: q.id,
     status: "open",
@@ -198,8 +257,8 @@ export function dispatchQuest(
   if (!quest || quest.status !== "open") return { state, error: "That bounty is no longer open." };
   const template = QUEST_BY_ID[quest.templateId];
   if (!template) return { state, error: "The bounty has faded." };
-  if (team.length !== template.teamSize)
-    return { state, error: `This bounty needs a team of ${template.teamSize}.` };
+  if (team.length < template.teamMin || team.length > template.teamMax)
+    return { state, error: `This bounty needs ${seatsLabel(template)} in the company.` };
   for (const id of team) {
     if (!ownedById(state, id)) return { state, error: "That name is not in your company." };
     if (isBusy(state, id)) return { state, error: `${CARD_BY_ID[id]?.name ?? id} is already out.` };
@@ -240,7 +299,7 @@ export function resolveQuest(
 
   let gold = won ? template.gold : 0;
   if (won && quest.critMatched) gold = Math.round(gold * CRIT_LOOT_MULT);
-  const tokens = result === "crit" ? (template.long ? 2 : 1) : 0;
+  const tokens = result === "crit" ? critTokens(template.tier) : 0;
   const xpEach = won ? template.xp : Math.max(1, Math.round(template.xp * 0.25));
   const restMs = template.durationMs * (won ? 0.5 : 2);
 

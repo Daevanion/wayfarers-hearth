@@ -6,7 +6,7 @@
 >
 > **Writer truth:** `c:\Users\daeva\Desktop\lores.xlsx` (outside the repo). Columns: `name | title | element | role | power | combat | lore`. Sets of **3** are separated by a repeated header row.
 >
-> **Repo:** https://github.com/Daevanion/wayfarers-hearth — save key `wayfarers-hearth-board-v1`, **SAVE_VERSION 12**. Adding cards does **not** require a version bump. Bump only if `GameState` shape changes.
+> **Repo:** https://github.com/Daevanion/wayfarers-hearth — save key `wayfarers-hearth-board-v1`, **SAVE_VERSION 13**. Adding cards does **not** require a version bump. Bump if `GameState` shape or daily board template IDs change (old boards would fade).
 >
 > After any roster or quest change, **update this document** (counts, tables, unused-trait list) so the next session starts accurate.
 
@@ -21,8 +21,11 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 ### What the player sees
 
 - Full-bleed swaying `town3.jpg` plaza
-- Bottom bounty dock (HUD can toggle `questBoardOpen`)
-- HUD: Gold, Tokens, Tavern, Collection, Full catalogue, Quest Board icon (`questboard_icon.png`)
+- Quest Board icon (`questboard_icon.png`) opens the wooden board overlay
+- Board shows **one large quest card** at a time; slide with arrows or Left/Right (flip sfx). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma).
+- Companies on the road appear as a **left-hand progress rail** (art, name, timer bar). Click for a full-view of the quest art with the assigned party.
+- Dispatch loadout uses the quest painting as the header, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
+- HUD: Gold, Tokens, Tavern, Collection, Full catalogue
 - Collection = owned company (element / role / status filters)
 - Catalogue = all cards, owned or not (All / Set views)
 - Click a card in Collection or Catalogue → full dossier (Excel lore + highlighted elements/traits + titled stats)
@@ -69,7 +72,7 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 5. [Power Output Tables](#5-power-output-tables)
 6. [Sets & Synergies](#6-sets--synergies)
 7. [Traits Reference (47)](#7-traits-reference-47)
-8. [Quest Board (18 Templates)](#8-quest-board-18-templates)
+8. [Quest Board (48 Templates)](#8-quest-board-48-templates)
 9. [Quest Design Guide](#9-quest-design-guide)
 10. [Character Lore Hooks for New Quests](#10-character-lore-hooks-for-new-quests)
 11. [Unimplemented Assets & Future Characters](#11-unimplemented-assets--future-characters)
@@ -96,14 +99,14 @@ The live game is a **daily bounty board** system. Players dispatch teams of owne
 | Gold | 30 |
 | Tokens | 0 |
 | Cards | Hera Starfall, Caelan Featherfoot, Cedric Oakmont (all L1) |
-| Daily quests | 4 short + 2 long (random from 18 templates) |
+| Daily quests | 7: 3 Low + 2 Mid + 1 High + 1 Extreme (from 48 templates) |
 
 ### Limits
 
 | Rule | Value |
 |------|-------|
 | Max card level | 5 |
-| Team size | 2 or 3 (per quest) |
+| Team size | Range per quest: Low 1–3, Mid 2–3, High 3–4, Extreme 4 |
 | Parallel quests | Unlimited (different cards) |
 | Roster cap | None |
 | Card rest (win) | `duration × 0.5` |
@@ -115,7 +118,8 @@ The live game is a **daily bounty board** system. Players dispatch teams of owne
 
 - Refreshes at local midnight (underway quests persist)
 - Deterministic RNG seeded by date (`YYYY-MM-DD`)
-- 4 short quests (90s–5min) + 2 long quests (1–3 hours)
+- Draws **3 Low, 2 Mid, 1 High, 1 Extreme** (`DAILY_BY_TIER`). World pool is empty.
+- UI: single illustrated card with prev/next; Open and Returned are clickable
 
 ---
 
@@ -201,7 +205,7 @@ Crit is checked **first** (low rolls = triumph).
 | Outcome | Gold | Tokens | XP each | Rest |
 |---------|------|--------|---------|------|
 | Success | `quest.gold` | 0 | `quest.xp` | `duration × 0.5` |
-| Crit | `quest.gold` | 1 (short) or 2 (long) | `quest.xp` | `duration × 0.5` |
+| Crit | `quest.gold` | 1 Low/Mid, 2 High, 3 Extreme | `quest.xp` | `duration × 0.5` |
 | Fail | 0 | 0 | `max(1, round(xp × 0.25))` | `duration × 2` |
 
 **Crit-match bonus:** `gold × 1.5` when team satisfies crit condition AND quest is won.
@@ -212,7 +216,7 @@ Crit is checked **first** (low rolls = triumph).
 
 ### Gold Sources
 
-- Quest success/crit: 10–170 gold per template
+- Quest success/crit: 14–280 gold per template
 - Crit-match multiplier: ×1.5
 
 ### Gold Sinks
@@ -221,7 +225,7 @@ Crit is checked **first** (low rolls = triumph).
 
 ### Tokens
 
-- Earned on **crit rolls only**: 1 (short) or 2 (long)
+- Earned on **crit rolls only**: 1 (Low/Mid), 2 (High), 3 (Extreme)
 - Spent on Sealed Letter pack (prefers unowned cards): **1 token**
 
 ### Duplicate XP (pack pulls)
@@ -233,19 +237,21 @@ Crit is checked **first** (low rolls = triumph).
 
 ### Rough Progression Pace
 
-- Average daily XP per card (if on all 6 quests): ~120–364 XP depending on assignments
+- Average daily XP per card (if on all 7 quests): ~120–364 XP depending on assignments
 - Solo card to max level (~700 XP): ~2–6 days of active play
-- Starting gold (30) covers **0** road packs; first pack needs ~2–3 short quest wins
+- Starting gold (30) covers **0** road packs; first pack needs ~2–3 Low quest wins
 
 ### Starter Team Reality (L1, no mods)
 
+Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme more seats) than the opening trio can supply.
+
 | Quest | Power req | Hera + Caelan (50) | Hearthbound trio (75) |
 |-------|-----------|--------------------|-----------------------|
-| Fever Herbs | 30 | 167% ✓ | 250% ✓ |
-| Lost Sparrow | 50 | 100% ✓ | 150% ✓ |
-| Goblin Toll | 60 | 83% (risky) | 125% ✓ |
-| Chapel Vigil | 70 | 71% (risky) | 107% ✓ |
-| Windworn Ledge | 100 | — (needs 3) | 75% (needs levels/recruits) |
+| Marsh Sage Before Dark | 40 | 125% ✓ | 187% ✓ |
+| The Named Raider | 55 | 91% (risky) | 136% ✓ |
+| Hold the Merchant Road | 60 | 83% (risky) | 125% ✓ |
+| The Rogue Greatwolf | 70 | 71% (risky) | 107% ✓ |
+| The Windworn Boy | 75 | 67% (risky) | 100% ✓ |
 
 **Design implication:** Early game is trait-modifier dependent. Matching advantages (+15–20%) and avoiding hazards (−15–30%) is often the difference between safe and risky dispatches.
 
@@ -378,7 +384,7 @@ Crit is checked **first** (low rolls = triumph).
 
 | Team | Raw | Notes |
 |------|-----|-------|
-| Odin + Reinhart | 190 | Covers all long quests at 79%+ base (no mods) |
+| Odin + Reinhart | 190 | Covers Mid at L1; High needs a third (or levels); Extreme is 4-seat |
 | Morrigan + Odin | 175 | |
 | Morrigan + Reinhart | 165 | |
 | Lysandra + Odin | 150 | |
@@ -388,7 +394,7 @@ Crit is checked **first** (low rolls = triumph).
 
 | Team | Raw | Notes |
 |------|-----|-------|
-| Glade Expedition (full set) | 265 | +10% set synergy; crit on Glade Survey |
+| Glade Expedition (full set) | 265 | +10% set synergy; still shy of Extreme 350+ without a fourth |
 | Moonlight Scripture (full set) | 210 | +10% set synergy; crit on Moonlight Retrieval |
 | Lysandra + Odin + Reinhart | 240 | |
 | Sylas + Odin + Reinhart | 240 | |
@@ -398,12 +404,10 @@ Crit is checked **first** (low rolls = triumph).
 
 | Tier | Power req | Example quests | Achievable at L1? |
 |------|-----------|------------------|-------------------|
-| Trivial | 30 | Fever Herbs | Starter duo (167%) |
-| Easy | 40–50 | Millstream Rats, Lost Sparrow | Starter duo (100–167%) |
-| Moderate | 60–80 | Goblin Toll, Night Courier, Chapel Vigil, Ember Cellar | Needs 3rd starter or recruit |
-| Hard (3-man) | 90–110 | Mire Lights, Windworn Ledge, Forge Haul | Needs recruited mid-tier team |
-| Long (2-man) | 140 | Moonlit Parley | Needs top pair (Odin+Reinhart = 154%) |
-| Long (3-man) | 160–240 | Envoy Road → Vault Wyrm | Needs legendaries or high-level mid-tier |
+| Low | 40–75 | Marsh Sage, Named Raider, Windworn Boy | Starter duo/trio; top Low is a coin-flip for the trio |
+| Mid | 110–160 | Quenched Commission, Moonlit Parley, Lesser Demon | Recruits or a legend pair |
+| High | 210–260 | Envoy's Road, Demon Watchfires, Necromancer | 3–4 including a Glade-tier name |
+| Extreme | 350–420 | Glade Survey, Calamity Samara | Four seats; Glade set + a fourth, or leveled legends |
 
 ### Element Affinity Impact (example: 2× L1 cards, 50 raw each)
 
@@ -483,102 +487,157 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 
 | Trait | Quests (advantage) | Quests (hazard) |
 |-------|-------------------|-----------------|
-| charismatic | Goblin Toll, Moonlit Parley | — |
-| mercenary | Goblin Toll | — |
-| hotheaded | — | Goblin Toll, Sunken Reliquary |
-| perceptive | Millstream Rats | — |
-| cowardly | — | Millstream Rats, Mire Lights, Windworn Ledge, Glade Survey |
-| sheltered | — | Windworn Ledge |
-| devout | Chapel Vigil | — |
-| faithless | — | Chapel Vigil |
-| focused | Mire Lights, Moonlight Retrieval | — |
-| oblivious | — | Mire Lights |
-| prodigy | Ember Cellar | — |
-| greedy | — | Ember Cellar, Forge Haul |
-| secretive | Night Courier | — |
-| forgetful | — | Night Courier |
-| brave | Windworn Ledge | — |
-| nurturing | Fever Herbs | — |
-| vindictive | — | Fever Herbs |
-| stalwart | Forge Haul | — |
-| artisan | Quenched Commission | — |
-| protective | Quenched Commission | — |
-| overprotective | — | Quenched Commission |
-| kindhearted | Lost Sparrow | — |
-| lethal | Glade Survey, Moonlight Retrieval | Lost Sparrow |
+| arrogant | — | Moonlit Parley, The Pale Labyrinth |
+| artisan | Iron from the Hill Forge, The Quenched Commission | — |
+| battlehungry | — | The East Palisade, Moonlit Parley, The Infiltration Path |
+| beloved | The False Saint | Find the Unholy Impostor |
+| brave | The Named Raider, The Windworn Boy | — |
+| charismatic | The Bridge Gang, Moonlit Parley | — |
+| cowardly | — | The Rogue Greatwolf, Wolves at the Fold, The Windworn Boy, Vermin Under the Mill, The Mountain Troll, Corruption at the Glade's Edge, The Blood-Debt Duel, Subjugate Calamity: Samara, Survey of the Dark Glade |
+| devout | Watch at the Broken Chapel, Drive the Barrow Wights, The Envoy's Road | — |
+| distrustful | — | Infiltrate the Brotherhood, The Envoy's Road, Whereabouts of General Alastor |
+| eccentric | — | Wyrm of the Deep Vault |
+| faithless | — | Watch at the Broken Chapel, A Lesser Demon, The Desecrated Nave |
+| fearless | A Lesser Demon, The Demon Watchfires | — |
+| focused | The Fen Herders, The East Palisade, Lights Over the Mire, Corruption at the Glade's Edge, The Moonlight Retrieval, Whereabouts of General Alastor | — |
+| forgetful | — | Eyes on the Brotherhood, The Night Letter, Frosthollow Pass |
 | graceful | Moonlit Parley | — |
-| battlehungry | — | Moonlit Parley |
-| arrogant | — | Moonlit Parley |
-| loyal | Envoy Road | — |
-| distrustful | — | Envoy Road |
-| wise | Sunken Reliquary | — |
-| fearless | Demon Watchfires | — |
-| martyr | — | Demon Watchfires |
-| legendary | Glade Survey | — |
-| mighty | Vault Wyrm | — |
-| eccentric | — | Vault Wyrm |
-| intolerant | — | Moonlight Retrieval |
-| hollow | — | Moonlight Retrieval |
+| greedy | — | Hold the Merchant Road, Cutpurses of the Old Road, Iron from the Hill Forge, Scour the Goblin Den, The Ember Nest, Tide in the Drowned Keep, Retake the Adamant Mines |
+| guiltridden | — | The Necromancer of Caldara |
+| hollow | — | Drive the Barrow Wights, The Moonlight Retrieval |
+| honorbound | Blood on the Caravan, The Blood-Debt Duel | — |
+| hotheaded | — | The Named Raider, The Bridge Gang, The Sunken Reliquary |
+| intolerant | — | The Moonlight Retrieval |
+| legendary | Subjugate Calamity: Samara, Survey of the Dark Glade | — |
+| lethal | The Thing in the Cellar-Keep, The Moonlight Retrieval, The Infiltration Path, Survey of the Dark Glade | — |
+| loyal | The Envoy's Road | — |
+| martyr | — | The Demon Watchfires |
+| mighty | Scour the Goblin Den, The Mountain Troll, Retake the Adamant Mines, Wyrm of the Deep Vault | — |
+| nurturing | Marsh Sage Before Dark, Purify the Miasma Wood | — |
+| oblivious | — | The Fen Herders, Mark the Barrow Stones, Lights Over the Mire |
+| overprotective | — | The Quenched Commission |
+| perceptive | The Rogue Greatwolf, Cutpurses of the Old Road, Vermin Under the Mill, Find the Unholy Impostor | — |
+| prodigy | The Ember Nest | — |
+| protective | The Quenched Commission | — |
+| reclusive | — | Purify the Miasma Wood |
+| resolute | The Desecrated Nave, Frosthollow Pass | — |
+| scheming | Infiltrate the Brotherhood | The False Saint |
+| scholarly | The Necromancer of Caldara | — |
+| secretive | Eyes on the Brotherhood, The Night Letter, Infiltrate the Brotherhood, The Infiltration Path | — |
+| sheltered | — | The Windworn Boy, The Thing in the Cellar-Keep |
+| softspoken | — | Break the Holdfast |
+| stalwart | Hold the Merchant Road, Break the Holdfast, Tide in the Drowned Keep | — |
+| steadfast | Wolves at the Fold | — |
+| vindictive | — | Marsh Sage Before Dark, Blood on the Caravan |
+| wise | Mark the Barrow Stones, The Sunken Reliquary, The Pale Labyrinth | — |
 
 ### Unused Traits (available for new quests)
 
-`steadfast`, `reclusive`, `honorbound`, `guiltridden`, `scholarly`, `scheming`, `spearmaiden`, `softspoken`, `beloved`, `resolute`
+`kindhearted`, `mercenary`, `resourceful`, `spearmaiden`
 
 ### Roles Used in Crit Conditions
 
 | Role | Quest |
 |------|-------|
-| scout | Goblin Toll, Night Courier |
-| cleric | Chapel Vigil |
-| mage | Ember Cellar |
-| healer | Fever Herbs |
-| ranger | Lost Sparrow |
-| tank | Forge Haul |
-| paladin | Moonlit Parley |
-| berserker | Demon Watchfires, Vault Wyrm |
+| archmage | The Necromancer of Caldara, Subjugate Calamity: Samara, The Pale Labyrinth |
+| berserker | Scour the Goblin Den, The Mountain Troll, The Demon Watchfires, Wyrm of the Deep Vault |
+| cleric | Watch at the Broken Chapel, A Lesser Demon, Drive the Barrow Wights, The False Saint, Find the Unholy Impostor |
+| healer | Marsh Sage Before Dark |
+| mage | The Ember Nest |
+| paladin | Moonlit Parley, The Desecrated Nave, The Thing in the Cellar-Keep |
+| ranger | Wolves at the Fold, The East Palisade, Mark the Barrow Stones, Blood on the Caravan, Corruption at the Glade's Edge, Whereabouts of General Alastor |
+| scout | The Named Raider, Eyes on the Brotherhood, The Bridge Gang, The Night Letter, Infiltrate the Brotherhood, The Infiltration Path |
+| tank | Hold the Merchant Road, Iron from the Hill Forge, Retake the Adamant Mines |
+| warrior | Break the Holdfast, The Blood-Debt Duel |
 
-**Unused roles in crits:** `warrior`, `archmage` — good hooks for character-specific quests (Fenric, Odin).
+**Unused roles in crits:** none — every combat role has at least one crit hook.
 
 ---
 
-## 8. Quest Board (18 Templates)
+## 8. Quest Board (48 Templates)
 
-### Short Quests (11)
+Pool in `src/data/quests.ts`. Each template has `flavor` (card hook), `lore` (2–4 sentences in dispatch), `tier`, `teamMin`/`teamMax`, `art`. **Named Raider** uses `goblinquest_bg.jpg`. All others cycle Whispering Woods / Old King's Road / Mirefen / Ruins of Caldara.
 
-| ID | Name | Dur | Elem | Pwr | Team | Gold | XP | Advantage | Hazard | Crit |
-|----|------|-----|------|-----|------|------|-----|-----------|--------|------|
-| `herb-run` | Fever Herbs Before Dark | 90s | — | 30 | 2 | 10 | 18 | nurturing +20% | vindictive −15% | role: healer |
-| `millstream-rats` | Rats Under the Millstream | 1m | earth | 40 | 2 | 12 | 20 | perceptive +20% | cowardly −25% | elem: earth |
-| `lost-sparrow` | The Lost Sparrow | 2m | — | 50 | 2 | 16 | 24 | kindhearted +20% | lethal −20% | role: ranger |
-| `goblin-toll` | The Goblin King's Toll | 2m | — | 60 | 2 | 22 | 30 | charismatic +20%, mercenary +15% | hotheaded −25% | role: scout |
-| `night-courier` | The Night Courier | 2m | dark | 60 | 2 | 24 | 30 | secretive +20% | forgetful −25% | role: scout |
-| `chapel-vigil` | Vigil at the Broken Chapel | 3m | light | 70 | 2 | 26 | 34 | devout +20% | faithless −30% | role: cleric |
-| `quenched-commission` | The Quenched Commission | 3m | earth | 70 | 2 | 26 | 34 | artisan +20%, protective +15% | overprotective −20% | set: forge-kin |
-| `ember-cellar` | The Ember Cellar | 3m | fire | 80 | 2 | 30 | 36 | prodigy +20% | greedy −20% | role: mage |
-| `mire-lights` | Lights Over the Mire | 4m | water | 90 | 3 | 34 | 40 | focused +15% | oblivious −20% | elem: water |
-| `windworn-ledge` | The Windworn Ledge | 5m | air | 100 | 3 | 38 | 44 | brave +20% | cowardly −30%, sheltered −15% | elem: air |
-| `forge-haul` | The Old Forge Haul | 4m | earth | 110 | 3 | 42 | 46 | stalwart +15% | greedy −20% | role: tank |
+World tier is typed; **zero templates** until prerequisites are specified. Character-specific locks are **not wired**.
 
-### Long Quests (7)
+Samara / Alastor appear in Extreme quest fiction only — no playable cards.
 
-| ID | Name | Dur | Elem | Pwr | Team | Gold | XP | Advantages | Hazard | Crit |
-|----|------|-----|------|-----|------|-----|-----|------------|--------|------|
-| `parley-moon` | Moonlit Parley | 1h | air | 140 | 2 | 80 | 80 | charismatic +20%, graceful +15% | battlehungry −30%, arrogant −15% | role: paladin |
-| `envoy-road` | The Envoy's Road | 1.5h | light | 160 | 3 | 95 | 90 | loyal +15%, devout +15% | distrustful −25% | set: sun-scripture |
-| `sunken-reliquary` | The Sunken Reliquary | 2h | water | 180 | 3 | 110 | 100 | wise +20% | hotheaded −25% | elem: water |
-| `demon-watchfires` | The Demon Watchfires | 2.5h | fire | 200 | 3 | 130 | 110 | fearless +20% | martyr −20% | role: berserker |
-| `glade-survey` | Survey of the Dark Glade | 3h | dark | 220 | 3 | 150 | 130 | legendary +20%, lethal +15% | cowardly −30% | set: glade-expedition |
-| `moonlight-retrieval` | The Moonlight Retrieval | 2.5h | dark | 200 | 3 | 130 | 110 | focused +15%, lethal +15% | intolerant −25%, hollow −15% | set: moonlight-scripture |
-| `vault-wyrm` | Wyrm of the Deep Vault | 3h | earth | 240 | 3 | 170 | 140 | mighty +20% | eccentric −15% | role: berserker |
+### Low — 16 (seats 1–3, power 40–75, 90s–8m)
+
+| ID | Name | Elem | Pwr | Gold | XP | Crit |
+|----|------|------|-----|------|-----|------|
+| `named-raider` | The Named Raider | — | 55 | 24 | 32 | scout |
+| `brotherhood-whispers` | Eyes on the Brotherhood | dark | 50 | 22 | 30 | scout |
+| `rogue-greatwolf` | The Rogue Greatwolf | earth | 70 | 32 | 42 | earth |
+| `merchant-road` | Hold the Merchant Road | — | 60 | 28 | 36 | tank |
+| `marsh-sage` | Marsh Sage Before Dark | water | 40 | 14 | 20 | healer |
+| `bridge-gang` | The Bridge Gang | — | 65 | 30 | 38 | scout |
+| `wolves-at-fold` | Wolves at the Fold | earth | 45 | 18 | 24 | ranger |
+| `chapel-watch` | Watch at the Broken Chapel | light | 50 | 22 | 30 | cleric |
+| `night-letter` | The Night Letter | dark | 55 | 24 | 30 | scout |
+| `kings-cutpurses` | Cutpurses of the Old Road | air | 50 | 20 | 28 | air |
+| `fen-herders` | The Fen Herders | water | 60 | 26 | 34 | water |
+| `hill-forge` | Iron from the Hill Forge | earth | 70 | 34 | 42 | tank |
+| `windworn-boy` | The Windworn Boy | air | 75 | 36 | 44 | air |
+| `mill-vermin` | Vermin Under the Mill | earth | 40 | 16 | 22 | earth |
+| `east-palisade` | The East Palisade | fire | 65 | 28 | 36 | ranger |
+| `barrow-marks` | Mark the Barrow Stones | — | 45 | 18 | 26 | ranger |
+
+### Mid — 12 (seats 2–3, power 110–160, 12–40m)
+
+| ID | Name | Elem | Pwr | Gold | XP | Crit |
+|----|------|------|-----|------|-----|------|
+| `goblin-den` | Scour the Goblin Den | earth | 130 | 70 | 72 | berserker |
+| `brotherhood-infiltrate` | Infiltrate the Brotherhood | dark | 140 | 78 | 80 | scout |
+| `mountain-troll` | The Mountain Troll | earth | 150 | 85 | 88 | berserker |
+| `lesser-demon` | A Lesser Demon | fire | 160 | 92 | 94 | cleric |
+| `mire-lights` | Lights Over the Mire | water | 120 | 62 | 64 | water |
+| `ember-nest` | The Ember Nest | fire | 125 | 66 | 68 | mage |
+| `bandit-holdfast` | Break the Holdfast | — | 115 | 58 | 60 | warrior |
+| `barrow-wights` | Drive the Barrow Wights | dark | 145 | 80 | 82 | cleric |
+| `quenched-commission` | The Quenched Commission | earth | 110 | 55 | 58 | **set: forge-kin** |
+| `beastfolk-parley` | Moonlit Parley | air | 140 | 75 | 78 | paladin |
+| `chapel-desecration` | The Desecrated Nave | light | 135 | 72 | 74 | paladin |
+| `caravan-blood` | Blood on the Caravan | — | 120 | 64 | 66 | ranger |
+
+### High — 12 (seats 3–4, power 210–260, 50m–2h)
+
+| ID | Name | Elem | Pwr | Gold | XP | Crit |
+|----|------|------|-----|------|-----|------|
+| `vampire-hunt` | The Thing in the Cellar-Keep | dark | 240 | 150 | 128 | paladin |
+| `necromancer` | The Necromancer of Caldara | dark | 260 | 165 | 140 | archmage |
+| `miasma-wood` | Purify the Miasma Wood | earth | 220 | 130 | 112 | earth |
+| `glade-corruption` | Corruption at the Glade's Edge | dark | 250 | 155 | 132 | ranger |
+| `demon-watchfires` | The Demon Watchfires | fire | 230 | 145 | 122 | berserker |
+| `envoy-road` | The Envoy's Road | light | 210 | 125 | 108 | **set: sun-scripture** |
+| `sunken-reliquary` | The Sunken Reliquary | water | 220 | 140 | 118 | water |
+| `moonlight-retrieval` | The Moonlight Retrieval | dark | 240 | 150 | 128 | **set: moonlight-scripture** |
+| `frost-pass` | Frosthollow Pass | air | 230 | 142 | 120 | air |
+| `false-saint` | The False Saint | light | 250 | 158 | 134 | cleric |
+| `blood-debt` | The Blood-Debt Duel | fire | 235 | 148 | 124 | warrior |
+| `drowned-keep` | Tide in the Drowned Keep | water | 255 | 170 | 145 | water |
+
+### Extreme — 8 (seats 4, power 350–420, 2.5–4h)
+
+| ID | Name | Elem | Pwr | Gold | XP | Crit |
+|----|------|------|-----|------|-----|------|
+| `calamity-samara` | Subjugate Calamity: Samara | dark | 420 | 270 | 220 | archmage |
+| `adamant-mines` | Retake the Adamant Mines | earth | 380 | 240 | 200 | tank |
+| `unholy-impostor` | Find the Unholy Impostor | light | 360 | 225 | 185 | cleric |
+| `glade-path` | The Infiltration Path | dark | 400 | 255 | 210 | scout |
+| `general-alastor` | Whereabouts of General Alastor | fire | 390 | 250 | 205 | ranger |
+| `vault-wyrm` | Wyrm of the Deep Vault | earth | 370 | 235 | 195 | berserker |
+| `glade-survey` | Survey of the Dark Glade | dark | 350 | 220 | 180 | **set: glade-expedition** |
+| `pale-labyrinth` | The Pale Labyrinth | — | 410 | 265 | 225 | archmage |
 
 ### Reward Bands
 
-| Category | Gold | XP | Duration |
-|----------|------|-----|----------|
-| Short low | 10–16 | 18–24 | 90s–2m |
-| Short mid | 22–30 | 30–36 | 2–3m |
-| Short high | 34–42 | 40–46 | 4–5m |
-| Long | 80–170 | 80–140 | 1–3h |
+| Tier | Gold | XP | Duration | Crit tokens |
+|------|------|-----|----------|-------------|
+| Low | 14–36 | 20–44 | 90s–8m | 1 |
+| Mid | 55–92 | 58–94 | 12–40m | 1 |
+| High | 125–170 | 108–145 | 50m–2h | 2 |
+| Extreme | 220–270 | 180–225 | 2.5–4h | 3 |
 
 ---
 
@@ -590,12 +649,15 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 {
   id: string,
   name: string,
-  flavor: string,
+  flavor: string,            // card hook
+  lore: string,              // 2–4 sentence mini-lore
   durationMs: number,
-  long?: boolean,           // long quest = 2 tokens on crit
+  tier: "low" | "mid" | "high" | "extreme" | "world",
   element: ElementId | null,
-  power: number,            // team power requirement
-  teamSize: 2 | 3,
+  power: number,
+  teamMin: number,
+  teamMax: number,
+  art: string,               // imported image URL
   advantages: [{ type: "trait"|"role", id: string, pct: number }],
   hazards: [{ type: "trait"|"role", id: string, pct: number }],
   crit?: { type: "element"|"role"|"set", id: string, note: string },
@@ -604,36 +666,34 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 }
 ```
 
+Crit tokens: Low/Mid **1**, High **2**, Extreme **3**. Dispatch accepts any team size in `[teamMin, teamMax]`.
+
 ### Recommended Power Targets
 
 Design quests so intended teams land at **85–110% base** before modifiers:
 
-| Player stage | Typical 2-man eff | Typical 3-man eff | Suggested power range |
-|--------------|-------------------|-------------------|-----------------------|
-| Early (starters L1–3) | 50–70 | 75–105 | 30–70 (short only) |
-| Mid (1–2 recruits L1) | 80–120 | 120–160 | 60–100 (short), 140 (long 2-man) |
-| Late (legends L1) | 150–190 | 240–290 | 160–220 (long) |
-| Endgame (legends L5) | 170–230 | 300–350 | 220–280 (long cap) |
+| Tier | Seats | Suggested power | Typical party |
+|------|-------|-----------------|---------------|
+| Low | 1–3 | 40–90 | Starters / one recruit |
+| Mid | 2–3 | 110–180 | Mid-roster L1 |
+| High | 3–4 | 200–300 | Recruits + a legend |
+| Extreme | 4 | 340–450 | Glade-tier or leveled mid |
+| World | TBD | TBD | Prerequisite chain |
 
 ### Modifier Budget
 
-| Modifier | Typical range in existing quests |
-|----------|----------------------------------|
+| Modifier | Typical range |
+|----------|----------------|
 | Single advantage | +15% to +20% |
 | Single hazard | −15% to −30% |
-| Dual advantage (long) | +15% + +15% or +20% + +15% |
+| Dual advantage | +15% + +15% or +20% + +15% |
 | Full set synergy | +10% (automatic, not in template) |
 
 **Design rule:** Trait matchup should swing outcomes by ~15–30%. Power requirement handles raw scaling; traits handle flavor and team composition rewards.
 
-### Character-Specific Quest Ideas (schema extensions)
+### Character-Specific Quest Ideas (not wired)
 
-The current system has **no per-card quest requirements**, but you can simulate character quests via:
-
-1. **Trait/role crit** tied to one character's unique combo (e.g. `spearmaiden` advantage — only Elanor)
-2. **Set crit** for narrative arcs (already used for Sun Scripture, Glade Expedition)
-3. **Element + role pairing** that only one character satisfies (e.g. light + cleric = Sylas or Elanor)
-4. **Future:** add `requires?: string[]` (card IDs) or `requiresAny?: string[]` to quest template
+Seat ranges (`teamMin`/`teamMax`) are the current "character slots." Later: `requires?: string[]` / `requiresAny?: string[]` on the template. Until then, use trait/role/set crits.
 
 ### Level System Extension Ideas
 
@@ -657,9 +717,9 @@ Extended lore lives in `src/data/lore.ts`. Below: narrative hooks mapped to mech
 
 | Character | Lore thread | Quest hook ideas |
 |-----------|-------------|------------------|
-| **Hera** | Goblin raid orphan; Rubus the sparrow; oblivious to Cedric | Sparrow rescue (exists); goblin remnant hunt; Rubus leads to hidden cache (crit: kindhearted) |
+| **Hera** | Goblin raid orphan; Rubus the sparrow; oblivious to Cedric | Named Raider (exists); sparrow rescue still unused (`kindhearted`); Rubus leads to hidden cache |
 | **Caelan** | Shadow scout; sewing/pottery; knows Cedric's secret | Infiltration courier; mend supplies under siege (artisan +20%); expose a secret that hurts the party (secretive hazard) |
-| **Cedric** | Air ranger; forgetful; loves Hera | Wind rescue (exists); lost love letter delivery (forgetful hazard); prove himself to Hera (brave + resourceful) |
+| **Cedric** | Air ranger; forgetful; loves Hera | Windworn Boy (exists); lost love letter delivery (forgetful hazard); prove himself to Hera (brave + resourceful) |
 
 **Chain idea:** 3-part Hearthbound arc unlocking at full-set dispatch → reveals goblin raid truth.
 
@@ -850,11 +910,11 @@ Rarity is **not** on the sheet — infer from power + lore weight (Odin 100 = le
 
 After the roster changes, run this pass (do not ship cards without it):
 
-1. **Starter safety.** Hearthbound L1 (75 raw / 50 for a duo) must still clear Fever Herbs and Lost Sparrow, and still struggle on longs. Do not lower long-quest power just because a new legendary exists.
-2. **New-set coverage.** Compute L1 set total vs long quests (140–240). A 130-power set should need levels or a borrowed legend for Vault Wyrm; a 265 set should trivialise most longs — that is Glade's job, do not clone it.
+1. **Starter safety.** Hearthbound L1 (75 raw / 50 for a duo) must still clear Low 40–55, and still fail Mid/High/Extreme on power and seats. Do not lower Extreme power just because a new legendary exists.
+2. **New-set coverage.** Compute L1 set total vs Mid (110–160) and High (210–260). A 130-power set should need levels or a borrowed legend for High; Extreme is 4-seat and 350+. Do not clone Glade's 265 band.
 3. **Trait spotlight.** Add **0–2 quests** (or retune existing advantages/hazards) so each new unique trait appears at least once. Prefer the Unused Traits list in §7.
 4. **Crit hook.** One new crit of type `role`, `element`, or `set` that only this trio naturally hits (see Envoy's Road / Glade Survey).
-5. **Reward bands.** Stay inside §8 gold/XP tables. Short 10–42 gold; long 80–170.
+5. **Reward bands.** Stay inside §8 gold/XP tables. Low 14–36; Mid 55–92; High 125–170; Extreme 220–270.
 6. **Power targets.** Intended team at **85–110% base** before modifiers ([§9](#9-quest-design-guide)).
 7. **Refresh this file:** roster tables, set totals, unused traits, quest tables, footer counts.
 
@@ -864,7 +924,7 @@ After the roster changes, run this pass (do not ship cards without it):
 npx tsc --noEmit
 ```
 
-Then in the running app: Catalogue All + Set views, click-dossier lore highlights, dispatch a short quest with a new trait showing in the live % footer.
+Then in the running app: Catalogue All + Set views, click-dossier lore highlights, dispatch a Low quest with a new trait showing in the live % footer.
 
 ---
 
@@ -879,4 +939,4 @@ Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary"
 
 ---
 
-*Document version: save v12, 21 cards, 7 sets of 3, 18 quest templates, 47 traits. Update the counts in this line whenever they change.*
+*Document version: save v13, 21 cards, 7 sets of 3, 48 quest templates, 47 traits. Update the counts in this line whenever they change.*

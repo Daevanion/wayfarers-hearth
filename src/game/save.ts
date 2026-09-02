@@ -3,7 +3,7 @@ import { dateKey, makeBoard } from "./quests";
 import type { GameState } from "../types";
 
 export const SAVE_KEY = "wayfarers-hearth-board-v1";
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 
 export function createNewGame(): GameState {
   const now = Date.now();

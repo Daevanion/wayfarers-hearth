@@ -47,6 +47,8 @@ export const COMBAT_LABEL: Record<CombatId, string> = {
   magic: "Magic",
 };
 
+export const COMBAT_ORDER: CombatId[] = ["melee", "ranged", "magic"];
+
 export const ROLE_LABEL: Record<RoleId, string> = {
   healer: "Healer",
   scout: "Scout",
