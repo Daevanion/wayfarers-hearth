@@ -13,6 +13,12 @@ import reinhartDen from "../Assets/cards/reinhart_den.jpg";
 import elanorLightbearer from "../Assets/cards/elanor_lightbearer.jpg";
 import fenricValerand from "../Assets/cards/fenric_valerand.jpg";
 import seraphinaAurora from "../Assets/cards/seraphina_aurora.jpg";
+import aldenHollowgarth from "../Assets/cards/alden_hollowgarth.jpg";
+import eamonStoneseeker from "../Assets/cards/eamon_stoneseeker.jpg";
+import yvaineAshcroft from "../Assets/cards/yvaine_ashcroft.jpg";
+import auroraStarling from "../Assets/cards/aurora_starling.jpg";
+import corvusGrim from "../Assets/cards/corvus_grim.jpg";
+import serilla from "../Assets/cards/serilla.jpg";
 import cardBack from "../Assets/cards/back_cover_card.jpg";
 
 export const CARD_BACK = cardBack;
@@ -33,4 +39,10 @@ export const PORTRAITS = {
   "elanor-lightbearer": elanorLightbearer,
   "fenric-valerand": fenricValerand,
   "seraphina-aurora": seraphinaAurora,
+  "alden-hollowgarth": aldenHollowgarth,
+  "eamon-stoneseeker": eamonStoneseeker,
+  "yvaine-ashcroft": yvaineAshcroft,
+  "aurora-starling": auroraStarling,
+  "corvus-grim": corvusGrim,
+  serilla,
 } as const;

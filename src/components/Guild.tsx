@@ -1,13 +1,12 @@
 import { useMemo, useState } from "react";
 import { CARD_BY_ID } from "../data/cards";
-import { COMBAT_LABEL, ELEMENT_LABEL, ELEMENT_ORDER, ROLE_LABEL, ROLE_ORDER } from "../data/icons";
-import { cardPower, formatDuration, MAX_LEVEL, RARITY_LABEL, xpToNext } from "../game/formulas";
+import { ELEMENT_LABEL, ELEMENT_ORDER, ROLE_LABEL, ROLE_ORDER } from "../data/icons";
+import { cardPower, formatDuration } from "../game/formulas";
 import { isBusy, isExhausted } from "../game/quests";
 import { useGame } from "../store/GameContext";
 import type { ElementId, RoleId } from "../types";
 import { Modal } from "./Modal";
 import { PortraitCard } from "./PortraitCard";
-import { CombatBadges, ElementBadge, TraitChips } from "./StatIcons";
 
 type Status = "all" | "ready" | "out" | "resting";
 
@@ -16,8 +15,6 @@ export function Guild() {
   const [element, setElement] = useState<ElementId | "all">("all");
   const [role, setRole] = useState<RoleId | "all">("all");
   const [status, setStatus] = useState<Status>("all");
-  const inspecting = ui.inspecting ? state.cards.find((c) => c.id === ui.inspecting) : null;
-  const template = ui.inspecting ? CARD_BY_ID[ui.inspecting] : null;
 
   const company = useMemo(() => {
     return state.cards.filter((owned) => {
@@ -139,29 +136,6 @@ export function Guild() {
               </div>
             )}
           </section>
-
-          {inspecting && template ? (
-            <aside className="inspect-pane collection-inspect menu-fade-in">
-              <p className="kicker">{ROLE_LABEL[template.role]}</p>
-              <h3>{template.name}</h3>
-              <p className="adv-title">{template.title}</p>
-              <p>{template.flavor}</p>
-              <p className="muted">
-                {RARITY_LABEL[template.rarity]} · <ElementBadge element={template.element} labeled /> ·{" "}
-                {template.combat.map((c) => COMBAT_LABEL[c]).join(" / ")}
-              </p>
-              <p className="muted">
-                Rank {inspecting.level} · Power {cardPower(inspecting)}
-                {(() => {
-                  const need = xpToNext(inspecting.level);
-                  if (need == null) return ` · Peak rank (${MAX_LEVEL})`;
-                  return ` · ${inspecting.xp}/${need} XP`;
-                })()}
-              </p>
-              <CombatBadges combat={template.combat} labeled />
-              <TraitChips traits={template.traits} />
-            </aside>
-          ) : null}
         </div>
       </div>
     </Modal>

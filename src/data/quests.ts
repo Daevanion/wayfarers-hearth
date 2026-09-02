@@ -14,7 +14,10 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     element: null,
     power: 60,
     teamSize: 2,
-    advantages: [{ type: "trait", id: "charismatic", pct: 20 }],
+    advantages: [
+      { type: "trait", id: "charismatic", pct: 20 },
+      { type: "trait", id: "mercenary", pct: 15 },
+    ],
     hazards: [{ type: "trait", id: "hotheaded", pct: -25 }],
     crit: { type: "role", id: "scout", note: "A scout slips past the barricade and finds the toll chest." },
     gold: 22,
@@ -99,7 +102,10 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     power: 100,
     teamSize: 3,
     advantages: [{ type: "trait", id: "brave", pct: 20 }],
-    hazards: [{ type: "trait", id: "cowardly", pct: -30 }],
+    hazards: [
+      { type: "trait", id: "cowardly", pct: -30 },
+      { type: "trait", id: "sheltered", pct: -15 },
+    ],
     crit: { type: "element", id: "air", note: "An air-touched climber reads the gusts and reaches the boy first." },
     gold: 38,
     xp: 44,
@@ -159,7 +165,10 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
       { type: "trait", id: "charismatic", pct: 20 },
       { type: "trait", id: "graceful", pct: 15 },
     ],
-    hazards: [{ type: "trait", id: "battlehungry", pct: -30 }],
+    hazards: [
+      { type: "trait", id: "battlehungry", pct: -30 },
+      { type: "trait", id: "arrogant", pct: -15 },
+    ],
     crit: { type: "role", id: "paladin", note: "An oathkeeper's word carries; the envoy offers tribute as well as terms." },
     gold: 80,
     xp: 80,
@@ -244,6 +253,50 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     crit: { type: "role", id: "berserker", note: "The wyrm's hoard is pried loose while it reels." },
     gold: 170,
     xp: 140,
+  },
+  {
+    id: "quenched-commission",
+    name: "The Quenched Commission",
+    flavor:
+      "A village forge wants a master's eye on a cracked anvil before the next caravan. The work is honest. The road to it is not.",
+    durationMs: 3 * MIN,
+    element: "earth",
+    power: 70,
+    teamSize: 2,
+    advantages: [
+      { type: "trait", id: "artisan", pct: 20 },
+      { type: "trait", id: "protective", pct: 15 },
+    ],
+    hazards: [{ type: "trait", id: "overprotective", pct: -20 }],
+    crit: { type: "set", id: "forge-kin", note: "Kin of the anvil read the quench and restore the maker's mark." },
+    gold: 26,
+    xp: 34,
+  },
+  {
+    id: "moonlight-retrieval",
+    name: "The Moonlight Retrieval",
+    flavor:
+      "The Archbishop wants a lost artifact brought out of the Dark Glade before the next moon. The church will not say what it is, only who must go.",
+    durationMs: 150 * MIN,
+    long: true,
+    element: "dark",
+    power: 200,
+    teamSize: 3,
+    advantages: [
+      { type: "trait", id: "focused", pct: 15 },
+      { type: "trait", id: "lethal", pct: 15 },
+    ],
+    hazards: [
+      { type: "trait", id: "intolerant", pct: -25 },
+      { type: "trait", id: "hollow", pct: -15 },
+    ],
+    crit: {
+      type: "set",
+      id: "moonlight-scripture",
+      note: "The Scripture walks the glade it was assembled for; the artifact leaves with them.",
+    },
+    gold: 130,
+    xp: 110,
   },
 ];
 

@@ -33,7 +33,7 @@ export function CardDossier({
 
   function onArtEnter() {
     window.clearTimeout(hoverTimer.current);
-    hoverTimer.current = window.setTimeout(() => setArtOpen(true), 450);
+    hoverTimer.current = window.setTimeout(() => setArtOpen(true), 1500);
   }
 
   function onArtLeave() {

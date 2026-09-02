@@ -44,6 +44,10 @@ export const TRAITS: Record<string, TraitDef> = {
   beloved: { id: "beloved", name: "Beloved", good: true, blurb: "The people would follow her anywhere." },
   resolute: { id: "resolute", name: "Resolute", good: true, blurb: "Pain does not reach the decision." },
   martyr: { id: "martyr", name: "Martyr", good: false, blurb: "Spends herself to spare the rest." },
+  overprotective: { id: "overprotective", name: "Overprotective", good: false, blurb: "Keeps the young behind him when the road turns." },
+  intolerant: { id: "intolerant", name: "Intolerant", good: false, blurb: "Will not stand beside those she names other." },
+  arrogant: { id: "arrogant", name: "Arrogant", good: false, blurb: "The title sits easily; doubt does not." },
+  hollow: { id: "hollow", name: "Hollow", good: false, blurb: "No fear, no want, no warmth left to read." },
 };
 
 export function traitLabel(id: string): string {

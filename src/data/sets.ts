@@ -36,6 +36,20 @@ export const SETS: SetDef[] = [
     description:
       "A secret envoy carrying the demon king's weakness to the Citadel. Its leader knows this journey will be her last.",
   },
+  {
+    id: "forge-kin",
+    name: "Forge Kin",
+    members: ["alden-hollowgarth", "eamon-stoneseeker", "yvaine-ashcroft"],
+    description:
+      "A smith returned to the road for a newborn, the niece who would restore his name, and the tavern friend who never meant to walk this far.",
+  },
+  {
+    id: "moonlight-scripture",
+    name: "Moonlight Scripture",
+    members: ["aurora-starling", "corvus-grim", "serilla"],
+    description:
+      "A classified retrieval into the Dark Glade: a ruthless commander, a scythe-prince of the templars, and the church's buried trump.",
+  },
 ];
 
 export const SET_BY_ID = Object.fromEntries(SETS.map((s) => [s.id, s])) as Record<string, SetDef>;

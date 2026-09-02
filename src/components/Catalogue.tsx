@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { CARDS, CARD_BY_ID } from "../data/cards";
-import { COMBAT_LABEL, ROLE_LABEL } from "../data/icons";
 import { SETS } from "../data/sets";
-import { RARITY_LABEL } from "../game/formulas";
 import { useGame } from "../store/GameContext";
 import { Modal } from "./Modal";
 import { PortraitCard } from "./PortraitCard";
-import { CombatBadges, ElementBadge, TraitChips } from "./StatIcons";
 
 type CatalogueView = "all" | "set";
 
@@ -14,7 +11,6 @@ export function Catalogue() {
   const { state, ui, inspect, openCatalogue } = useGame();
   const [view, setView] = useState<CatalogueView>("all");
   const ownedIds = new Set(state.cards.map((c) => c.id));
-  const template = ui.inspecting ? CARD_BY_ID[ui.inspecting] : null;
 
   return (
     <Modal
@@ -92,22 +88,6 @@ export function Catalogue() {
               </div>
             </section>
           )}
-
-          {template ? (
-            <aside className="inspect-pane collection-inspect menu-fade-in">
-              <p className="kicker">{ROLE_LABEL[template.role]}</p>
-              <h3>{template.name}</h3>
-              <p className="adv-title">{template.title}</p>
-              <p>{template.flavor}</p>
-              <p className="muted">
-                {RARITY_LABEL[template.rarity]} · <ElementBadge element={template.element} labeled /> ·{" "}
-                {template.combat.map((c) => COMBAT_LABEL[c]).join(" / ")} · Power {template.power}
-                {ownedIds.has(template.id) ? "" : " · Not yet in the company"}
-              </p>
-              <CombatBadges combat={template.combat} labeled />
-              <TraitChips traits={template.traits} />
-            </aside>
-          ) : null}
         </div>
       </div>
     </Modal>

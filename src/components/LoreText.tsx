@@ -10,12 +10,12 @@ interface Mark {
 
 const ELEMENT_ALIASES: Record<ElementId, string[]> = {
   fire: ["Master of Fire", "Fire Mage", "Fire Berserker", "fire magic", "fiery", "Fire"],
-  water: ["Water Ranger", "water"],
+  water: ["Water Ranger", "Water Cleric", "water"],
   earth: ["Earth healer", "Earth Warrior", "earthen", "Earth"],
-  air: ["Air Ranger", "Air Warrior", "air"],
+  air: ["Air Ranger", "Air Warrior", "Air Scout", "air"],
   light: ["Light Cleric", "Light Paladin", "Light"],
-  dark: ["Dark Berserker", "dark aura", "dark glade", "darkness", "dark forests", "dark origins", "Dark"],
-  null: ["lacking elemental", "without relying on elemental", "elemental magic"],
+  dark: ["Dark Berserker", "Dark Mage", "dark aura", "dark glade", "darkness", "dark forests", "dark origins", "Dark"],
+  null: ["lacking elemental", "without relying on elemental", "without the need for elemental", "non elemental", "elemental magic"],
   wild: ["wild magic", "Wild"],
 };
 
@@ -24,7 +24,7 @@ const TRAIT_ALIASES: Record<string, string[]> = {
   steadfast: ["unbreakable vow", "steadfast"],
   oblivious: ["oblivious", "denseness"],
   perceptive: ["perceptive"],
-  artisan: ["sewing and pottery", "sewing", "pottery"],
+  artisan: ["sewing and pottery", "sewing", "pottery", "blacksmith", "smithing", "craftsmanship", "craftswoman"],
   secretive: ["closely guarded secrets", "secrets"],
   brave: ["bravery", "brave"],
   resourceful: ["resourcefulness", "resourceful", "quick thinking"],
@@ -41,13 +41,13 @@ const TRAIT_ALIASES: Record<string, string[]> = {
   prodigy: ["prodigious", "prodigy"],
   hotheaded: ["thorny exterior", "hot-headed", "hotheaded"],
   devout: ["holy order", "Bishop", "devout"],
-  protective: ["protector", "protective"],
+  protective: ["protector", "parental", "protective"],
   guiltridden: ["well of guilt", "guilt"],
   mighty: ["massive blade", "raw strength", "mighty"],
   cowardly: ["unapologetic coward", "coward", "skittish"],
   eccentric: ["eccentric", "bizarre"],
   lethal: ["highly lethal", "lethal"],
-  mercenary: ["merit and financial gain", "mercenary"],
+  mercenary: ["merit and financial gain", "mercenary", "coin purse", "lowest grade quests"],
   distrustful: ["untrusting", "distrusts", "distrustful"],
   legendary: ["living legend", "legendary"],
   scholarly: ["intellectual", "scholarly"],
@@ -63,6 +63,10 @@ const TRAIT_ALIASES: Record<string, string[]> = {
   beloved: ["cherished companions", "beloved"],
   resolute: ["resolute"],
   martyr: ["sacrificing", "lifespan", "martyr"],
+  overprotective: ["overprotectiveness", "overprotective"],
+  intolerant: ["hatred for all non human", "non human races", "intolerant"],
+  arrogant: ["arrogance", "arrogant"],
+  hollow: ["living weapon", "unfeeling", "detached", "hollow"],
 };
 
 function collectMarks(template: CardTemplate): Mark[] {

@@ -9,7 +9,7 @@ import type { BoardQuest } from "../types";
 import { DispatchModal } from "./DispatchModal";
 
 export function Plaza() {
-  const { state, now, resolve, ui } = useGame();
+  const { state, now, resolve, ui, openQuestBoard } = useGame();
   const sway = usePointerSway(14);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [pickerOut, setPickerOut] = useState(false);
@@ -31,20 +31,35 @@ export function Plaza() {
         </div>
       </div>
 
-      <div className={`quest-dock ${ui.questBoardOpen ? "open" : ""}`}>
-        {state.board.map((q, index) => (
-          <BountyChit
-            key={q.key}
-            quest={q}
-            now={now}
-            index={index}
-            onOpen={() => {
-              setPickerOut(false);
-              setOpenKey(q.key);
-            }}
-            onResolve={() => resolve(q.key)}
-          />
-        ))}
+      <div
+        className={`quest-board-layer ${ui.questBoardOpen ? "open" : ""}`}
+        aria-hidden={!ui.questBoardOpen}
+      >
+        <button
+          type="button"
+          className="quest-board-dim"
+          aria-label="Close quest board"
+          tabIndex={ui.questBoardOpen ? 0 : -1}
+          onClick={() => openQuestBoard(false)}
+        />
+        <div className="quest-board-frame">
+          <img className="quest-board-art" src={BACKGROUNDS.questboard} alt="" />
+          <div className="quest-dock">
+            {state.board.map((q, index) => (
+              <BountyChit
+                key={q.key}
+                quest={q}
+                now={now}
+                index={index}
+                onOpen={() => {
+                  setPickerOut(false);
+                  setOpenKey(q.key);
+                }}
+                onResolve={() => resolve(q.key)}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {openKey ? <DispatchModal questKey={openKey} leaving={pickerOut} onClose={closePicker} /> : null}

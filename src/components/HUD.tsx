@@ -1,4 +1,5 @@
 import { HUD_ICONS } from "../data/hud";
+import { playSfx } from "../game/audio";
 import { useGame } from "../store/GameContext";
 
 export function HUD() {
@@ -7,6 +8,12 @@ export function HUD() {
 
   const underway = state.board.filter((q) => q.status === "underway");
   const ready = underway.filter((q) => now >= q.endsAt).length;
+
+  function toggleBoard() {
+    const next = !ui.questBoardOpen;
+    if (next) playSfx("board");
+    openQuestBoard(next);
+  }
 
   return (
     <header className="hud map-hud">
@@ -38,12 +45,6 @@ export function HUD() {
         <span className="quest-raid">New bounties at midnight</span>
       </div>
       <div className="hud-actions">
-        <button
-          className={`ghost tiny ${ui.questBoardOpen ? "on" : ""}`}
-          onClick={() => openQuestBoard(!ui.questBoardOpen)}
-        >
-          Quest board
-        </button>
         <button className="ghost tiny" onClick={() => openTavern(true)}>
           Tavern
         </button>
@@ -53,6 +54,20 @@ export function HUD() {
         <button className="ghost tiny" onClick={() => openCatalogue(true)}>
           Full catalogue
         </button>
+      </div>
+      <div className="hud-questboard">
+        <button
+          type="button"
+          className={`questboard-btn ${ui.questBoardOpen ? "on" : ""}`}
+          aria-label="Quest Board"
+          aria-expanded={ui.questBoardOpen}
+          onClick={toggleBoard}
+        >
+          <img src={HUD_ICONS.questboard} alt="" />
+        </button>
+        <span className="hud-bubble" role="tooltip">
+          Quest Board
+        </span>
       </div>
     </header>
   );

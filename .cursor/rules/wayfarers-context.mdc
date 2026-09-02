@@ -1,0 +1,14 @@
+---
+description: Read the Wayfarer's Hearth design reference before changing cards, traits, quests, or balance.
+alwaysApply: true
+---
+
+# Wayfarer's Hearth — context
+
+Before adding characters, traits, or quests, read [docs/game-design-reference.md](docs/game-design-reference.md):
+
+- **§0 Session Handoff** — live loop, file map, hard rules
+- **§13 Character Intake Pipeline** — Excel (`lores.xlsx`) → cards/traits/lore → quest rebalance
+- **§2–§9** — formulas, power bands, unused traits, quest schema
+
+Writer sheet (outside repo): `c:\Users\daeva\Desktop\lores.xlsx`. Sets are always 3. Reuse trait IDs. Do not invent cards for leftover art. Do not revive Crossroads/Blacksmith. Adding cards does not bump `SAVE_VERSION` (12). Update the design reference when roster or quest counts change.
