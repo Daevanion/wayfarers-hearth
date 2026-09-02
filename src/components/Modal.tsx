@@ -7,6 +7,7 @@ export function Modal({
   children,
   wide,
   scene,
+  page,
   tone,
   className,
 }: {
@@ -16,6 +17,7 @@ export function Modal({
   children: ReactNode;
   wide?: boolean;
   scene?: string;
+  page?: string;
   tone?: "hearth" | "road" | "stage";
   className?: string;
 }) {
@@ -43,12 +45,13 @@ export function Modal({
   return (
     <div className={`modal-back ${leaving ? "out" : ""}`} onClick={requestClose} onMouseMove={sway} role="presentation">
       <section
-        className={`modal ${wide ? "wide" : ""} ${scene ? "has-scene" : ""} ${tone ? `scene-${tone}` : ""} ${className ?? ""} ${leaving ? "out" : ""}`}
+        className={`modal ${wide ? "wide" : ""} ${scene ? "has-scene" : ""} ${page ? "has-page" : ""} ${tone ? `scene-${tone}` : ""} ${className ?? ""} ${leaving ? "out" : ""}`}
         style={style}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label={title}
       >
+        {page ? <img className="modal-page-bg" src={page} alt="" /> : null}
         {scene ? (
           <>
             <div className="modal-scene" aria-hidden />

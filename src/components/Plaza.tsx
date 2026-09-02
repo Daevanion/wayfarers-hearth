@@ -43,7 +43,7 @@ export function Plaza() {
 
   function go(delta: number) {
     if (board.length === 0) return;
-    playSfx("flip");
+    playSfx("quest");
     setDir(delta > 0 ? "right" : "left");
     setIndex((i) => (i + delta + board.length) % board.length);
   }
@@ -62,6 +62,11 @@ export function Plaza() {
       <div className="map-frame">
         <div className="map-stage" ref={sway}>
           <img className="map-art" src={BACKGROUNDS.town3} alt="The valley and the town" />
+          <img
+            className={`map-art tavern-scene ${ui.tavernOpen ? "on" : ""}`}
+            src={BACKGROUNDS.tavern3}
+            alt=""
+          />
         </div>
       </div>
 
@@ -70,19 +75,28 @@ export function Plaza() {
       <div
         className={`quest-board-layer ${ui.questBoardOpen ? "open" : ""}`}
         aria-hidden={!ui.questBoardOpen}
+        inert={!ui.questBoardOpen ? true : undefined}
       >
         <button
           type="button"
           className="quest-board-dim"
           aria-label="Close quest board"
           tabIndex={ui.questBoardOpen ? 0 : -1}
+          disabled={!ui.questBoardOpen}
           onClick={() => openQuestBoard(false)}
         />
         <div className="quest-board-frame">
           <img className="quest-board-art" src={BACKGROUNDS.questboard} alt="" />
           <div className="quest-dock">
             {board.length > 1 ? (
-              <button type="button" className="quest-slide-btn prev" aria-label="Previous bounty" onClick={() => go(-1)}>
+              <button
+                type="button"
+                className="quest-slide-btn prev"
+                aria-label="Previous bounty"
+                disabled={!ui.questBoardOpen}
+                tabIndex={ui.questBoardOpen ? 0 : -1}
+                onClick={() => go(-1)}
+              >
                 ‹
               </button>
             ) : null}
@@ -95,6 +109,7 @@ export function Plaza() {
                   dir={dir}
                   index={index}
                   total={board.length}
+                  boardOpen={ui.questBoardOpen}
                   onOpen={() => {
                     setPickerOut(false);
                     setOpenKey(current.key);
@@ -106,7 +121,14 @@ export function Plaza() {
               )}
             </div>
             {board.length > 1 ? (
-              <button type="button" className="quest-slide-btn next" aria-label="Next bounty" onClick={() => go(1)}>
+              <button
+                type="button"
+                className="quest-slide-btn next"
+                aria-label="Next bounty"
+                disabled={!ui.questBoardOpen}
+                tabIndex={ui.questBoardOpen ? 0 : -1}
+                onClick={() => go(1)}
+              >
                 ›
               </button>
             ) : null}
@@ -125,6 +147,7 @@ function QuestCard({
   dir,
   index,
   total,
+  boardOpen,
   onOpen,
   onResolve,
 }: {
@@ -133,6 +156,7 @@ function QuestCard({
   dir: "left" | "right";
   index: number;
   total: number;
+  boardOpen: boolean;
   onOpen: () => void;
   onResolve: () => void;
 }) {
@@ -149,7 +173,8 @@ function QuestCard({
       <button
         type="button"
         className="quest-card-face"
-        disabled={!clickable}
+        disabled={!boardOpen || !clickable}
+        tabIndex={boardOpen && clickable ? 0 : -1}
         onClick={quest.status === "open" ? onOpen : ready ? onResolve : undefined}
       >
         <img className="quest-card-art" src={template.art} alt="" />

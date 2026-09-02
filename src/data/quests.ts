@@ -9,6 +9,7 @@ const kings = BACKGROUNDS.oldKingsRoad;
 const mire = BACKGROUNDS.mirefenCrossing;
 const ruins = BACKGROUNDS.ruinsCaldara;
 const goblin = BACKGROUNDS.goblinQuest;
+const caravan = BACKGROUNDS.caravan;
 
 /** Daily board draws 3 low, 2 mid, 1 high, 1 extreme. World templates are reserved. Character locks are not wired yet. */
 export const QUEST_TEMPLATES: QuestTemplate[] = [
@@ -527,7 +528,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     power: 120,
     teamMin: 2,
     teamMax: 3,
-    art: kings,
+    art: caravan,
     advantages: [{ type: "trait", id: "honorbound", pct: 20 }],
     hazards: [{ type: "trait", id: "vindictive", pct: -15 }],
     crit: { type: "role", id: "ranger", note: "A ranger cuts the false patrol's trail before the cloaks can be burned." },

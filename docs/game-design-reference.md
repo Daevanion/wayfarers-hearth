@@ -20,9 +20,9 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 
 ### What the player sees
 
-- Full-bleed swaying `town3.jpg` plaza
+- Full-bleed swaying `town3.jpg` plaza; Tavern swaps the plaza to swaying `tavern3.jpg` under a light dim (no book panel)
 - Quest Board icon (`questboard_icon.png`) opens the wooden board overlay
-- Board shows **one large quest card** at a time; slide with arrows or Left/Right (flip sfx). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma).
+- Board shows **one large quest card** at a time; slide with arrows or Left/Right (`quest_click.mp3`). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma).
 - Companies on the road appear as a **left-hand progress rail** (art, name, timer bar). Click for a full-view of the quest art with the assigned party.
 - Dispatch loadout uses the quest painting as the header, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
 - HUD: Gold, Tokens, Tavern, Collection, Full catalogue
@@ -31,7 +31,7 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 - Click a card in Collection or Catalogue → full dossier (Excel lore + highlighted elements/traits + titled stats)
 - Hover 1.5s on dossier art → full-size visual zoom (dim only; zoom 1× / 1.25× / 1.5×)
 - Opening draw: **Hearthbound trio** (Hera, Caelan, Cedric)
-- BGM: `src/Assets/sfx/thepire.mp3` then `src/Assets/sfx/troves.mp3`, looping
+- BGM: `src/Assets/sfx/thepire.mp3` then `src/Assets/sfx/whispering_elven_woods.mp3`, looping
 
 ### File map (content work)
 
@@ -598,7 +598,7 @@ Samara / Alastor appear in Extreme quest fiction only — no playable cards.
 | `quenched-commission` | The Quenched Commission | earth | 110 | 55 | 58 | **set: forge-kin** |
 | `beastfolk-parley` | Moonlit Parley | air | 140 | 75 | 78 | paladin |
 | `chapel-desecration` | The Desecrated Nave | light | 135 | 72 | 74 | paladin |
-| `caravan-blood` | Blood on the Caravan | — | 120 | 64 | 66 | ranger |
+| `caravan-blood` | Blood on the Caravan | — | 120 | 64 | 66 | ranger · `caravan.jpg` |
 
 ### High — 12 (seats 3–4, power 210–260, 50m–2h)
 

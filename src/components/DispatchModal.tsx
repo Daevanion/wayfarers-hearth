@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { BACKGROUNDS } from "../data/backgrounds";
 import { CARD_BY_ID } from "../data/cards";
 import {
   COMBAT_LABEL,
@@ -139,6 +140,7 @@ export function DispatchModal({
         role="dialog"
         aria-label={template.name}
       >
+        <img className="loadout-page-bg" src={BACKGROUNDS.questPage} alt="" />
         <header className="loadout-head">
           <img className="loadout-head-art" src={template.art} alt="" />
           <span className={`loadout-head-glow tier-${template.tier}`} aria-hidden />

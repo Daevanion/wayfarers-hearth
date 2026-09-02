@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import tavernScene from "../Assets/bg/tavern.jpg";
+import { useMemo, useState, type CSSProperties } from "react";
 import { CARD_BY_ID } from "../data/cards";
 import { HUD_ICONS } from "../data/hud";
 import { CARD_BACK } from "../data/portraits";
@@ -29,8 +28,6 @@ export function TavernShop() {
       kicker="The storefront"
       title="Tavern"
       onClose={() => openTavern(false)}
-      scene={tavernScene}
-      tone="hearth"
       className="tavern-modal"
     >
       <div className="tavern-shop">
@@ -46,9 +43,9 @@ export function TavernShop() {
           )}
         </div>
 
-        <div className="tavern-actions">
+        <div className="tavern-actions" style={{ ["--pack-back" as string]: `url(${CARD_BACK})` } as CSSProperties}>
           <button
-            className="pack-btn"
+            className="pack-btn road"
             type="button"
             disabled={state.gold < GOLD_PACK_COST}
             onClick={() => buy("gold")}
