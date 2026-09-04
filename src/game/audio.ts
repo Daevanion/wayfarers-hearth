@@ -27,10 +27,19 @@ const VOLUME: Record<SfxKind, number> = {
   quest: 0.58,
 };
 
+const ONE_SHOT: SfxKind[] = ["card", "flip", "ui", "board", "quest"];
+
 let tavernLoop: HTMLAudioElement | null = null;
 let menuBgm: HTMLAudioElement | null = null;
 let menuWanted = false;
 let bgmIndex = 0;
+let bgmDuck = 1;
+let sfxCtx: AudioContext | null = null;
+let sfxPreload: Promise<void> | null = null;
+const sfxBuffers: Partial<Record<SfxKind, AudioBuffer>> = {};
+const sfxNodes: Partial<Record<SfxKind, HTMLAudioElement[]>> = {};
+const sfxRaw: Partial<Record<SfxKind, ArrayBuffer>> = {};
+let sfxFetch: Promise<void> | null = null;
 
 const BGM_TRACKS = [thePire, whisperingWoods];
 
@@ -39,6 +48,103 @@ const BGM_KEY = "wayfarers-hearth-bgm";
 export interface BgmSettings {
   enabled: boolean;
   volume: number;
+}
+
+function sfxContext(): AudioContext {
+  if (!sfxCtx) {
+    const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    sfxCtx = new Ctor();
+  }
+  return sfxCtx;
+}
+
+function htmlPool(kind: SfxKind): HTMLAudioElement[] {
+  let pool = sfxNodes[kind];
+  if (!pool) {
+    const primed = new Audio(SRC[kind]);
+    primed.preload = "auto";
+    primed.volume = VOLUME[kind];
+    pool = [primed];
+    sfxNodes[kind] = pool;
+  }
+  return pool;
+}
+
+async function fetchSfx(): Promise<void> {
+  await Promise.all(
+    ONE_SHOT.map(async (kind) => {
+      htmlPool(kind);
+      if (sfxRaw[kind]) return;
+      try {
+        const res = await fetch(SRC[kind]);
+        sfxRaw[kind] = await res.arrayBuffer();
+      } catch {
+        /* HTMLAudio fallback stays armed */
+      }
+    }),
+  );
+}
+
+function ensureFetched(): Promise<void> {
+  if (!sfxFetch) sfxFetch = fetchSfx();
+  return sfxFetch;
+}
+
+async function decodeSfx(): Promise<void> {
+  await ensureFetched();
+  const ctx = sfxContext();
+  await Promise.all(
+    ONE_SHOT.map(async (kind) => {
+      const raw = sfxRaw[kind];
+      if (sfxBuffers[kind] || !raw) return;
+      try {
+        sfxBuffers[kind] = await ctx.decodeAudioData(raw.slice(0));
+      } catch {
+        /* HTMLAudio fallback stays armed */
+      }
+    }),
+  );
+}
+
+export function unlockAudio(): void {
+  const ctx = sfxContext();
+  if (ctx.state === "suspended") {
+    void ctx.resume();
+  }
+  if (!sfxPreload) sfxPreload = decodeSfx();
+}
+
+function playBuffered(kind: SfxKind): boolean {
+  const ctx = sfxCtx;
+  const buffer = sfxBuffers[kind];
+  if (!ctx || ctx.state !== "running" || !buffer) return false;
+  const src = ctx.createBufferSource();
+  src.buffer = buffer;
+  const gain = ctx.createGain();
+  gain.gain.value = VOLUME[kind];
+  src.connect(gain);
+  gain.connect(ctx.destination);
+  src.start(0);
+  return true;
+}
+
+function playHtml(kind: SfxKind): void {
+  const pool = htmlPool(kind);
+  let node = pool.find((audio) => audio.paused || audio.ended);
+  if (!node) {
+    node = pool[0].cloneNode(true) as HTMLAudioElement;
+    node.preload = "auto";
+    pool.push(node);
+  }
+  node.volume = VOLUME[kind];
+  try {
+    node.currentTime = 0;
+  } catch {
+    /* some browsers throw if the element is still loading */
+  }
+  void node.play().catch(() => {
+    /* wait for a later gesture */
+  });
 }
 
 export function loadBgmSettings(): BgmSettings {
@@ -88,7 +194,7 @@ function ensureMenuBgm(): HTMLAudioElement {
 
 function applyBgmSettings(settings: BgmSettings): void {
   const audio = ensureMenuBgm();
-  audio.volume = settings.volume;
+  audio.volume = settings.volume * bgmDuck;
   if (!settings.enabled || !menuWanted) {
     audio.pause();
     return;
@@ -96,6 +202,16 @@ function applyBgmSettings(settings: BgmSettings): void {
   void audio.play().catch(() => {
     /* wait for a gesture */
   });
+}
+
+export function duckMenuBgm(amount = 0.08): void {
+  bgmDuck = amount;
+  applyBgmSettings(loadBgmSettings());
+}
+
+export function restoreMenuBgm(): void {
+  bgmDuck = 1;
+  applyBgmSettings(loadBgmSettings());
 }
 
 export function startMenuBgm(): void {
@@ -113,11 +229,9 @@ export function playSfx(kind: SfxKind): void {
     startTavernAmbience();
     return;
   }
-  const audio = new Audio(SRC[kind]);
-  audio.volume = VOLUME[kind];
-  void audio.play().catch(() => {
-    /* browsers may block until a gesture; the click itself is the gesture */
-  });
+  unlockAudio();
+  if (playBuffered(kind)) return;
+  playHtml(kind);
 }
 
 export function startTavernAmbience(): void {
@@ -151,4 +265,9 @@ export function sfxFromEventTarget(target: EventTarget | null): SfxKind | null {
   if (el.closest(".quest-slide-btn")) return null;
   if (el.closest(".portrait-card, .adv-card, .adv-portrait-wrap, .slot-face")) return "card";
   return "ui";
+}
+
+if (typeof window !== "undefined") {
+  for (const kind of ONE_SHOT) htmlPool(kind);
+  void ensureFetched();
 }

@@ -12,6 +12,7 @@ import { SfxRoot } from "./components/SfxRoot";
 import { BgmRoot } from "./components/BgmRoot";
 import { Settings } from "./components/Settings";
 import { OpeningDraw } from "./components/OpeningDraw";
+import { VisualNovel } from "./components/VisualNovel";
 
 function Shell() {
   const { ui } = useGame();
@@ -19,6 +20,7 @@ function Shell() {
     return (
       <>
         <TitleScreen />
+        {ui.vnScene ? <VisualNovel /> : null}
         <Settings />
       </>
     );
@@ -35,6 +37,7 @@ function Shell() {
       <QuestResult />
       {ui.intro ? null : <Journal />}
       {ui.intro ? null : <Toasts />}
+      {ui.vnScene ? <VisualNovel /> : null}
       <Settings />
     </div>
   );

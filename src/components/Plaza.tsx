@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState, type ReactNode } from "react";
 import { BACKGROUNDS } from "../data/backgrounds";
 import { ELEMENT_ICON, ELEMENT_LABEL, TIME_ICON } from "../data/icons";
 import { QUEST_BY_ID } from "../data/quests";
-import { playSfx } from "../game/audio";
 import { formatDuration } from "../game/formulas";
 import { seatsLabel, TIER_LABEL } from "../game/quests";
 import { usePointerSway } from "../hooks/usePointerSway";
@@ -16,37 +15,11 @@ export function Plaza() {
   const sway = usePointerSway(14);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [pickerOut, setPickerOut] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [dir, setDir] = useState<"left" | "right">("right");
 
   const board = state.board;
-  const current = board[index] ?? board[0] ?? null;
-
-  useEffect(() => {
-    if (index >= board.length) setIndex(0);
-  }, [board.length, index]);
-
-  useEffect(() => {
-    if (!ui.questBoardOpen || openKey) return;
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        go(1);
-      } else if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        go(-1);
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [ui.questBoardOpen, openKey, board.length]);
-
-  function go(delta: number) {
-    if (board.length === 0) return;
-    playSfx("quest");
-    setDir(delta > 0 ? "right" : "left");
-    setIndex((i) => (i + delta + board.length) % board.length);
-  }
+  const available = board.filter((q) => q.status === "open" || (q.status === "underway" && now >= q.endsAt));
+  const progressing = board.filter((q) => q.status === "underway" && now < q.endsAt);
+  const completed = board.filter((q) => q.status === "done");
 
   function closePicker() {
     if (pickerOut) return;
@@ -55,6 +28,11 @@ export function Plaza() {
       setOpenKey(null);
       setPickerOut(false);
     }, 220);
+  }
+
+  function openQuest(quest: BoardQuest) {
+    setPickerOut(false);
+    setOpenKey(quest.key);
   }
 
   return (
@@ -67,7 +45,17 @@ export function Plaza() {
             src={BACKGROUNDS.tavern3}
             alt=""
           />
+          <img
+            className={`map-art collection-scene ${ui.guildOpen ? "on" : ""}`}
+            src={BACKGROUNDS.collection}
+            alt=""
+          />
         </div>
+        <img
+          className={`map-art questboard-scene ${ui.questBoardOpen ? "on" : ""}`}
+          src={BACKGROUNDS.questboard2}
+          alt=""
+        />
       </div>
 
       {ui.intro ? null : <QuestTrack hidden={Boolean(openKey)} />}
@@ -85,53 +73,44 @@ export function Plaza() {
           disabled={!ui.questBoardOpen}
           onClick={() => openQuestBoard(false)}
         />
-        <div className="quest-board-frame">
-          <img className="quest-board-art" src={BACKGROUNDS.questboard} alt="" />
-          <div className="quest-dock">
-            {board.length > 1 ? (
-              <button
-                type="button"
-                className="quest-slide-btn prev"
-                aria-label="Previous bounty"
-                disabled={!ui.questBoardOpen}
-                tabIndex={ui.questBoardOpen ? 0 : -1}
-                onClick={() => go(-1)}
-              >
-                ‹
-              </button>
-            ) : null}
-            <div className="quest-slide-stage">
-              {current ? (
+        <div className="quest-board-frame overview">
+          <div className="quest-overview">
+            <OverviewSection title="Currently available" empty="No open bounties." count={available.length}>
+              {available.map((quest) => (
                 <QuestCard
-                  key={`${current.key}-${dir}`}
-                  quest={current}
+                  key={quest.key}
+                  quest={quest}
                   now={now}
-                  dir={dir}
-                  index={index}
-                  total={board.length}
                   boardOpen={ui.questBoardOpen}
-                  onOpen={() => {
-                    setPickerOut(false);
-                    setOpenKey(current.key);
-                  }}
-                  onResolve={() => resolve(current.key)}
+                  onOpen={() => openQuest(quest)}
+                  onResolve={() => resolve(quest.key)}
                 />
-              ) : (
-                <p className="quest-empty">The board is bare until midnight.</p>
-              )}
-            </div>
-            {board.length > 1 ? (
-              <button
-                type="button"
-                className="quest-slide-btn next"
-                aria-label="Next bounty"
-                disabled={!ui.questBoardOpen}
-                tabIndex={ui.questBoardOpen ? 0 : -1}
-                onClick={() => go(1)}
-              >
-                ›
-              </button>
-            ) : null}
+              ))}
+            </OverviewSection>
+            <OverviewSection title="In progress" empty="No companies on the road." count={progressing.length}>
+              {progressing.map((quest) => (
+                <QuestCard
+                  key={quest.key}
+                  quest={quest}
+                  now={now}
+                  boardOpen={ui.questBoardOpen}
+                  onOpen={() => openQuest(quest)}
+                  onResolve={() => resolve(quest.key)}
+                />
+              ))}
+            </OverviewSection>
+            <OverviewSection title="Completed" empty="None finished today." count={completed.length}>
+              {completed.map((quest) => (
+                <QuestCard
+                  key={quest.key}
+                  quest={quest}
+                  now={now}
+                  boardOpen={ui.questBoardOpen}
+                  onOpen={() => openQuest(quest)}
+                  onResolve={() => resolve(quest.key)}
+                />
+              ))}
+            </OverviewSection>
           </div>
         </div>
       </div>
@@ -141,21 +120,34 @@ export function Plaza() {
   );
 }
 
+function OverviewSection({
+  title,
+  empty,
+  count,
+  children,
+}: {
+  title: string;
+  empty: string;
+  count: number;
+  children: ReactNode;
+}) {
+  return (
+    <section className="quest-overview-section">
+      <h3>{title}</h3>
+      {count > 0 ? <div className="quest-overview-grid">{children}</div> : <p className="quest-empty">{empty}</p>}
+    </section>
+  );
+}
+
 function QuestCard({
   quest,
   now,
-  dir,
-  index,
-  total,
   boardOpen,
   onOpen,
   onResolve,
 }: {
   quest: BoardQuest;
   now: number;
-  dir: "left" | "right";
-  index: number;
-  total: number;
   boardOpen: boolean;
   onOpen: () => void;
   onResolve: () => void;
@@ -163,59 +155,70 @@ function QuestCard({
   const template = QUEST_BY_ID[quest.templateId];
   if (!template) return null;
   const ready = quest.status === "underway" && now >= quest.endsAt;
+  const inProgress = quest.status === "underway" && !ready;
   const stateClass =
     quest.status === "done" ? "done" : ready ? "ready" : quest.status === "underway" ? "underway" : "open";
   const elementIcon = template.element ? ELEMENT_ICON[template.element] : null;
   const clickable = quest.status === "open" || ready;
 
   return (
-    <article className={`quest-card ${stateClass} tier-${template.tier} slide-${dir}`}>
+    <article className={`quest-card ${stateClass} tier-${template.tier} page-1`}>
       <button
         type="button"
         className="quest-card-face"
+        data-sfx={quest.status === "open" ? "quest" : undefined}
         disabled={!boardOpen || !clickable}
         tabIndex={boardOpen && clickable ? 0 : -1}
         onClick={quest.status === "open" ? onOpen : ready ? onResolve : undefined}
       >
-        <img className="quest-card-art" src={template.art} alt="" />
-        <span className="quest-card-veil" aria-hidden />
-        <span className={`quest-tier tier-${template.tier}`}>{TIER_LABEL[template.tier]}</span>
-        <span className="quest-card-copy">
-          <strong>{template.name}</strong>
-          <span className="quest-card-hook">{template.flavor}</span>
-          <span className="quest-card-facts">
-            <span className="quest-card-time">
-              <img src={TIME_ICON} alt="" />
-              {quest.status === "underway"
-                ? ready
-                  ? "Returned"
-                  : formatDuration(quest.endsAt - now)
-                : formatDuration(template.durationMs)}
-            </span>
-            {elementIcon ? (
-              <span className="quest-card-el">
-                <img src={elementIcon} alt="" />
-                {ELEMENT_LABEL[template.element!]}
+        <img className="quest-card-page" src={BACKGROUNDS.questPage1} alt="" />
+        <span className="quest-card-inner">
+          <span className="quest-card-art-frame">
+            <img className="quest-card-art" src={template.art} alt="" />
+            <span className="quest-card-veil" aria-hidden />
+            <span className={`quest-tier tier-${template.tier}`}>{TIER_LABEL[template.tier]}</span>
+            {inProgress ? (
+              <span className="quest-progress-mark">
+                <img src={TIME_ICON} alt="" />
+                <em>In progress</em>
               </span>
-            ) : (
-              <span className="quest-card-el">No affinity</span>
-            )}
-            <span>
-              {template.power} power · {seatsLabel(template)} seats
+            ) : null}
+            {quest.status === "done" ? <span className="quest-complete-mark">Quest Complete</span> : null}
+          </span>
+          <span className="quest-card-copy">
+            <strong>{template.name}</strong>
+            <span className="quest-card-hook">{template.flavor}</span>
+            <span className="quest-card-facts">
+              <span className="quest-card-time">
+                <img src={TIME_ICON} alt="" />
+                {quest.status === "underway"
+                  ? ready
+                    ? "Returned"
+                    : formatDuration(quest.endsAt - now)
+                  : formatDuration(template.durationMs)}
+              </span>
+              {elementIcon ? (
+                <span className="quest-card-el">
+                  <img src={elementIcon} alt="" />
+                  {ELEMENT_LABEL[template.element!]}
+                </span>
+              ) : (
+                <span className="quest-card-el">No affinity</span>
+              )}
+              <span>
+                {template.power} power · {seatsLabel(template)} seats
+              </span>
+            </span>
+            <span className="quest-card-state">
+              {quest.status === "open"
+                ? "Open bounty"
+                : quest.status === "done"
+                  ? "Done for today"
+                  : ready
+                    ? "Tap to hear the report"
+                    : `${quest.success}% odds`}
             </span>
           </span>
-          <span className="quest-card-state">
-            {quest.status === "open"
-              ? "Open bounty"
-              : quest.status === "done"
-                ? "Done for today"
-                : ready
-                  ? "Tap to hear the report"
-                  : `${quest.success}% odds`}
-          </span>
-        </span>
-        <span className="quest-card-count">
-          {index + 1} / {total}
         </span>
       </button>
     </article>

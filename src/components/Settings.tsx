@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { loadBgmSettings, saveBgmSettings, startMenuBgm, type BgmSettings } from "../game/audio";
+import { useGame } from "../store/GameContext";
 
 export function Settings() {
+  const { ui, grantDebugFunds, startVn } = useGame();
   const [open, setOpen] = useState(false);
   const [bgm, setBgm] = useState<BgmSettings>(() => loadBgmSettings());
   const box = useRef<HTMLDivElement>(null);
@@ -49,6 +51,24 @@ export function Settings() {
             />
             <em>{Math.round(bgm.volume * 100)}</em>
           </label>
+          <button
+            type="button"
+            className="settings-debug"
+            disabled={ui.screen !== "plaza"}
+            onClick={grantDebugFunds}
+          >
+            Debug: +1000 gold, +100 tokens
+          </button>
+          <button
+            type="button"
+            className="settings-debug"
+            onClick={() => {
+              setOpen(false);
+              startVn("hearthbound-arrival");
+            }}
+          >
+            Debug: Arrival dialogue
+          </button>
         </div>
       ) : null}
       <button

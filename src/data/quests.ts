@@ -10,6 +10,8 @@ const mire = BACKGROUNDS.mirefenCrossing;
 const ruins = BACKGROUNDS.ruinsCaldara;
 const goblin = BACKGROUNDS.goblinQuest;
 const caravan = BACKGROUNDS.caravan;
+const brotherhood = BACKGROUNDS.brotherhoodQuest1;
+const merchantRoad = BACKGROUNDS.merchantRoad;
 
 /** Daily board draws 3 low, 2 mid, 1 high, 1 extreme. World templates are reserved. Character locks are not wired yet. */
 export const QUEST_TEMPLATES: QuestTemplate[] = [
@@ -43,7 +45,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     power: 50,
     teamMin: 1,
     teamMax: 3,
-    art: woods,
+    art: brotherhood,
     advantages: [{ type: "trait", id: "secretive", pct: 20 }],
     hazards: [{ type: "trait", id: "forgetful", pct: -25 }],
     crit: { type: "role", id: "scout", note: "A scout copies a mark no checkpoint was meant to see." },
@@ -79,7 +81,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     power: 60,
     teamMin: 1,
     teamMax: 3,
-    art: kings,
+    art: merchantRoad,
     advantages: [{ type: "trait", id: "stalwart", pct: 15 }],
     hazards: [{ type: "trait", id: "greedy", pct: -20 }],
     crit: { type: "role", id: "tank", note: "A shield holds the wagon-line until the thieves melt back into the mile-stones." },

@@ -149,6 +149,25 @@ export function DispatchModal({
             <p className="kicker">{TIER_LABEL[template.tier]} bounty</p>
             <h3>{template.name}</h3>
             <p className="quest-flavor">{template.flavor}</p>
+            <ul className="quest-facts loadout-head-facts">
+              <li>
+                <img src={TIME_ICON} alt="" />
+                {formatDuration(template.durationMs)}
+              </li>
+              <li>
+                <strong>{template.power}</strong> power needed
+              </li>
+              <li>
+                {template.teamMin === template.teamMax
+                  ? `Team of ${template.teamMin}`
+                  : `Team of ${seatsLabel(template)}`}
+              </li>
+              {template.element ? (
+                <li className="quest-element">{ELEMENT_LABEL[template.element]} favored</li>
+              ) : (
+                <li>No affinity</li>
+              )}
+            </ul>
           </div>
           <button className="icon-btn loadout-close" type="button" onClick={onClose} aria-label="Close">
             ✕
@@ -157,22 +176,6 @@ export function DispatchModal({
 
         <div className="loadout-body">
           <p className="quest-lore">{template.lore}</p>
-
-          <ul className="quest-facts">
-            <li>
-              <img src={TIME_ICON} alt="" />
-              {formatDuration(template.durationMs)}
-            </li>
-            <li>
-              <strong>{template.power}</strong> power needed
-            </li>
-            <li>
-              {template.teamMin === template.teamMax
-                ? `Team of ${template.teamMin}`
-                : `Team of ${seatsLabel(template)}`}
-            </li>
-            {template.element ? <li className="quest-element">{ELEMENT_LABEL[template.element]} favored</li> : <li>No affinity</li>}
-          </ul>
 
           <div className="loadout-stats">
             <StatBlock title="Advantages" tone="good">

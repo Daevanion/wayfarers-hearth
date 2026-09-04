@@ -20,17 +20,20 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 
 ### What the player sees
 
-- Full-bleed swaying `town3.jpg` plaza; Tavern swaps the plaza to swaying `tavern3.jpg` under a light dim (no book panel)
-- Quest Board icon (`questboard_icon.png`) opens the wooden board overlay
-- Board shows **one large quest card** at a time; slide with arrows or Left/Right (`quest_click.mp3`). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma).
+- Full-bleed swaying `town3.jpg` plaza; Tavern swaps to swaying `tavern3.jpg`, Collection to swaying `collection_bg.jpg`, both under a light dim
+- HUD menu buttons (Tavern / Collection / Full catalogue) are thin-lined, slightly transparent plaques, set below the resource strip
+- Quest Board icon (`questboard_icon.png`) swaps the plaza to swaying `questboard_bg2.jpg` and lists available / in-progress / completed bounties. “Today’s bounties” is hidden while the board is open
+- Quest entries sit on `quest_page_1.png` parchment with the quest painting and bounty copy on top. The board painting does not sway. Click an open bounty to open assignment (`quest_click.mp3`). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma). Completed cards grey-green with “Quest Complete”; in-progress cards show the time mark. Returned bounties tap to resolve.
 - Companies on the road appear as a **left-hand progress rail** (art, name, timer bar). Click for a full-view of the quest art with the assigned party.
-- Dispatch loadout uses the quest painting as the header, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
+- Dispatch loadout uses the quest painting as the header with time, power needed, team size, and favor on it, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
 - HUD: Gold, Tokens, Tavern, Collection, Full catalogue
-- Collection = owned company (element / role / status filters)
+- Collection = owned company (All / Set views plus element / role / status filters), framed like the catalogue
 - Catalogue = all cards, owned or not (All / Set views)
 - Click a card in Collection or Catalogue → full dossier (Excel lore + highlighted elements/traits + titled stats)
 - Hover 1.5s on dossier art → full-size visual zoom (dim only; zoom 1× / 1.25× / 1.5×)
 - Opening draw: **Hearthbound trio** (Hera, Caelan, Cedric)
+- Visual novel: arrival scene (Hera / Cedric idle sprites, parchment box). Sprites stand on the bottom edge of the game display. Triggered from Settings for now; 2s lock before a line can be skipped
+- Tavern pack: fade in `pack_open3.mp4` and wait until the clip finishes, then a white fade to a sealed card on blurred `tavern3.jpg`. Name, title, and traits fade in after the click. 1s later, Back to Tavern / Go to Collection (opens that card’s dossier)
 - BGM: `src/Assets/sfx/thepire.mp3` then `src/Assets/sfx/whispering_elven_woods.mp3`, looping
 
 ### File map (content work)
@@ -567,7 +570,7 @@ Samara / Alastor appear in Extreme quest fiction only — no playable cards.
 | ID | Name | Elem | Pwr | Gold | XP | Crit |
 |----|------|------|-----|------|-----|------|
 | `named-raider` | The Named Raider | — | 55 | 24 | 32 | scout |
-| `brotherhood-whispers` | Eyes on the Brotherhood | dark | 50 | 22 | 30 | scout |
+| `brotherhood-whispers` | Eyes on the Brotherhood | dark | 50 | 22 | 30 | scout · `brotherhood_quest1.jpg` |
 | `rogue-greatwolf` | The Rogue Greatwolf | earth | 70 | 32 | 42 | earth |
 | `merchant-road` | Hold the Merchant Road | — | 60 | 28 | 36 | tank |
 | `marsh-sage` | Marsh Sage Before Dark | water | 40 | 14 | 20 | healer |

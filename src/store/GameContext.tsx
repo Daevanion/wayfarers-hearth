@@ -28,6 +28,9 @@ interface GameApi {
   openCatalogue: (open: boolean) => void;
   openTavern: (open: boolean) => void;
   openQuestBoard: (open: boolean) => void;
+  grantDebugFunds: () => void;
+  startVn: (sceneId: string) => void;
+  endVn: () => void;
   dismissToast: (id: string) => void;
 }
 
@@ -42,6 +45,7 @@ function emptyUi(partial: Partial<UiState> = {}): UiState {
     tavernOpen: false,
     questBoardOpen: false,
     intro: null,
+    vnScene: null,
     outcome: null,
     toasts: [],
     ...partial,
@@ -158,6 +162,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
       openCatalogue: (open) => setUi((u) => ({ ...u, catalogueOpen: open, guildOpen: false, tavernOpen: false })),
       openTavern: (open) => setUi((u) => ({ ...u, tavernOpen: open, guildOpen: false, catalogueOpen: false })),
       openQuestBoard: (open) => setUi((u) => ({ ...u, questBoardOpen: open })),
+      grantDebugFunds: () => {
+        setState((prev) => {
+          if (!prev) return prev;
+          return { ...prev, gold: prev.gold + 1000, tokens: prev.tokens + 100 };
+        });
+      },
+      startVn: (sceneId) =>
+        setUi((u) => ({
+          ...u,
+          vnScene: sceneId,
+          guildOpen: false,
+          catalogueOpen: false,
+          tavernOpen: false,
+          questBoardOpen: false,
+        })),
+      endVn: () => setUi((u) => ({ ...u, vnScene: null })),
       dismissToast: (id) => setUi((u) => ({ ...u, toasts: u.toasts.filter((t) => t.id !== id) })),
     };
   }, [state, ui, now, pushToast]);

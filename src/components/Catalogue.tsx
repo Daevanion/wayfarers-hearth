@@ -21,7 +21,8 @@ export function Catalogue() {
       className="collection-modal"
     >
       <div className="collection">
-        <div className="collection-toolbar">
+        <div className="collection-panel">
+          <div className="collection-toolbar">
           <div className="filter-row">
             <span>View</span>
             <div className="filter-chips">
@@ -33,11 +34,11 @@ export function Catalogue() {
               </button>
             </div>
           </div>
-        </div>
+          </div>
 
-        <div className="collection-body">
+          <div className="collection-body">
           {view === "all" ? (
-            <section key="catalogue-all" className="view-fade">
+            <section key="catalogue-all" className="view-fade collection-section">
               <h3 className="section-title">
                 All cards <em>{CARDS.length}</em>
               </h3>
@@ -88,6 +89,7 @@ export function Catalogue() {
               </div>
             </section>
           )}
+          </div>
         </div>
       </div>
     </Modal>

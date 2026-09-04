@@ -8,11 +8,16 @@ import whisperingWoods from "../Assets/bg/whispering_woods.jpg";
 import oldKingsRoad from "../Assets/bg/old_kings_road.jpg";
 import mirefenCrossing from "../Assets/bg/mirefen_crossing.jpg";
 import ruinsCaldara from "../Assets/bg/ruins_caldara.jpg";
-import questboard from "../Assets/bg/questboard_bg.png";
+import questboard2 from "../Assets/bg/questboard_bg2.jpg";
 import questPage from "../Assets/bg/quest_page_bg.png";
+import questPage1 from "../Assets/bg/quest_page_1.png";
+import questPage2 from "../Assets/bg/quest_page_2.png";
 import book from "../Assets/bg/book_bg.png";
 import goblinQuest from "../Assets/bg/goblinquest_bg.jpg";
 import caravan from "../Assets/bg/caravan.jpg";
+import collection from "../Assets/bg/collection_bg.jpg";
+import brotherhoodQuest1 from "../Assets/bg/brotherhood_quest1.jpg";
+import merchantRoad from "../Assets/bg/merchant_road.jpg";
 
 export const BACKGROUNDS = {
   town,
@@ -25,11 +30,16 @@ export const BACKGROUNDS = {
   oldKingsRoad,
   mirefenCrossing,
   ruinsCaldara,
-  questboard,
+  questboard2,
   questPage,
+  questPage1,
+  questPage2,
   book,
   goblinQuest,
   caravan,
+  collection,
+  brotherhoodQuest1,
+  merchantRoad,
 } as const;
 
 const LOCATION_SCENE: Record<string, string> = {

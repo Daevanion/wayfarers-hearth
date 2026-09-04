@@ -1,5 +1,4 @@
 import { HUD_ICONS } from "../data/hud";
-import { playSfx } from "../game/audio";
 import { useGame } from "../store/GameContext";
 
 export function HUD() {
@@ -10,9 +9,7 @@ export function HUD() {
   const ready = underway.filter((q) => now >= q.endsAt).length;
 
   function toggleBoard() {
-    const next = !ui.questBoardOpen;
-    if (next) playSfx("board");
-    openQuestBoard(next);
+    openQuestBoard(!ui.questBoardOpen);
   }
 
   return (
@@ -33,7 +30,7 @@ export function HUD() {
           <strong>{state.tokens}</strong>
         </li>
       </ul>
-      <div className="hud-day">
+      <div className={`hud-day ${ui.questBoardOpen ? "is-hidden" : ""}`} aria-hidden={ui.questBoardOpen}>
         <span className="quest-label">Today's bounties</span>
         <span className="quest-time">
           {underway.length === 0
@@ -45,13 +42,13 @@ export function HUD() {
         <span className="quest-raid">New bounties at midnight</span>
       </div>
       <div className="hud-actions">
-        <button className="ghost tiny" onClick={() => openTavern(true)}>
+        <button className={`menu-btn ${ui.tavernOpen ? "on" : ""}`} onClick={() => openTavern(true)}>
           Tavern
         </button>
-        <button className="ghost tiny" onClick={() => openGuild(true)}>
+        <button className={`menu-btn ${ui.guildOpen ? "on" : ""}`} onClick={() => openGuild(true)}>
           Collection
         </button>
-        <button className="ghost tiny" onClick={() => openCatalogue(true)}>
+        <button className={`menu-btn ${ui.catalogueOpen ? "on" : ""}`} onClick={() => openCatalogue(true)}>
           Full catalogue
         </button>
       </div>
@@ -59,6 +56,7 @@ export function HUD() {
         <button
           type="button"
           className={`questboard-btn ${ui.questBoardOpen ? "on" : ""}`}
+          data-sfx="board"
           aria-label="Quest Board"
           aria-expanded={ui.questBoardOpen}
           onClick={toggleBoard}

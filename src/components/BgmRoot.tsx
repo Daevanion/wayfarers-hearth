@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from "react";
-import { pauseMenuBgm, startMenuBgm } from "../game/audio";
+import { pauseMenuBgm, startMenuBgm, unlockAudio } from "../game/audio";
 import { useGame } from "../store/GameContext";
 
 export function BgmRoot({ children }: { children: ReactNode }) {
@@ -13,6 +13,7 @@ export function BgmRoot({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     function unlock() {
+      unlockAudio();
       if (onMenu) startMenuBgm();
     }
     document.addEventListener("pointerdown", unlock);

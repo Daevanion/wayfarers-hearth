@@ -54,7 +54,6 @@ export function OpeningDraw() {
 
   function draw() {
     if (beat !== "sealed" && beat !== "enter") return;
-    playSfx("flip");
     setBeat("spin");
   }
 

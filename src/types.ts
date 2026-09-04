@@ -165,6 +165,7 @@ export interface UiState {
   tavernOpen: boolean;
   questBoardOpen: boolean;
   intro: IntroPhase;
+  vnScene: string | null;
   outcome: QuestOutcome | null;
   toasts: Toast[];
 }
