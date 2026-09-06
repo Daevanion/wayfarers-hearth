@@ -60,6 +60,10 @@ export const ROLE_LABEL: Record<RoleId, string> = {
   archmage: "Archmage",
   warrior: "Warrior",
   paladin: "Paladin",
+  beasttamer: "Beast Tamer",
+  darkpaladin: "Dark Paladin",
+  swordsaint: "Sword Saint",
+  soulharvester: "Soul Harvester",
 };
 
 export const ROLE_ORDER: RoleId[] = [
@@ -73,6 +77,10 @@ export const ROLE_ORDER: RoleId[] = [
   "archmage",
   "warrior",
   "paladin",
+  "beasttamer",
+  "darkpaladin",
+  "swordsaint",
+  "soulharvester",
 ];
 
 export const ROLE_ICON: Partial<Record<RoleId, string>> = {

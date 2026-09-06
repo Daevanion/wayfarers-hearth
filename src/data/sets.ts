@@ -50,6 +50,21 @@ export const SETS: SetDef[] = [
     description:
       "A classified retrieval into the Dark Glade: a ruthless commander, a scythe-prince of the templars, and the church's buried trump.",
   },
+  {
+    id: "wolfcrag-exile",
+    name: "Wolfcrag Exile",
+    members: ["elowen-wolfcrag", "evander-wolfcrag", "eva-hearthgale"],
+    description:
+      "A cursed lycanthrope, the father who saved her, and the gale-whisperer who walks them to the elven border.",
+  },
+  {
+    id: "calamity-seal",
+    name: "Calamity Seal",
+    members: ["bran-bloodseeker", "marpha", "samara-blackheart"],
+    obtain: "quest",
+    description:
+      "Not sold at the tavern. A grieving paladin, the goddess who sealed the first darkness, and the calamity they must face again.",
+  },
 ];
 
 export const SET_BY_ID = Object.fromEntries(SETS.map((s) => [s.id, s])) as Record<string, SetDef>;

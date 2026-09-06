@@ -18,6 +18,9 @@ import caravan from "../Assets/bg/caravan.jpg";
 import collection from "../Assets/bg/collection_bg.jpg";
 import brotherhoodQuest1 from "../Assets/bg/brotherhood_quest1.jpg";
 import merchantRoad from "../Assets/bg/merchant_road.jpg";
+import brokenChapel from "../Assets/bg/broken_chapel.jpg";
+import corruptionEdge from "../Assets/bg/corruption_edge.jpg";
+import abyss from "../Assets/bg/abyss.jpg";
 
 export const BACKGROUNDS = {
   town,
@@ -40,6 +43,9 @@ export const BACKGROUNDS = {
   collection,
   brotherhoodQuest1,
   merchantRoad,
+  brokenChapel,
+  corruptionEdge,
+  abyss,
 } as const;
 
 const LOCATION_SCENE: Record<string, string> = {

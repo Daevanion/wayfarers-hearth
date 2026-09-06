@@ -2,7 +2,24 @@ import { CARD_BY_ID } from "../data/cards";
 import type { OwnedCard, Rarity } from "../types";
 
 export const MAX_LEVEL = 5;
-export const POWER_PER_LEVEL = 5;
+export const POWER_PER_LEVEL = 1;
+
+/** Player-facing rank. Fresh cards are 0 and show no mark. */
+export function shownLevel(level: number): number {
+  return Math.max(0, level - 1);
+}
+
+export function makeOwned(id: string): OwnedCard {
+  return { id, level: 1, xp: 0, exhaustedUntil: 0, duplicates: 0, duplicateXp: 0 };
+}
+
+export function normalizeOwned(card: OwnedCard): OwnedCard {
+  return {
+    ...card,
+    duplicates: card.duplicates ?? 0,
+    duplicateXp: card.duplicateXp ?? 0,
+  };
+}
 
 export const RARITY_LABEL: Record<Rarity, string> = {
   common: "Common",
@@ -20,7 +37,15 @@ export function xpToNext(level: number): number | null {
 
 export function cardPower(owned: OwnedCard): number {
   const base = CARD_BY_ID[owned.id]?.power ?? 0;
-  return base + (owned.level - 1) * POWER_PER_LEVEL;
+  return base + Math.max(0, owned.level - 1) * POWER_PER_LEVEL;
+}
+
+/** Spend banked duplicate likenesses into this card's XP. */
+export function spendDuplicateXp(owned: OwnedCard): { card: OwnedCard; leveled: boolean } {
+  const amount = owned.duplicateXp ?? 0;
+  if (amount <= 0) return { card: normalizeOwned(owned), leveled: false };
+  const { card, leveled } = grantXp(owned, amount);
+  return { card: { ...card, duplicates: 0, duplicateXp: 0 }, leveled };
 }
 
 /** Add XP and consume level-ups. Returns the new card and whether it leveled. */

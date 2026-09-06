@@ -1,9 +1,9 @@
-import { CARD_BY_ID, CARDS } from "../data/cards";
+import { CARD_BY_ID, TAVERN_CARDS } from "../data/cards";
 import { QUEST_BY_ID, QUEST_TEMPLATES } from "../data/quests";
 import { SET_BY_ID } from "../data/sets";
 import { ELEMENT_LABEL, ROLE_LABEL } from "../data/icons";
 import { traitLabel } from "../data/traits";
-import { cardPower, clamp, grantXp, uid } from "./formulas";
+import { cardPower, clamp, grantXp, makeOwned, uid } from "./formulas";
 import type {
   BoardQuest,
   CardTemplate,
@@ -348,9 +348,9 @@ export function buyPack(
   if (kind === "token" && state.tokens < TOKEN_PACK_COST) return { state, error: "No recruitment tokens." };
 
   const ownedIds = new Set(state.cards.map((c) => c.id));
-  let pool = CARDS;
+  let pool = TAVERN_CARDS;
   if (kind === "token") {
-    const unowned = CARDS.filter((c) => !ownedIds.has(c.id));
+    const unowned = TAVERN_CARDS.filter((c) => !ownedIds.has(c.id));
     if (unowned.length > 0) pool = unowned;
   }
   const pick = pool[Math.floor(Math.random() * pool.length)];
@@ -359,9 +359,13 @@ export function buyPack(
 
   let cards = state.cards;
   if (isNew) {
-    cards = [...cards, { id: pick.id, level: 1, xp: 0, exhaustedUntil: 0 }];
+    cards = [...cards, makeOwned(pick.id)];
   } else {
-    cards = cards.map((c) => (c.id === pick.id ? grantXp(c, dupeXp).card : c));
+    cards = cards.map((c) =>
+      c.id === pick.id
+        ? { ...c, duplicates: (c.duplicates ?? 0) + 1, duplicateXp: (c.duplicateXp ?? 0) + dupeXp }
+        : c,
+    );
   }
 
   let next: GameState = {
@@ -373,7 +377,9 @@ export function buyPack(
   next = log(
     next,
     "recruit",
-    isNew ? `${pick.name} joins the company.` : `Another likeness of ${pick.name} — ${dupeXp} XP.`,
+    isNew
+      ? `${pick.name} joins the company.`
+      : `Another likeness of ${pick.name} is held in reserve (${dupeXp} XP).`,
   );
   return { state: next, result: { cardId: pick.id, isNew, xp: isNew ? 0 : dupeXp } };
 }

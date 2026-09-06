@@ -12,6 +12,9 @@ const goblin = BACKGROUNDS.goblinQuest;
 const caravan = BACKGROUNDS.caravan;
 const brotherhood = BACKGROUNDS.brotherhoodQuest1;
 const merchantRoad = BACKGROUNDS.merchantRoad;
+const brokenChapel = BACKGROUNDS.brokenChapel;
+const corruptionEdge = BACKGROUNDS.corruptionEdge;
+const abyss = BACKGROUNDS.abyss;
 
 /** Daily board draws 3 low, 2 mid, 1 high, 1 extreme. World templates are reserved. Character locks are not wired yet. */
 export const QUEST_TEMPLATES: QuestTemplate[] = [
@@ -64,7 +67,10 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     teamMin: 1,
     teamMax: 3,
     art: woods,
-    advantages: [{ type: "trait", id: "perceptive", pct: 20 }],
+    advantages: [
+      { type: "trait", id: "perceptive", pct: 20 },
+      { type: "trait", id: "agile", pct: 15 },
+    ],
     hazards: [{ type: "trait", id: "cowardly", pct: -25 }],
     crit: { type: "element", id: "earth", note: "An earth-touched tracker reads the print and finds the den before dusk." },
     gold: 32,
@@ -137,7 +143,10 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     teamMax: 3,
     art: woods,
     advantages: [{ type: "trait", id: "steadfast", pct: 20 }],
-    hazards: [{ type: "trait", id: "cowardly", pct: -20 }],
+    hazards: [
+      { type: "trait", id: "cowardly", pct: -20 },
+      { type: "trait", id: "cursed", pct: -15 },
+    ],
     crit: { type: "role", id: "ranger", note: "A ranger turns the pack with a whistle the hills still remember." },
     gold: 18,
     xp: 24,
@@ -153,7 +162,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     power: 50,
     teamMin: 1,
     teamMax: 3,
-    art: ruins,
+    art: brokenChapel,
     advantages: [{ type: "trait", id: "devout", pct: 20 }],
     hazards: [{ type: "trait", id: "faithless", pct: -30 }],
     crit: { type: "role", id: "cleric", note: "A cleric reconsecrates the altar and finds the crypt tithe." },
@@ -492,6 +501,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     advantages: [
       { type: "trait", id: "charismatic", pct: 20 },
       { type: "trait", id: "graceful", pct: 15 },
+      { type: "trait", id: "beastmaster", pct: 15 },
     ],
     hazards: [
       { type: "trait", id: "battlehungry", pct: -30 },
@@ -536,6 +546,27 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     crit: { type: "role", id: "ranger", note: "A ranger cuts the false patrol's trail before the cloaks can be burned." },
     gold: 64,
     xp: 66,
+  },
+  {
+    id: "eastern-wood-crossing",
+    name: "The Eastern Wood Crossing",
+    flavor: "Walk a cursed girl and a whispered packet to the elven border. The woods will test who belongs.",
+    lore: "The eastern council promised sanctuary if the packet from Silver Gale reaches the standing oaks. The dark forest does not care about treaties. A cursed step, a father's shield, and a voice the beasts will heed are the only sure crossing. Arrive with the girl whole and the oaks will open. Arrive without her, and the pact is ash.",
+    durationMs: 28 * MIN,
+    tier: "mid",
+    element: "dark",
+    power: 125,
+    teamMin: 2,
+    teamMax: 3,
+    art: woods,
+    advantages: [
+      { type: "trait", id: "beastmaster", pct: 20 },
+      { type: "trait", id: "kindhearted", pct: 15 },
+    ],
+    hazards: [{ type: "trait", id: "cursed", pct: -20 }],
+    crit: { type: "set", id: "wolfcrag-exile", note: "The exiles deliver the packet and the oaks remember the pact." },
+    gold: 68,
+    xp: 70,
   },
 
   // — High (12), seats 3–4 —
@@ -604,7 +635,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     power: 250,
     teamMin: 3,
     teamMax: 4,
-    art: woods,
+    art: corruptionEdge,
     advantages: [{ type: "trait", id: "focused", pct: 15 }],
     hazards: [{ type: "trait", id: "cowardly", pct: -25 }],
     crit: { type: "role", id: "ranger", note: "A ranger's marks hold; the next survey will not have to guess the rim." },
@@ -892,7 +923,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     power: 350,
     teamMin: 4,
     teamMax: 4,
-    art: woods,
+    art: abyss,
     advantages: [
       { type: "trait", id: "legendary", pct: 20 },
       { type: "trait", id: "lethal", pct: 15 },

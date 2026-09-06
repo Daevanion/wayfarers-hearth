@@ -119,7 +119,9 @@ export function PackOpening({
 
   const showVideo = phase === "video" || phase === "white";
   const showCard = phase === "sealed" || phase === "reveal" || phase === "cta";
-  const note = result.isNew ? `${template.name} joins the company!` : `Another likeness — +${result.xp} XP`;
+  const note = result.isNew
+    ? `${template.name} joins the company!`
+    : `Another likeness held in reserve — ${result.xp} XP waiting`;
 
   return (
     <div className={`pack-open ${phase}`} role="dialog" aria-modal="true" aria-label="Opening a pack">

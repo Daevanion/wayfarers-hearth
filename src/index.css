@@ -194,8 +194,7 @@ button {
 .equip-card.clickable:hover,
 .slot-card:hover,
 .plaza-dock button:hover,
-.drop-btn:hover,
-.drop-list button:hover {
+.drop-btn:hover {
   transform: scale(1.055);
 }
 
@@ -393,7 +392,8 @@ button {
 }
 
 .modal-back:has(.tavern-modal),
-.modal-back:has(.collection-scene) {
+.modal-back:has(.collection-scene),
+.modal-back:has(.ledger-volume) {
   background: rgba(8, 12, 28, 0.32);
 }
 
@@ -1057,9 +1057,50 @@ button {
   align-items: start;
 }
 
+.dossier-art-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .dossier-art {
   position: relative;
   margin: 0;
+}
+
+.dossier-levelup {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.dossier-levelup .menu-btn {
+  min-width: 0;
+}
+
+.dossier-levelup-btn {
+  flex: 1;
+}
+
+.dossier-levelup-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+
+.dossier-dupe-count {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  padding: 7px 10px;
+  pointer-events: none;
+}
+
+.dossier-level-mark {
+  left: 10px;
+  bottom: 10px;
+  top: auto;
 }
 
 .dossier-art-hit {
@@ -2025,6 +2066,11 @@ p.muted.tight {
   animation: drop-in 0.18s ease;
   max-height: 240px;
   overflow: auto;
+  scrollbar-width: none;
+}
+
+.drop-list::-webkit-scrollbar {
+  display: none;
 }
 
 .drop-list button {
@@ -2035,6 +2081,10 @@ p.muted.tight {
   color: inherit;
   padding: 7px 8px;
   border-radius: 6px;
+}
+
+.drop-list button:hover {
+  transform: none;
 }
 
 .drop-list button.on {
@@ -2369,6 +2419,43 @@ p.muted.tight {
     inset 0 0 0 1px rgba(255, 244, 214, 0.42);
 }
 
+.collection-modal.ledger-volume {
+  width: min(1080px, 100%);
+  max-height: min(88vh, 900px);
+  padding-left: 6px;
+}
+
+.collection-modal.ledger-volume::before {
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  clip-path: none;
+  background: #3d2918;
+  box-shadow: inset -1px 0 0 #c4a15a;
+}
+
+.collection-modal.ledger-volume::after {
+  display: none;
+}
+
+.collection-modal.ledger-volume .modal-head {
+  padding-top: 16px;
+}
+
+.collection-modal.ledger-volume .modal-body {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ledger-volume .collection,
+.ledger-volume .collection-panel {
+  flex: 1;
+  min-height: 0;
+}
+
 .collection-modal::before,
 .collection-modal::after {
   background: #c4a15a;
@@ -2523,6 +2610,127 @@ p.muted.tight {
   border-bottom: 1px solid rgba(90, 70, 51, 0.28);
 }
 
+.ledger-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  z-index: 6;
+}
+
+.ledger-volume .collection-body {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+  scrollbar-width: none;
+}
+
+.ledger-volume .collection-body::-webkit-scrollbar {
+  display: none;
+}
+
+.collection-modal.ledger-volume .ledger-toolbar .chip,
+.collection-modal.ledger-volume .ledger-drops .drop-btn {
+  border: 1px solid rgba(201, 162, 39, 0.48);
+  border-radius: 2px;
+  background: rgba(12, 16, 32, 0.38);
+  color: #f4ebd6;
+  font-family: Cinzel, serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  box-shadow: none;
+}
+
+.collection-modal.ledger-volume .ledger-toolbar .chip {
+  padding: 7px 16px;
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+.collection-modal.ledger-volume .ledger-toolbar .chip:hover,
+.collection-modal.ledger-volume .ledger-drops .drop-btn:hover {
+  transform: translateY(1px);
+  border-color: rgba(201, 162, 39, 0.78);
+  background: rgba(12, 16, 32, 0.52);
+}
+
+.collection-modal.ledger-volume .ledger-toolbar .chip.on,
+.collection-modal.ledger-volume .ledger-drops .drop-btn[aria-expanded="true"] {
+  color: var(--gold);
+  border-color: rgba(201, 162, 39, 0.85);
+  background: rgba(12, 16, 32, 0.58);
+}
+
+.ledger-drops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 280px;
+}
+
+.ledger-drops .drop {
+  flex: 0 1 148px;
+  min-width: 124px;
+}
+
+.ledger-drops .drop-btn {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 12px;
+}
+
+.ledger-drops .drop-btn span {
+  font-size: 0.58rem;
+  color: rgba(244, 235, 214, 0.72);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+
+.ledger-drops .drop-btn strong {
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+.ledger-drops .drop-list {
+  min-width: 148px;
+  max-height: 240px;
+  overflow: auto;
+  padding: 4px;
+  border-radius: 2px;
+  background: rgba(12, 16, 32, 0.92);
+  border: 1px solid rgba(201, 162, 39, 0.48);
+  box-shadow: none;
+  scrollbar-width: none;
+}
+
+.ledger-drops .drop-list::-webkit-scrollbar {
+  display: none;
+}
+
+.ledger-drops .drop-list button {
+  padding: 6px 8px;
+  font-size: 0.74rem;
+  color: #f4ebd6;
+  border-radius: 2px;
+}
+
+.ledger-drops .drop-list button:hover {
+  transform: none;
+  background: rgba(12, 16, 32, 0.52);
+  border-color: transparent;
+}
+
+.ledger-drops .drop-list button.on {
+  background: rgba(12, 16, 32, 0.58);
+  color: var(--gold);
+}
+
 .filter-row {
   display: flex;
   align-items: flex-start;
@@ -2592,6 +2800,15 @@ p.muted.tight {
     inset 0 0 0 1px rgba(255, 244, 214, 0.42);
 }
 
+.ledger-volume .collection-panel {
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 4px 4px 8px;
+  gap: 18px;
+}
+
 .modal.collection-scene .collection-panel {
   background: rgba(12, 10, 8, 0.42);
   box-shadow:
@@ -2604,6 +2821,72 @@ p.muted.tight {
   padding: 12px 12px 14px;
   border: 1px solid rgba(196, 161, 90, 0.55);
   box-shadow: inset 0 0 0 1px rgba(255, 244, 214, 0.16);
+}
+
+.ledger-page {
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.ledger-page .section-title {
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(90, 61, 34, 0.28);
+}
+
+.fellowship-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.fellowship header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.fellowship header strong {
+  font-family: Cinzel, serif;
+  color: #1c160e;
+}
+
+.fellowship header span {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: #5a3c16;
+}
+
+.fellowship .muted.tight {
+  margin: 4px 0 12px;
+}
+
+.fellowship-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 168px));
+  gap: 14px;
+  justify-content: start;
+}
+
+.vacant-frame {
+  aspect-ratio: 2 / 3;
+  border: 1px solid #6a5428;
+  background: #3d2918;
+  overflow: hidden;
+}
+
+.vacant-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.42;
+  filter: grayscale(0.35);
+}
+
+.collection-card.vacant {
+  pointer-events: none;
 }
 
 .modal.collection-scene .collection-section,
@@ -3682,7 +3965,8 @@ p.muted.tight {
 
 /* On-frame card overlays */
 .frame-element,
-.frame-power {
+.frame-power,
+.frame-level {
   position: absolute;
   top: 6px;
   z-index: 3;
@@ -3720,14 +4004,34 @@ p.muted.tight {
   color: var(--gold);
 }
 
+.frame-level {
+  top: auto;
+  left: 6px;
+  bottom: 6px;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 2px;
+  background: rgba(10, 14, 26, 0.72);
+  box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.45);
+  font-family: Cinzel, serif;
+  font-size: 0.72rem;
+  color: var(--gold);
+}
+
 .size-compact .frame-element,
-.size-compact .frame-power {
+.size-compact .frame-power,
+.size-compact .frame-level {
   transform: scale(0.82);
   transform-origin: top left;
 }
 
 .size-compact .frame-power {
   transform-origin: top right;
+}
+
+.size-compact .frame-level {
+  transform-origin: bottom left;
 }
 
 .zoom-stats {
@@ -4340,19 +4644,36 @@ p.muted.tight {
 }
 
 .odds-power {
-  margin: 0 0 4px;
-  font-size: 0.8rem;
-  color: #4a4034;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin: 0 0 8px;
+  font-family: Cinzel, serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5a3c16;
 }
 
 .odds-power strong {
-  font-family: Cinzel, serif;
+  font-size: 1.7rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
   color: var(--gold-deep);
+}
+
+.odds-power .odds-need {
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: #3a2410;
 }
 
 .odds-power em {
   font-style: normal;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
   color: var(--blue-ribbon);
 }
 
@@ -5732,7 +6053,8 @@ p.muted.tight {
   }
   .loadout-stats,
   .loadout-drops,
-  .loadout-pick {
+  .loadout-pick,
+  .fellowship-row {
     grid-template-columns: 1fr;
   }
   .loadout-head {

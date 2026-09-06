@@ -18,7 +18,13 @@ export type RoleId =
   | "berserker"
   | "archmage"
   | "warrior"
-  | "paladin";
+  | "paladin"
+  | "beasttamer"
+  | "darkpaladin"
+  | "swordsaint"
+  | "soulharvester";
+
+export type ObtainId = "tavern" | "quest";
 
 export type CombatId = "melee" | "ranged" | "magic";
 
@@ -49,6 +55,8 @@ export interface CardTemplate {
   flavor: string;
   accent: string;
   portrait?: string;
+  /** Default tavern. Quest cards never roll from packs. */
+  obtain?: ObtainId;
 }
 
 export interface SetDef {
@@ -56,6 +64,7 @@ export interface SetDef {
   name: string;
   members: string[];
   description: string;
+  obtain?: ObtainId;
 }
 
 export interface OwnedCard {
@@ -63,6 +72,8 @@ export interface OwnedCard {
   level: number;
   xp: number;
   exhaustedUntil: number;
+  duplicates: number;
+  duplicateXp: number;
 }
 
 export interface QuestModRef {

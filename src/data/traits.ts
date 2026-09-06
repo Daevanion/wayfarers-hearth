@@ -48,6 +48,10 @@ export const TRAITS: Record<string, TraitDef> = {
   intolerant: { id: "intolerant", name: "Intolerant", good: false, blurb: "Will not stand beside those she names other." },
   arrogant: { id: "arrogant", name: "Arrogant", good: false, blurb: "The title sits easily; doubt does not." },
   hollow: { id: "hollow", name: "Hollow", good: false, blurb: "No fear, no want, no warmth left to read." },
+  agile: { id: "agile", name: "Agile", good: true, blurb: "Finds the gap before the blow lands." },
+  cursed: { id: "cursed", name: "Cursed", good: false, blurb: "The change comes when she can least afford it." },
+  beastmaster: { id: "beastmaster", name: "Beastmaster", good: true, blurb: "The woods answer when she speaks." },
+  reckless: { id: "reckless", name: "Reckless", good: false, blurb: "Grief spends him faster than any blade." },
 };
 
 export function traitLabel(id: string): string {

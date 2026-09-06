@@ -1,6 +1,8 @@
 import { useState, type CSSProperties, type MouseEvent } from "react";
 import { ELEMENT_ICON, ELEMENT_LABEL, ROLE_LABEL } from "../data/icons";
 import { CARD_BACK } from "../data/portraits";
+import { shownLevel } from "../game/formulas";
+import { useGame } from "../store/GameContext";
 import type { CardTemplate } from "../types";
 import { CardDossier } from "./CardDossier";
 import { CardZoom } from "./CardZoom";
@@ -31,9 +33,11 @@ export function PortraitCard({
   onClick?: () => void;
   onHover?: (active: boolean) => void;
 }) {
+  const { state } = useGame();
   const [tilt, setTilt] = useState({ rx: 0, ry: 0, x: 50, y: 50, on: false });
   const [dossierOpen, setDossierOpen] = useState(false);
   const shown = Boolean(owned) || Boolean(reveal);
+  const rank = shownLevel(state.cards.find((card) => card.id === template.id)?.level ?? 1);
   const art = shown && template.portrait ? template.portrait : CARD_BACK;
   const shownPower = power ?? template.power;
   const elementIcon = ELEMENT_ICON[template.element];
@@ -101,6 +105,11 @@ export function PortraitCard({
           <span className="frame-power" title="Power">
             {shownPower}
           </span>
+          {rank > 0 ? (
+            <span className="frame-level" title={`Level ${rank}`}>
+              {rank}
+            </span>
+          ) : null}
         </>
       ) : null}
       <span className="portrait-shine" aria-hidden />

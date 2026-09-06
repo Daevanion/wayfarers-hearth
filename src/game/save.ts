@@ -1,4 +1,5 @@
 import { STARTER_IDS } from "../data/cards";
+import { makeOwned, normalizeOwned } from "./formulas";
 import { dateKey, makeBoard } from "./quests";
 import type { GameState } from "../types";
 
@@ -12,7 +13,7 @@ export function createNewGame(): GameState {
     version: SAVE_VERSION,
     gold: 30,
     tokens: 0,
-    cards: STARTER_IDS.map((id) => ({ id, level: 1, xp: 0, exhaustedUntil: 0 })),
+    cards: STARTER_IDS.map((id) => makeOwned(id)),
     boardDate: day,
     board: makeBoard(day),
     journal: [
@@ -33,7 +34,10 @@ export function loadSave(): GameState | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as GameState;
     if (!parsed || parsed.version !== SAVE_VERSION) return null;
-    return parsed;
+    return {
+      ...parsed,
+      cards: (parsed.cards ?? []).map(normalizeOwned),
+    };
   } catch {
     return null;
   }

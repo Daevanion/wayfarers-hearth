@@ -14,9 +14,9 @@ const ELEMENT_ALIASES: Record<ElementId, string[]> = {
   earth: ["Earth healer", "Earth Warrior", "earthen", "Earth"],
   air: ["Air Ranger", "Air Warrior", "Air Scout", "air"],
   light: ["Light Cleric", "Light Paladin", "Light"],
-  dark: ["Dark Berserker", "Dark Mage", "dark aura", "dark glade", "darkness", "dark forests", "dark origins", "Dark"],
-  null: ["lacking elemental", "without relying on elemental", "without the need for elemental", "non elemental", "elemental magic"],
-  wild: ["wild magic", "Wild"],
+  dark: ["Dark Paladin", "Dark attuned", "Dark Berserker", "Dark Mage", "dark aura", "dark glade", "darkness", "dark forests", "dark origins", "Dark"],
+  null: ["lacking elemental", "without relying on elemental", "without the need for elemental", "non elemental", "without elemental magic", "elemental magic"],
+  wild: ["goddess of the wild", "Wild element", "wild magic", "Wild"],
 };
 
 const TRAIT_ALIASES: Record<string, string[]> = {
@@ -33,7 +33,7 @@ const TRAIT_ALIASES: Record<string, string[]> = {
   nurturing: ["adopted daughter", "took in", "nurturing"],
   reclusive: ["solitary", "isolation", "reclusive"],
   focused: ["focused", "singular focus"],
-  honorbound: ["debt of life", "honorbound"],
+  honorbound: ["blood oath", "debt of life", "honorbound"],
   vindictive: ["vindictive"],
   charismatic: ["charisma", "charismatic"],
   stalwart: ["stood his ground", "stalwart"],
@@ -51,7 +51,7 @@ const TRAIT_ALIASES: Record<string, string[]> = {
   distrustful: ["untrusting", "distrusts", "distrustful"],
   legendary: ["living legend", "legendary"],
   scholarly: ["intellectual", "scholarly"],
-  scheming: ["ulterior motives", "shrouded in secrecy", "scheming"],
+  scheming: ["ulterior motives", "shrouded in complete mystery", "shrouded in secrecy", "scheming"],
   fearless: ["fearless"],
   battlehungry: ["thrill of meeting powerful warriors", "battle-hungry"],
   graceful: ["graceful"],
@@ -62,11 +62,15 @@ const TRAIT_ALIASES: Record<string, string[]> = {
   faithless: ["zero faith", "non believer", "faithless"],
   beloved: ["cherished companions", "beloved"],
   resolute: ["resolute"],
-  martyr: ["sacrificing", "lifespan", "martyr"],
+  martyr: ["sacrifice", "sacrificing", "lifespan", "martyr"],
   overprotective: ["overprotectiveness", "overprotective"],
   intolerant: ["hatred for all non human", "non human races", "intolerant"],
   arrogant: ["arrogance", "arrogant"],
   hollow: ["living weapon", "unfeeling", "detached", "hollow"],
+  agile: ["natural agility", "agility", "agile"],
+  cursed: ["cursed child", "terrible curse", "cursed"],
+  beastmaster: ["Beast Master of the Gale", "converse directly with the creatures", "beast tamer", "beastmaster"],
+  reckless: ["reckless abandon", "raw desperation", "reckless"],
 };
 
 function collectMarks(template: CardTemplate): Mark[] {
@@ -89,6 +93,11 @@ function collectMarks(template: CardTemplate): Mark[] {
     { term: "Warrior", className: "lore-mark lore-role" },
     { term: "Paladin", className: "lore-mark lore-role" },
     { term: "Arch Mage", className: "lore-mark lore-role" },
+    { term: "Beast Tamer", className: "lore-mark lore-role" },
+    { term: "Tank", className: "lore-mark lore-role" },
+    { term: "Dark Paladin", className: "lore-mark lore-role" },
+    { term: "Sword Saint", className: "lore-mark lore-role" },
+    { term: "Soul Harvester", className: "lore-mark lore-role" },
   );
   for (const id of template.traits) {
     const def = TRAITS[id];

@@ -1,4 +1,5 @@
-import type { CardTemplate } from "../types";
+import type { CardTemplate, RoleId } from "../types";
+import { ROLE_ORDER } from "./icons";
 import { PORTRAITS } from "./portraits";
 
 export const STARTER_IDS = ["hera-starfall", "caelan-featherfoot", "cedric-oakmont"] as const;
@@ -353,6 +354,128 @@ export const CARDS: CardTemplate[] = [
     accent: "#9aa0a8",
     portrait: PORTRAITS.serilla,
   },
+
+  // — Wolfcrag Exile —
+  {
+    id: "elowen-wolfcrag",
+    name: "Elowen Wolfcrag",
+    title: "The Cursed Child",
+    element: "dark",
+    role: "scout",
+    combat: ["melee"],
+    power: 25,
+    rarity: "common",
+    traits: ["kindhearted", "agile", "cursed"],
+    setId: "wolfcrag-exile",
+    flavor:
+      "A lycanthrope girl saved from her own tribe's sentence. She smiles through exile, trusts the people beside her, and has not yet learned to master the wolf.",
+    accent: "#6b4a62",
+    portrait: PORTRAITS["elowen-wolfcrag"],
+  },
+  {
+    id: "evander-wolfcrag",
+    name: "Evander Wolfcrag",
+    title: "The Exiled Shield",
+    element: "null",
+    role: "tank",
+    combat: ["melee"],
+    power: 50,
+    rarity: "rare",
+    traits: ["wise", "protective", "overprotective"],
+    setId: "wolfcrag-exile",
+    flavor:
+      "Once the chief's bodyguard, now an outcast who threw rank away to keep his daughter alive. He bargained sanctuary from the eastern woods and stands between her and everything else.",
+    accent: "#6a6a58",
+    portrait: PORTRAITS["evander-wolfcrag"],
+  },
+  {
+    id: "eva-hearthgale",
+    name: "Eva Hearthgale",
+    title: "The Gale Whisperer",
+    element: "air",
+    role: "beasttamer",
+    combat: ["magic"],
+    power: 45,
+    rarity: "rare",
+    traits: ["beastmaster", "charismatic", "scheming"],
+    setId: "wolfcrag-exile",
+    flavor:
+      "An air beast tamer who talks to the woods and walks with a black direwolf. She allied with the exiles to move human secrets east — and because Elowen's curse fascinates her.",
+    accent: "#5a9a8a",
+    portrait: PORTRAITS["eva-hearthgale"],
+  },
+
+  // — Calamity Seal (quest-only) —
+  {
+    id: "bran-bloodseeker",
+    name: "Bran Bloodseeker",
+    title: "The Dark Knight",
+    element: "null",
+    role: "darkpaladin",
+    combat: ["melee"],
+    power: 90,
+    rarity: "legendary",
+    traits: ["honorbound", "vindictive", "reckless"],
+    setId: "calamity-seal",
+    obtain: "quest",
+    flavor:
+      "A half-elf, half-dwarf paladin who lost the Light when Samara slew the woman he loved. He hunts her bloodline with nothing left but a sworn oath.",
+    accent: "#4a4550",
+    portrait: PORTRAITS["bran-bloodseeker"],
+  },
+  {
+    id: "marpha",
+    name: "Marpha",
+    title: "Goddess of the Wild",
+    element: "wild",
+    role: "swordsaint",
+    combat: ["melee"],
+    power: 100,
+    rarity: "legendary",
+    traits: ["legendary", "graceful", "martyr"],
+    setId: "calamity-seal",
+    obtain: "quest",
+    flavor:
+      "The ancient elven queen who struck down the first demon king and sealed the miasma with her own body. Three centuries dormant. Newly awake.",
+    accent: "#7a9a4a",
+    portrait: PORTRAITS.marpha,
+  },
+  {
+    id: "samara-blackheart",
+    name: "Samara Blackheart",
+    title: "The Calamity Demon",
+    element: "dark",
+    role: "soulharvester",
+    combat: ["melee", "magic"],
+    power: 95,
+    rarity: "legendary",
+    traits: ["lethal", "mighty", "scheming"],
+    setId: "calamity-seal",
+    obtain: "quest",
+    flavor:
+      "The Blackheart executor who shattered Sunwatch Bay and slew Melisande Sunward. She survived Reinhart and Odin, then went silent — until now.",
+    accent: "#5a1a2a",
+    portrait: PORTRAITS["samara-blackheart"],
+  },
 ];
 
 export const CARD_BY_ID = Object.fromEntries(CARDS.map((c) => [c.id, c])) as Record<string, CardTemplate>;
+
+export function isTavernCard(card: CardTemplate): boolean {
+  return card.obtain !== "quest";
+}
+
+export const TAVERN_CARDS = CARDS.filter(isTavernCard);
+
+/** Roles shown in Collection / dispatch. Quest-only classes stay catalogue-only until owned. */
+export function visibleRoles(ownedIds: Iterable<string>): RoleId[] {
+  const owned = new Set(ownedIds);
+  return ROLE_ORDER.filter((role) =>
+    CARDS.some((card) => card.role === role && (isTavernCard(card) || owned.has(card.id))),
+  );
+}
+
+/** Roles shown in the Full catalogue, including unowned quest-only classes. */
+export function catalogueRoles(): RoleId[] {
+  return ROLE_ORDER.filter((role) => CARDS.some((card) => card.role === role));
+}

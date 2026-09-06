@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { BACKGROUNDS } from "../data/backgrounds";
-import { CARD_BY_ID } from "../data/cards";
+import { CARD_BY_ID, visibleRoles } from "../data/cards";
 import {
   COMBAT_LABEL,
   COMBAT_ORDER,
   ELEMENT_LABEL,
   ELEMENT_ORDER,
   ROLE_LABEL,
-  ROLE_ORDER,
   TIME_ICON,
 } from "../data/icons";
 import { QUEST_BY_ID } from "../data/quests";
@@ -68,6 +67,8 @@ export function DispatchModal({
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
+
+  const roleOptions = useMemo(() => visibleRoles(state.cards.map((card) => card.id)), [state.cards]);
 
   const roster = useMemo(() => {
     if (!template) return [];
@@ -253,7 +254,7 @@ export function DispatchModal({
               <FilterDrop
                 label="Role"
                 value={role}
-                options={[{ id: "all", label: "Any" }, ...ROLE_ORDER.map((id) => ({ id, label: ROLE_LABEL[id] }))]}
+                options={[{ id: "all", label: "Any" }, ...roleOptions.map((id) => ({ id, label: ROLE_LABEL[id] }))]}
                 open={openDrop === "role"}
                 onToggle={() => setOpenDrop(openDrop === "role" ? null : "role")}
                 onChange={(id) => {
@@ -302,8 +303,10 @@ export function DispatchModal({
         <footer className="dispatch-footer">
           <div className="dispatch-odds">
             <p className="odds-power">
-              Power <strong>{assessment.effPower}</strong> / {assessment.need}
-              {assessment.effPower !== assessment.power ? <em> (affinity counted)</em> : null}
+              <span>Power</span>
+              <strong>{assessment.effPower}</strong>
+              <span className="odds-need">/ {assessment.need}</span>
+              {assessment.effPower !== assessment.power ? <em>affinity counted</em> : null}
             </p>
             {assessment.mods.length > 0 ? (
               <ul className="odds-mods">

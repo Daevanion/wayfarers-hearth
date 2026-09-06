@@ -46,7 +46,7 @@ export function Plaza() {
             alt=""
           />
           <img
-            className={`map-art collection-scene ${ui.guildOpen ? "on" : ""}`}
+            className={`map-art collection-scene ${ui.guildOpen || ui.catalogueOpen ? "on" : ""}`}
             src={BACKGROUNDS.collection}
             alt=""
           />

@@ -19,6 +19,12 @@ import yvaineAshcroft from "../Assets/cards/yvaine_ashcroft.jpg";
 import auroraStarling from "../Assets/cards/aurora_starling.jpg";
 import corvusGrim from "../Assets/cards/corvus_grim.jpg";
 import serilla from "../Assets/cards/serilla.jpg";
+import elowenWolfcrag from "../Assets/cards/elowen_wolfcrag.jpg";
+import evanderWolfcrag from "../Assets/cards/evander_wolfcrag.jpg";
+import evaHearthgale from "../Assets/cards/eva_hearthgale.jpg";
+import branBloodseeker from "../Assets/cards/bran_bloodseeker.jpg";
+import marpha from "../Assets/cards/marpha.jpg";
+import samaraBlackheart from "../Assets/cards/samara_blackheart.jpg";
 import cardBack from "../Assets/cards/back_cover_card.jpg";
 
 export const CARD_BACK = cardBack;
@@ -45,4 +51,10 @@ export const PORTRAITS = {
   "aurora-starling": auroraStarling,
   "corvus-grim": corvusGrim,
   serilla,
+  "elowen-wolfcrag": elowenWolfcrag,
+  "evander-wolfcrag": evanderWolfcrag,
+  "eva-hearthgale": evaHearthgale,
+  "bran-bloodseeker": branBloodseeker,
+  marpha,
+  "samara-blackheart": samaraBlackheart,
 } as const;

@@ -3,6 +3,8 @@ import { CARD_BACK } from "../data/portraits";
 import { ELEMENT_ICON, ELEMENT_LABEL, ROLE_LABEL } from "../data/icons";
 import { cardLore } from "../data/lore";
 import { TRAITS } from "../data/traits";
+import { MAX_LEVEL, shownLevel } from "../game/formulas";
+import { useGame } from "../store/GameContext";
 import type { CardTemplate } from "../types";
 import { affinityTitle, LoreText } from "./LoreText";
 import { CombatBadges } from "./StatIcons";
@@ -17,12 +19,18 @@ export function CardDossier({
   power?: number;
   shown?: boolean;
 }) {
+  const { state, spendDuplicates } = useGame();
+  const owned = state.cards.find((card) => card.id === template.id);
   const [artOpen, setArtOpen] = useState(false);
   const hoverTimer = useRef(0);
   const art = shown && template.portrait ? template.portrait : CARD_BACK;
   const lore = shown ? cardLore(template.id, template.flavor) : "";
   const shownPower = power ?? template.power;
   const elementIcon = ELEMENT_ICON[template.element];
+  const banked = owned?.duplicateXp ?? 0;
+  const copies = owned?.duplicates ?? 0;
+  const rank = shownLevel(owned?.level ?? 1);
+  const canSpend = Boolean(owned && banked > 0 && owned.level < MAX_LEVEL);
 
   function openArt(event?: MouseEvent) {
     event?.preventDefault();
@@ -55,14 +63,39 @@ export function CardDossier({
   return (
     <>
       <article className="card-dossier">
-        <figure className="dossier-art" onMouseEnter={onArtEnter} onMouseLeave={onArtLeave}>
-          <button type="button" className="dossier-art-hit" onClick={openArt} aria-label={`View ${template.name} full size`}>
-            <img src={art} alt={template.name} />
-          </button>
-          <ZoomButton className="dossier-zoom-btn" onClick={openArt} />
-        </figure>
+        <div className="dossier-art-col">
+          <figure className="dossier-art" onMouseEnter={onArtEnter} onMouseLeave={onArtLeave}>
+            <button type="button" className="dossier-art-hit" onClick={openArt} aria-label={`View ${template.name} full size`}>
+              <img src={art} alt={template.name} />
+            </button>
+            <ZoomButton className="dossier-zoom-btn" onClick={openArt} />
+            {rank > 0 ? (
+              <span className="frame-level dossier-level-mark" title={`Level ${rank}`}>
+                {rank}
+              </span>
+            ) : null}
+          </figure>
+          {owned ? (
+            <div className="dossier-levelup">
+              <button
+                type="button"
+                className="menu-btn dossier-levelup-btn"
+                disabled={!canSpend}
+                onClick={() => spendDuplicates(owned.id)}
+              >
+                {owned.level >= MAX_LEVEL ? "Max rank" : `Level up +${banked}`}
+              </button>
+              <span className="menu-btn dossier-dupe-count" title="Duplicates in possession">
+                {copies}
+              </span>
+            </div>
+          ) : null}
+        </div>
         <div className="dossier-copy">
-          <p className="kicker">{ROLE_LABEL[template.role]}</p>
+          <p className="kicker">
+            {ROLE_LABEL[template.role]}
+            {rank > 0 ? ` · Level ${rank}` : ""}
+          </p>
           <h3>{template.name}</h3>
           <p className="adv-title">{template.title}</p>
           <LoreText template={template} text={lore} />

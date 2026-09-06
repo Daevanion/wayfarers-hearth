@@ -20,16 +20,19 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 
 ### What the player sees
 
-- Full-bleed swaying `town3.jpg` plaza; Tavern swaps to swaying `tavern3.jpg`, Collection to swaying `collection_bg.jpg`, both under a light dim
+- Full-bleed swaying `town3.jpg` plaza; Tavern swaps to swaying `tavern3.jpg`, Collection and Full catalogue to swaying `collection_bg.jpg`, both under a light dim
 - HUD menu buttons (Tavern / Collection / Full catalogue) are thin-lined, slightly transparent plaques, set below the resource strip
 - Quest Board icon (`questboard_icon.png`) swaps the plaza to swaying `questboard_bg2.jpg` and lists available / in-progress / completed bounties. “Today’s bounties” is hidden while the board is open
 - Quest entries sit on `quest_page_1.png` parchment with the quest painting and bounty copy on top. The board painting does not sway. Click an open bounty to open assignment (`quest_click.mp3`). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma). Completed cards grey-green with “Quest Complete”; in-progress cards show the time mark. Returned bounties tap to resolve.
 - Companies on the road appear as a **left-hand progress rail** (art, name, timer bar). Click for a full-view of the quest art with the assigned party.
 - Dispatch loadout uses the quest painting as the header with time, power needed, team size, and favor on it, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
 - HUD: Gold, Tokens, Tavern, Collection, Full catalogue
-- Collection = owned company (All / Set views plus element / role / status filters), framed like the catalogue
-- Catalogue = all cards, owned or not (All / Set views)
-- Click a card in Collection or Catalogue → full dossier (Excel lore + highlighted elements/traits + titled stats)
+- Collection and Full catalogue are the same bound volume: parchment page, `The Ledger` kicker, All / Set chips plus dropdowns for Element, Role, and Status (Collection) or Obtain (Catalogue). Set view is fellowship rows of three
+- Collection = owned company. Catalogue = every face, owned or not. Quest-only cards caption **Quest-bound**
+- Collection hides empty quest-only sets until a member is owned
+- Tavern packs roll from `TAVERN_CARDS` only (`obtain !== "quest"`)
+- Click a card in Collection or Catalogue → full dossier (Excel lore + highlighted elements/traits + titled stats). Owned dossiers show **Level up +XP** and a duplicate count as menu plaques under the portrait; pack likenesses wait there instead of applying on pull
+- Card level sits at the bottom-left of the portrait. Fresh cards are 0 and show no mark; the first rank-up shows 1
 - Hover 1.5s on dossier art → full-size visual zoom (dim only; zoom 1× / 1.25× / 1.5×)
 - Opening draw: **Hearthbound trio** (Hera, Caelan, Cedric)
 - Visual novel: arrival scene (Hera / Cedric idle sprites, parchment box). Sprites stand on the bottom edge of the game display. Triggered from Settings for now; 2s lock before a line can be skipped
@@ -40,12 +43,13 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 
 | Concern | File |
 |---------|------|
-| Card stats / flavor / set membership | `src/data/cards.ts` |
+| Card stats / flavor / set membership / tavern vs quest | `src/data/cards.ts` (`obtain`, `TAVERN_CARDS`) |
 | Full Excel lore text | `src/data/lore.ts` |
 | Portrait imports | `src/data/portraits.ts` + `src/Assets/cards/*.jpg` |
 | Sets of 3 | `src/data/sets.ts` |
 | Trait definitions | `src/data/traits.ts` |
 | Lore keyword highlights | `src/components/LoreText.tsx` (`ELEMENT_ALIASES`, `TRAIT_ALIASES`) |
+| Shared Collection / Catalogue ledger | `src/components/LedgerFilters.tsx` |
 | Quest pool | `src/data/quests.ts` |
 | Success math, board, packs | `src/game/quests.ts` |
 | XP / power per level | `src/game/formulas.ts` |
@@ -56,10 +60,11 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 
 - Roster is **Excel-driven**. Do not invent playable cards for leftover art unless the sheet has a row.
 - Sets are **always 3**. A new trio = new `SetDef` + three `CardTemplate`s.
+- `obtain: "quest"` cards appear in the Full catalogue only. They never roll from tavern packs. Do not invent obtain-quests or class benefits unless asked.
 - Traits: **2–4 per card**, at least one **negative** if the lore has a flaw. Reuse existing trait IDs before creating new ones.
 - `wild` matches **every** quest element (Odin). `null` matches none.
 - Combat can be multiple (`morrigan-crow` is melee + ranged).
-- Special IDs: `freya` (file `freya.jpg`, not `freya_icewalker`); `kaelen-duskwalker` even if the sheet says “kaelen duskwalk”; `serilla` (file `serilla.jpg`).
+- Special IDs: `freya` (file `freya.jpg`, not `freya_icewalker`); `kaelen-duskwalker` even if the sheet says “kaelen duskwalk”; `serilla` (file `serilla.jpg`); `marpha` (file `marpha.jpg`).
 - Voice: gold/blue/parchment, medieval, no modern slang.
 - Do not commit or push unless the user asks.
 
@@ -71,11 +76,11 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 1. [Active Game Loop](#1-active-game-loop)
 2. [Core Formulas](#2-core-formulas)
 3. [Progression & Economy](#3-progression--economy)
-4. [Full Roster (21 Cards)](#4-full-roster-21-cards)
+4. [Full Roster (27 Cards)](#4-full-roster-27-cards)
 5. [Power Output Tables](#5-power-output-tables)
 6. [Sets & Synergies](#6-sets--synergies)
-7. [Traits Reference (47)](#7-traits-reference-47)
-8. [Quest Board (48 Templates)](#8-quest-board-48-templates)
+7. [Traits Reference (51)](#7-traits-reference-51)
+8. [Quest Board (49 Templates)](#8-quest-board-49-templates)
 9. [Quest Design Guide](#9-quest-design-guide)
 10. [Character Lore Hooks for New Quests](#10-character-lore-hooks-for-new-quests)
 11. [Unimplemented Assets & Future Characters](#11-unimplemented-assets--future-characters)
@@ -131,9 +136,11 @@ The live game is a **daily bounty board** system. Players dispatch teams of owne
 ### Card Power
 
 ```
-cardPower = basePower + (level - 1) × 5
+cardPower = basePower + (level - 1) × 1
 MAX_LEVEL = 5
-POWER_PER_LEVEL = 5
+POWER_PER_LEVEL = 1
+
+L1 +0 · L2 +1 · L3 +2 · L4 +3 · L5 +4
 ```
 
 ### XP & Leveling
@@ -233,8 +240,10 @@ Crit is checked **first** (low rolls = triumph).
 
 ### Duplicate XP (pack pulls)
 
-| Pack type | Duplicate XP |
-|-----------|--------------|
+Duplicates are **held**, not applied. Each extra likeness adds to `duplicates` and `duplicateXp` on that card. The dossier **Level up +[XP]** button spends the bank.
+
+| Pack type | Banked XP per likeness |
+|-----------|------------------------|
 | Gold pack | +40 XP |
 | Token pack | +80 XP |
 
@@ -260,17 +269,17 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 ---
 
-## 4. Full Roster (21 Cards)
+## 4. Full Roster (27 Cards)
 
 ### Hearthbound — `hearthbound`
 
 | ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
 |----|------|-------|-----|--------|---------|------|--------|--------|--------|
-| `hera-starfall` | Hera Starfall | The Earthen Heart | 25 | 45 | earth | healer | melee | common | kindhearted, steadfast, oblivious |
-| `caelan-featherfoot` | Caelan Featherfoot | The Quiet Edge | 25 | 45 | null | scout | melee | common | perceptive, artisan, secretive |
-| `cedric-oakmont` | Cedric Oakmont | The Wayward Gale | 25 | 45 | air | ranger | ranged | common | brave, resourceful, forgetful |
+| `hera-starfall` | Hera Starfall | The Earthen Heart | 25 | 29 | earth | healer | melee | common | kindhearted, steadfast, oblivious |
+| `caelan-featherfoot` | Caelan Featherfoot | The Quiet Edge | 25 | 29 | null | scout | melee | common | perceptive, artisan, secretive |
+| `cedric-oakmont` | Cedric Oakmont | The Wayward Gale | 25 | 29 | air | ranger | ranged | common | brave, resourceful, forgetful |
 
-**Set total:** L1 = 75 | L5 = 135
+**Set total:** L1 = 75 | L5 = 87
 
 ---
 
@@ -278,11 +287,11 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
 |----|------|-------|-----|--------|---------|------|--------|--------|--------|
-| `lysandra-silverleaf` | Lysandra Silverleaf | The White Witch | 50 | 70 | air | mage | magic | rare | wise, nurturing, reclusive |
-| `kaelen-duskwalker` | Kaelen Duskwalker | The Royal Stride | 40 | 60 | water | ranger | ranged | uncommon | focused, honorbound, vindictive |
-| `gall-ironbend` | Gall Ironbend | Shieldwall Gall | 40 | 60 | earth | tank | melee | uncommon | charismatic, stalwart, greedy |
+| `lysandra-silverleaf` | Lysandra Silverleaf | The White Witch | 50 | 54 | air | mage | magic | rare | wise, nurturing, reclusive |
+| `kaelen-duskwalker` | Kaelen Duskwalker | The Royal Stride | 40 | 44 | water | ranger | ranged | uncommon | focused, honorbound, vindictive |
+| `gall-ironbend` | Gall Ironbend | Shieldwall Gall | 40 | 44 | earth | tank | melee | uncommon | charismatic, stalwart, greedy |
 
-**Set total:** L1 = 130 | L5 = 190
+**Set total:** L1 = 130 | L5 = 142
 
 ---
 
@@ -290,11 +299,11 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
 |----|------|-------|-----|--------|---------|------|--------|--------|--------|
-| `leona-stormrage` | Leona Stormrage | The Crimson Spark | 35 | 55 | fire | mage | magic | uncommon | prodigy, hotheaded |
-| `sylas-duskwalker` | Sylas Duskwalker | The Penitent Shield | 50 | 70 | light | cleric | melee | rare | devout, protective, guiltridden |
-| `freya` | Freya | The Reluctant Blade | 45 | 65 | dark | berserker | melee | rare | mighty, cowardly, eccentric |
+| `leona-stormrage` | Leona Stormrage | The Crimson Spark | 35 | 39 | fire | mage | magic | uncommon | prodigy, hotheaded |
+| `sylas-duskwalker` | Sylas Duskwalker | The Penitent Shield | 50 | 54 | light | cleric | melee | rare | devout, protective, guiltridden |
+| `freya` | Freya | The Reluctant Blade | 45 | 49 | dark | berserker | melee | rare | mighty, cowardly, eccentric |
 
-**Set total:** L1 = 130 | L5 = 190
+**Set total:** L1 = 130 | L5 = 142
 
 **Note:** Leona has only 2 traits (others have 3). Sylas and Kaelen share the Duskwalker surname — family lore hook.
 
@@ -304,11 +313,11 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
 |----|------|-------|-----|--------|---------|------|--------|--------|--------|
-| `morrigan-crow` | Morrigan Crow | The Blood Crow | 75 | 95 | null | scout | melee, ranged | epic | lethal, mercenary, distrustful |
-| `odin-stormrage` | Odin Stormrage | The Azure Sage | 100 | 120 | wild | archmage | ranged | legendary | legendary, scholarly, scheming |
-| `reinhart-den` | Reinhart Den | The Beast God | 90 | 110 | fire | berserker | melee | legendary | fearless, charismatic, battlehungry |
+| `morrigan-crow` | Morrigan Crow | The Blood Crow | 75 | 79 | null | scout | melee, ranged | epic | lethal, mercenary, distrustful |
+| `odin-stormrage` | Odin Stormrage | The Azure Sage | 100 | 104 | wild | archmage | ranged | legendary | legendary, scholarly, scheming |
+| `reinhart-den` | Reinhart Den | The Beast God | 90 | 94 | fire | berserker | melee | legendary | fearless, charismatic, battlehungry |
 
-**Set total:** L1 = 265 | L5 = 325
+**Set total:** L1 = 265 | L5 = 277
 
 **Note:** Odin's `wild` element counts as affinity on **every** elemental quest (+25% power on that card).
 
@@ -318,11 +327,11 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
 |----|------|-------|-----|--------|---------|------|--------|--------|
-| `elanor-lightbearer` | Elanor Lightbearer | The Hidden Lance | 30 | 50 | light | cleric | magic | uncommon | graceful, spearmaiden, sheltered |
-| `fenric-valerand` | Fenric Valerand | The Faithless Shield | 45 | 65 | air | warrior | melee | rare | loyal, softspoken, faithless |
-| `seraphina-aurora` | Seraphina Aurora | The Sun's Martyr | 30 | 50 | light | paladin | melee | rare | beloved, resolute, martyr |
+| `elanor-lightbearer` | Elanor Lightbearer | The Hidden Lance | 30 | 34 | light | cleric | magic | uncommon | graceful, spearmaiden, sheltered |
+| `fenric-valerand` | Fenric Valerand | The Faithless Shield | 45 | 49 | air | warrior | melee | rare | loyal, softspoken, faithless |
+| `seraphina-aurora` | Seraphina Aurora | The Sun's Martyr | 30 | 34 | light | paladin | melee | rare | beloved, resolute, martyr |
 
-**Set total:** L1 = 105 | L5 = 165
+**Set total:** L1 = 105 | L5 = 117
 
 ---
 
@@ -330,11 +339,11 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
 |----|------|-------|-----|--------|---------|------|--------|--------|--------|
-| `alden-hollowgarth` | Alden Hollowgarth | The Anvil's Tide | 30 | 50 | water | cleric | magic | uncommon | artisan, protective, overprotective |
-| `eamon-stoneseeker` | Eamon Stoneseeker | Lightfoot Thunder | 35 | 55 | air | scout | melee | uncommon | charismatic, mercenary, cowardly |
-| `yvaine-ashcroft` | Yvaine Ashcroft | The Iron Sight | 25 | 45 | null | ranger | ranged | common | perceptive, artisan, sheltered |
+| `alden-hollowgarth` | Alden Hollowgarth | The Anvil's Tide | 30 | 34 | water | cleric | magic | uncommon | artisan, protective, overprotective |
+| `eamon-stoneseeker` | Eamon Stoneseeker | Lightfoot Thunder | 35 | 39 | air | scout | melee | uncommon | charismatic, mercenary, cowardly |
+| `yvaine-ashcroft` | Yvaine Ashcroft | The Iron Sight | 25 | 29 | null | ranger | ranged | common | perceptive, artisan, sheltered |
 
-**Set total:** L1 = 90 | L5 = 150
+**Set total:** L1 = 90 | L5 = 102
 
 ---
 
@@ -342,13 +351,41 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
 |----|------|-------|-----|--------|---------|------|--------|--------|--------|
-| `aurora-starling` | Aurora Starling | The Umbral Smile | 70 | 90 | dark | mage | magic | epic | lethal, graceful, intolerant |
-| `corvus-grim` | Corvus Grim | The Azure Prince | 65 | 85 | light | paladin | melee | epic | devout, focused, arrogant |
-| `serilla` | Serilla | The Living Artifact | 75 | 95 | null | berserker | melee | epic | mighty, fearless, sheltered, hollow |
+| `aurora-starling` | Aurora Starling | The Umbral Smile | 70 | 74 | dark | mage | magic | epic | lethal, graceful, intolerant |
+| `corvus-grim` | Corvus Grim | The Azure Prince | 65 | 69 | light | paladin | melee | epic | devout, focused, arrogant |
+| `serilla` | Serilla | The Living Artifact | 75 | 79 | null | berserker | melee | epic | mighty, fearless, sheltered, hollow |
 
-**Set total:** L1 = 210 | L5 = 270
+**Set total:** L1 = 210 | L5 = 222
 
 **Note:** Serilla has 4 traits. `serilla` is a single-name id (same pattern as `freya`).
+
+---
+
+### Wolfcrag Exile — `wolfcrag-exile`
+
+| ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
+|----|------|-------|-----|--------|---------|------|--------|--------|--------|
+| `elowen-wolfcrag` | Elowen Wolfcrag | The Cursed Child | 25 | 29 | dark | scout | melee | common | kindhearted, agile, cursed |
+| `evander-wolfcrag` | Evander Wolfcrag | The Exiled Shield | 50 | 54 | null | tank | melee | rare | wise, protective, overprotective |
+| `eva-hearthgale` | Eva Hearthgale | The Gale Whisperer | 45 | 49 | air | beasttamer | magic | rare | beastmaster, charismatic, scheming |
+
+**Set total:** L1 = 120 | L5 = 132
+
+**Note:** Sheet element for Elowen is Dark (lycanthrope / dark forest). Lore still calls her an Earth Scout. Eva's role `beasttamer` is new. `eva-hearthgale` keeps the file name `eva_hearthgale.jpg`.
+
+---
+
+### Calamity Seal — `calamity-seal` (quest-only)
+
+| ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
+|----|------|-------|-----|--------|---------|------|--------|--------|--------|
+| `bran-bloodseeker` | Bran Bloodseeker | The Dark Knight | 90 | 94 | null | darkpaladin | melee | legendary | honorbound, vindictive, reckless |
+| `marpha` | Marpha | Goddess of the Wild | 100 | 104 | wild | swordsaint | melee | legendary | legendary, graceful, martyr |
+| `samara-blackheart` | Samara Blackheart | The Calamity Demon | 95 | 99 | dark | soulharvester | melee + magic | legendary | lethal, mighty, scheming |
+
+**Set total:** L1 = 285 | L5 = 297
+
+**Note:** `obtain: "quest"`. Full catalogue only — never tavern. Unique roles are **display-only** (no class benefits, no crits). No obtain-quest yet. `marpha` is a single-name id. `reckless` is new and unused on quests.
 
 ---
 
@@ -356,11 +393,11 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | Rarity | Power range | Cards |
 |--------|-------------|-------|
-| Common | 25 | Hera, Caelan, Cedric, Yvaine |
+| Common | 25 | Hera, Caelan, Cedric, Yvaine, Elowen |
 | Uncommon | 30–40 | Leona (35), Kaelen (40), Gall (40), Elanor (30), Alden (30), Eamon (35) |
-| Rare | 30–50 | Lysandra (50), Sylas (50), Freya (45), Fenric (45), Seraphina (30) |
+| Rare | 30–50 | Lysandra (50), Sylas (50), Freya (45), Fenric (45), Seraphina (30), Evander (50), Eva (45) |
 | Epic | 65–75 | Corvus (65), Aurora (70), Morrigan (75), Serilla (75) |
-| Legendary | 90–100 | Reinhart (90), Odin (100) |
+| Legendary | 90–100 | Reinhart (90), Bran (90), Samara (95), Odin (100), Marpha (100) |
 
 ---
 
@@ -370,18 +407,18 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | Card | L1 | L2 | L3 | L4 | L5 |
 |------|----|----|----|----|-----|
-| Hera / Caelan / Cedric / Yvaine | 25 | 30 | 35 | 40 | 45 |
-| Elanor / Seraphina / Alden | 30 | 35 | 40 | 45 | 50 |
-| Leona / Eamon | 35 | 40 | 45 | 50 | 55 |
-| Kaelen / Gall | 40 | 45 | 50 | 55 | 60 |
-| Freya | 45 | 50 | 55 | 60 | 65 |
-| Fenric | 45 | 50 | 55 | 60 | 65 |
-| Sylas / Lysandra | 50 | 55 | 60 | 65 | 70 |
-| Morrigan / Serilla | 75 | 80 | 85 | 90 | 95 |
-| Reinhart | 90 | 95 | 100 | 105 | 110 |
-| Odin | 100 | 105 | 110 | 115 | 120 |
-| Corvus | 65 | 70 | 75 | 80 | 85 |
-| Aurora | 70 | 75 | 80 | 85 | 90 |
+| Hera / Caelan / Cedric / Yvaine / Elowen | 25 | 26 | 27 | 28 | 29 |
+| Elanor / Seraphina / Alden | 30 | 31 | 32 | 33 | 34 |
+| Leona / Eamon | 35 | 36 | 37 | 38 | 39 |
+| Kaelen / Gall | 40 | 41 | 42 | 43 | 44 |
+| Freya / Fenric / Eva | 45 | 46 | 47 | 48 | 49 |
+| Sylas / Lysandra / Evander | 50 | 51 | 52 | 53 | 54 |
+| Corvus | 65 | 66 | 67 | 68 | 69 |
+| Aurora | 70 | 71 | 72 | 73 | 74 |
+| Morrigan / Serilla | 75 | 76 | 77 | 78 | 79 |
+| Reinhart / Bran | 90 | 91 | 92 | 93 | 94 |
+| Samara | 95 | 96 | 97 | 98 | 99 |
+| Odin / Marpha | 100 | 101 | 102 | 103 | 104 |
 
 ### Top 2-Person Teams (L1 raw power)
 
@@ -397,7 +434,7 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | Team | Raw | Notes |
 |------|-----|-------|
-| Glade Expedition (full set) | 265 | +10% set synergy; still shy of Extreme 350+ without a fourth |
+| Glade Expedition (full set) | 265 | +10% set synergy; still shy of Extreme 350+ without a fourth. Calamity Seal (285) is catalogue-only and not in play. |
 | Moonlight Scripture (full set) | 210 | +10% set synergy; crit on Moonlight Retrieval |
 | Lysandra + Odin + Reinhart | 240 | |
 | Sylas + Odin + Reinhart | 240 | |
@@ -437,13 +474,15 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | Set ID | Name | Members | L1 total | L5 total | +10% synergy |
 |--------|------|---------|----------|----------|--------------|
-| `hearthbound` | Hearthbound | Hera, Caelan, Cedric | 75 | 135 | When all 3 dispatched |
-| `woodland-debt` | Woodland Debt | Lysandra, Kaelen, Gall | 130 | 190 | When all 3 dispatched |
-| `penitent-order` | Penitent Order | Leona, Sylas, Freya | 130 | 190 | When all 3 dispatched |
-| `glade-expedition` | Glade Expedition | Morrigan, Odin, Reinhart | 265 | 325 | When all 3 dispatched |
-| `sun-scripture` | Sun Scripture | Elanor, Fenric, Seraphina | 105 | 165 | When all 3 dispatched |
-| `forge-kin` | Forge Kin | Alden, Eamon, Yvaine | 90 | 150 | When all 3 dispatched |
-| `moonlight-scripture` | Moonlight Scripture | Aurora, Corvus, Serilla | 210 | 270 | When all 3 dispatched |
+| `hearthbound` | Hearthbound | Hera, Caelan, Cedric | 75 | 87 | When all 3 dispatched |
+| `woodland-debt` | Woodland Debt | Lysandra, Kaelen, Gall | 130 | 142 | When all 3 dispatched |
+| `penitent-order` | Penitent Order | Leona, Sylas, Freya | 130 | 142 | When all 3 dispatched |
+| `glade-expedition` | Glade Expedition | Morrigan, Odin, Reinhart | 265 | 277 | When all 3 dispatched |
+| `sun-scripture` | Sun Scripture | Elanor, Fenric, Seraphina | 105 | 117 | When all 3 dispatched |
+| `forge-kin` | Forge Kin | Alden, Eamon, Yvaine | 90 | 102 | When all 3 dispatched |
+| `moonlight-scripture` | Moonlight Scripture | Aurora, Corvus, Serilla | 210 | 222 | When all 3 dispatched |
+| `wolfcrag-exile` | Wolfcrag Exile | Elowen, Evander, Eva | 120 | 132 | When all 3 dispatched |
+| `calamity-seal` | Calamity Seal | Bran, Marpha, Samara | 285 | 297 | Catalogue only — no set crit yet |
 
 ### Set-Specific Crit Quests (existing)
 
@@ -453,10 +492,11 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 | Survey of the Dark Glade | `glade-expedition` | Maps reach the war table |
 | The Quenched Commission | `forge-kin` | Kin of the anvil restore the maker's mark |
 | The Moonlight Retrieval | `moonlight-scripture` | The artifact leaves with them |
+| The Eastern Wood Crossing | `wolfcrag-exile` | The oaks remember the pact |
 
 ---
 
-## 7. Traits Reference (47)
+## 7. Traits Reference (51)
 
 Traits modify quest odds when any team member possesses them. **Good traits** appear as advantages on quests; **bad traits** appear as hazards.
 
@@ -485,18 +525,27 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 | Aurora | lethal, graceful | intolerant |
 | Corvus | devout, focused | arrogant |
 | Serilla | mighty, fearless | sheltered, hollow |
+| Elowen | kindhearted, agile | cursed |
+| Evander | wise, protective | overprotective |
+| Eva | beastmaster, charismatic | scheming |
+| Bran | honorbound | vindictive, reckless |
+| Marpha | legendary, graceful | martyr |
+| Samara | lethal, mighty | scheming |
 
 ### Traits Used in Current Quests
 
 | Trait | Quests (advantage) | Quests (hazard) |
 |-------|-------------------|-----------------|
 | arrogant | — | Moonlit Parley, The Pale Labyrinth |
+| agile | The Rogue Greatwolf | — |
 | artisan | Iron from the Hill Forge, The Quenched Commission | — |
 | battlehungry | — | The East Palisade, Moonlit Parley, The Infiltration Path |
+| beastmaster | Moonlit Parley, The Eastern Wood Crossing | — |
 | beloved | The False Saint | Find the Unholy Impostor |
 | brave | The Named Raider, The Windworn Boy | — |
 | charismatic | The Bridge Gang, Moonlit Parley | — |
 | cowardly | — | The Rogue Greatwolf, Wolves at the Fold, The Windworn Boy, Vermin Under the Mill, The Mountain Troll, Corruption at the Glade's Edge, The Blood-Debt Duel, Subjugate Calamity: Samara, Survey of the Dark Glade |
+| cursed | — | Wolves at the Fold, The Eastern Wood Crossing |
 | devout | Watch at the Broken Chapel, Drive the Barrow Wights, The Envoy's Road | — |
 | distrustful | — | Infiltrate the Brotherhood, The Envoy's Road, Whereabouts of General Alastor |
 | eccentric | — | Wyrm of the Deep Vault |
@@ -508,6 +557,7 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 | greedy | — | Hold the Merchant Road, Cutpurses of the Old Road, Iron from the Hill Forge, Scour the Goblin Den, The Ember Nest, Tide in the Drowned Keep, Retake the Adamant Mines |
 | guiltridden | — | The Necromancer of Caldara |
 | hollow | — | Drive the Barrow Wights, The Moonlight Retrieval |
+| kindhearted | The Eastern Wood Crossing | — |
 | honorbound | Blood on the Caravan, The Blood-Debt Duel | — |
 | hotheaded | — | The Named Raider, The Bridge Gang, The Sunken Reliquary |
 | intolerant | — | The Moonlight Retrieval |
@@ -536,7 +586,7 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 
 ### Unused Traits (available for new quests)
 
-`kindhearted`, `mercenary`, `resourceful`, `spearmaiden`
+`mercenary`, `resourceful`, `spearmaiden`, `reckless`
 
 ### Roles Used in Crit Conditions
 
@@ -553,17 +603,17 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 | tank | Hold the Merchant Road, Iron from the Hill Forge, Retake the Adamant Mines |
 | warrior | Break the Holdfast, The Blood-Debt Duel |
 
-**Unused roles in crits:** none — every combat role has at least one crit hook.
+**Unused roles in crits:** `beasttamer` (Eva; set crit on The Eastern Wood Crossing covers the trio). `darkpaladin`, `swordsaint`, `soulharvester` — display-only unique classes; no benefits or crits yet.
 
 ---
 
-## 8. Quest Board (48 Templates)
+## 8. Quest Board (49 Templates)
 
-Pool in `src/data/quests.ts`. Each template has `flavor` (card hook), `lore` (2–4 sentences in dispatch), `tier`, `teamMin`/`teamMax`, `art`. **Named Raider** uses `goblinquest_bg.jpg`. All others cycle Whispering Woods / Old King's Road / Mirefen / Ruins of Caldara.
+Pool in `src/data/quests.ts`. Each template has `flavor` (card hook), `lore` (2–4 sentences in dispatch), `tier`, `teamMin`/`teamMax`, `art`. Dedicated paintings: Named Raider `goblinquest_bg.jpg`, Eyes on the Brotherhood `brotherhood_quest1.jpg`, Merchant Road `merchant_road.jpg`, Broken Chapel `broken_chapel.jpg`, Caravan `caravan.jpg`, Glade's Edge `corruption_edge.jpg`, Dark Glade survey `abyss.jpg`. All others cycle Whispering Woods / Old King's Road / Mirefen / Ruins of Caldara.
 
 World tier is typed; **zero templates** until prerequisites are specified. Character-specific locks are **not wired**.
 
-Samara / Alastor appear in Extreme quest fiction only — no playable cards.
+Alastor remains Extreme fiction only. Samara is a catalogue / quest-bound card — not tavern-obtainable, no recruit quest yet.
 
 ### Low — 16 (seats 1–3, power 40–75, 90s–8m)
 
@@ -576,7 +626,7 @@ Samara / Alastor appear in Extreme quest fiction only — no playable cards.
 | `marsh-sage` | Marsh Sage Before Dark | water | 40 | 14 | 20 | healer |
 | `bridge-gang` | The Bridge Gang | — | 65 | 30 | 38 | scout |
 | `wolves-at-fold` | Wolves at the Fold | earth | 45 | 18 | 24 | ranger |
-| `chapel-watch` | Watch at the Broken Chapel | light | 50 | 22 | 30 | cleric |
+| `chapel-watch` | Watch at the Broken Chapel | light | 50 | 22 | 30 | cleric · `broken_chapel.jpg` |
 | `night-letter` | The Night Letter | dark | 55 | 24 | 30 | scout |
 | `kings-cutpurses` | Cutpurses of the Old Road | air | 50 | 20 | 28 | air |
 | `fen-herders` | The Fen Herders | water | 60 | 26 | 34 | water |
@@ -586,7 +636,7 @@ Samara / Alastor appear in Extreme quest fiction only — no playable cards.
 | `east-palisade` | The East Palisade | fire | 65 | 28 | 36 | ranger |
 | `barrow-marks` | Mark the Barrow Stones | — | 45 | 18 | 26 | ranger |
 
-### Mid — 12 (seats 2–3, power 110–160, 12–40m)
+### Mid — 13 (seats 2–3, power 110–160, 12–40m)
 
 | ID | Name | Elem | Pwr | Gold | XP | Crit |
 |----|------|------|-----|------|-----|------|
@@ -602,6 +652,7 @@ Samara / Alastor appear in Extreme quest fiction only — no playable cards.
 | `beastfolk-parley` | Moonlit Parley | air | 140 | 75 | 78 | paladin |
 | `chapel-desecration` | The Desecrated Nave | light | 135 | 72 | 74 | paladin |
 | `caravan-blood` | Blood on the Caravan | — | 120 | 64 | 66 | ranger · `caravan.jpg` |
+| `eastern-wood-crossing` | The Eastern Wood Crossing | dark | 125 | 68 | 70 | **set: wolfcrag-exile** |
 
 ### High — 12 (seats 3–4, power 210–260, 50m–2h)
 
@@ -610,7 +661,7 @@ Samara / Alastor appear in Extreme quest fiction only — no playable cards.
 | `vampire-hunt` | The Thing in the Cellar-Keep | dark | 240 | 150 | 128 | paladin |
 | `necromancer` | The Necromancer of Caldara | dark | 260 | 165 | 140 | archmage |
 | `miasma-wood` | Purify the Miasma Wood | earth | 220 | 130 | 112 | earth |
-| `glade-corruption` | Corruption at the Glade's Edge | dark | 250 | 155 | 132 | ranger |
+| `glade-corruption` | Corruption at the Glade's Edge | dark | 250 | 155 | 132 | ranger · `corruption_edge.jpg` |
 | `demon-watchfires` | The Demon Watchfires | fire | 230 | 145 | 122 | berserker |
 | `envoy-road` | The Envoy's Road | light | 210 | 125 | 108 | **set: sun-scripture** |
 | `sunken-reliquary` | The Sunken Reliquary | water | 220 | 140 | 118 | water |
@@ -630,7 +681,7 @@ Samara / Alastor appear in Extreme quest fiction only — no playable cards.
 | `glade-path` | The Infiltration Path | dark | 400 | 255 | 210 | scout |
 | `general-alastor` | Whereabouts of General Alastor | fire | 390 | 250 | 205 | ranger |
 | `vault-wyrm` | Wyrm of the Deep Vault | earth | 370 | 235 | 195 | berserker |
-| `glade-survey` | Survey of the Dark Glade | dark | 350 | 220 | 180 | **set: glade-expedition** |
+| `glade-survey` | Survey of the Dark Glade | dark | 350 | 220 | 180 | **set: glade-expedition** · `abyss.jpg` |
 | `pale-labyrinth` | The Pale Labyrinth | — | 410 | 265 | 225 | archmage |
 
 ### Reward Bands
@@ -798,6 +849,8 @@ Extended lore lives in `src/data/lore.ts`. Below: narrative hooks mapped to mech
 | Alden ↔ Yvaine | Uncle's last honest commission (artisan) |
 | Corvus ↔ Serilla | What the crypts made, and whether it can be unmade |
 | Aurora ↔ Lysandra | An elven emissary at a human encampment (intolerant hazard) |
+| Elowen ↔ Evander ↔ Eva | Eastern wood crossing / curse mastery (wolfcrag-exile) |
+| Bran ↔ Samara ↔ Marpha | Blood oath / Sunwatch Bay / the first seal (calamity-seal; obtain quests not designed) |
 
 ---
 
@@ -810,14 +863,8 @@ Portrait art exists in `src/Assets/cards/` but **no card data** yet (no Excel ro
 | `azoth_sharpedge.jpg` | Azoth Sharpedge | Reinhart's rival (half-beastfolk warrior) |
 | `rin_blackheart.jpg` | Rin Blackheart | Morrigan's imprisoned partner |
 | `alastor_blackheart.jpg` | Alastor Blackheart | Blackheart family |
-| `samara_blackheart.jpg` | Samara Blackheart | Named in Corvus's lore (demon calamity) |
-| `bran_bloodseeker.jpg` | Bran Bloodseeker | Unknown |
-| `elowen_wolfcrag.jpg` | Elowen Wolfcrag | Unknown |
-| `evander_wolfcrag.jpg` | Evander Wolfcrag | Unknown |
-| `eva_hearthgale.jpg` | Eva Hearthgale | Unknown |
 | `leander_hearthkeep.jpg` | Leander Hearthkeep | Unknown |
 | `rowena_windmere.jpg` | Rowena Windmere | Unknown |
-| `marpha.jpg` | Marpha | Unknown |
 | `zephyr_starling.jpg` | Zephyr Starling | Starling surname (Aurora family?) |
 
 **Suggested power placement for new legends:**
@@ -901,17 +948,17 @@ Rarity is **not** on the sheet — infer from power + lore weight (Odin 100 = le
 ### Step 4 — Register the card (checklist)
 
 - [ ] `src/data/portraits.ts` — import + `PORTRAITS` key
-- [ ] `src/data/cards.ts` — full `CardTemplate` (accent hex, flavor, traits, setId)
+- [ ] `src/data/cards.ts` — full `CardTemplate` (accent hex, flavor, traits, setId, `obtain` if not tavern)
 - [ ] `src/data/sets.ts` — new trio **or** add id to `members` if joining an existing set (still max 3 unless the user changes the rule)
 - [ ] `src/data/traits.ts` — only new ids
 - [ ] `src/data/lore.ts` — paste Excel lore; fix curly apostrophes to ASCII
 - [ ] `src/components/LoreText.tsx` — aliases for new trait/element phrases
-- [ ] Catalogue/Collection pick up `CARDS` / `SETS` automatically — no extra UI wiring
+- [ ] Catalogue/Collection pick up `CARDS` / `SETS` automatically. Quest-only sets stay hidden in Collection until owned.
 - [ ] If this is a **new starter**, change `STARTER_IDS` and OpeningDraw fan poses (currently 3 cards)
 
 ### Step 5 — Adjust quests and power balance
 
-After the roster changes, run this pass (do not ship cards without it):
+After the roster changes, run this pass (do not ship tavern cards without it). **Quest-bound display-only trios** skip steps 3–4 until obtain quests and class benefits are designed:
 
 1. **Starter safety.** Hearthbound L1 (75 raw / 50 for a duo) must still clear Low 40–55, and still fail Mid/High/Extreme on power and seats. Do not lower Extreme power just because a new legendary exists.
 2. **New-set coverage.** Compute L1 set total vs Mid (110–160) and High (210–260). A 130-power set should need levels or a borrowed legend for High; Extreme is 4-seat and 350+. Do not clone Glade's 265 band.
@@ -935,11 +982,12 @@ Then in the running app: Catalogue All + Set views, click-dossier lore highlight
 
 ```typescript
 ElementId = "fire" | "water" | "earth" | "air" | "light" | "dark" | "null" | "wild"
-RoleId = "healer" | "scout" | "ranger" | "mage" | "tank" | "cleric" | "berserker" | "archmage" | "warrior" | "paladin"
+RoleId = "healer" | "scout" | "ranger" | "mage" | "tank" | "cleric" | "berserker" | "archmage" | "warrior" | "paladin" | "beasttamer" | "darkpaladin" | "swordsaint" | "soulharvester"
+ObtainId = "tavern" | "quest"
 CombatId = "melee" | "ranged" | "magic"
 Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary"
 ```
 
 ---
 
-*Document version: save v13, 21 cards, 7 sets of 3, 48 quest templates, 47 traits. Update the counts in this line whenever they change.*
+*Document version: save v13, 27 cards, 9 sets of 3, 49 quest templates, 51 traits. Update the counts in this line whenever they change.*

@@ -8,6 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { CARD_BY_ID } from "../data/cards";
+import { spendDuplicateXp } from "../game/formulas";
 import { buyPack, dispatchQuest, resolveQuest, rolloverBoard } from "../game/quests";
 import { createNewGame, loadSave, persist, clearSave } from "../game/save";
 import type { GameState, PackResult, Toast, UiState } from "../types";
@@ -23,6 +25,7 @@ interface GameApi {
   dispatchTeam: (questKey: string, team: string[]) => string | null;
   resolve: (questKey: string) => string | null;
   buyCardPack: (kind: "gold" | "token") => PackResult | null;
+  spendDuplicates: (cardId: string) => void;
   dismissOutcome: () => void;
   openGuild: (open: boolean) => void;
   openCatalogue: (open: boolean) => void;
@@ -156,6 +159,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         setState(result.state);
         return result.result ?? null;
+      },
+      spendDuplicates: (cardId) => {
+        const live = current();
+        const owned = live.cards.find((card) => card.id === cardId);
+        if (!owned || (owned.duplicateXp ?? 0) <= 0) return;
+        const { card, leveled } = spendDuplicateXp(owned);
+        setState({
+          ...live,
+          cards: live.cards.map((entry) => (entry.id === cardId ? card : entry)),
+        });
+        if (leveled) pushToast(`${CARD_BY_ID[cardId]?.name ?? "A companion"} rises in rank.`, "recruit");
       },
       dismissOutcome: () => setUi((u) => ({ ...u, outcome: null })),
       openGuild: (open) => setUi((u) => ({ ...u, guildOpen: open, catalogueOpen: false, tavernOpen: false })),
