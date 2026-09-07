@@ -123,6 +123,15 @@ export interface BoardQuest {
   critMatched: boolean;
 }
 
+export interface QuestXpGain {
+  id: string;
+  gained: number;
+  fromLevel: number;
+  fromXp: number;
+  toLevel: number;
+  toXp: number;
+}
+
 export interface QuestOutcome {
   key: string;
   templateId: string;
@@ -135,6 +144,7 @@ export interface QuestOutcome {
   xpEach: number;
   team: string[];
   leveled: string[];
+  xpGains: QuestXpGain[];
   critMatched: boolean;
 }
 

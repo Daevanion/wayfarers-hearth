@@ -71,6 +71,17 @@ export function cardQuestFit(card: CardTemplate, quest: QuestTemplate): number {
   }
   return score;
 }
+
+export function cardQuestRibbons(card: CardTemplate, quest: QuestTemplate): { favored: boolean; hazard: boolean } {
+  const favored = quest.advantages.some((adv) =>
+    adv.type === "trait" ? card.traits.includes(adv.id) : card.role === adv.id,
+  );
+  const hazard = quest.hazards.some((haz) =>
+    haz.type === "trait" ? card.traits.includes(haz.id) : card.role === haz.id,
+  );
+  return { favored, hazard };
+}
+
 export const ELEMENT_POWER_BONUS = 1.25;
 export const SET_SYNERGY_PCT = 10;
 export const CRIT_LOOT_MULT = 1.5;
@@ -304,10 +315,19 @@ export function resolveQuest(
   const restMs = template.durationMs * (won ? 0.5 : 2);
 
   const leveled: string[] = [];
+  const xpGains: QuestOutcome["xpGains"] = [];
   const cards = state.cards.map((c) => {
     if (!quest.team.includes(c.id)) return c;
     const { card, leveled: up } = grantXp(c, xpEach);
     if (up) leveled.push(c.id);
+    xpGains.push({
+      id: c.id,
+      gained: xpEach,
+      fromLevel: c.level,
+      fromXp: c.xp,
+      toLevel: card.level,
+      toXp: card.xp,
+    });
     return { ...card, exhaustedUntil: now + restMs };
   });
 
@@ -333,6 +353,7 @@ export function resolveQuest(
     xpEach,
     team: quest.team,
     leveled,
+    xpGains,
     critMatched: quest.critMatched,
   };
   return { state: next, outcome };

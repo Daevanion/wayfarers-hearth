@@ -18,6 +18,7 @@ export function PortraitCard({
   exhausted,
   size = "guild",
   dossier,
+  hideTraits,
   onClick,
   onHover,
 }: {
@@ -30,6 +31,7 @@ export function PortraitCard({
   exhausted?: boolean;
   size?: "guild" | "compact" | "inspect";
   dossier?: boolean;
+  hideTraits?: boolean;
   onClick?: () => void;
   onHover?: (active: boolean) => void;
 }) {
@@ -120,7 +122,7 @@ export function PortraitCard({
     <span className="portrait-caption">
       <strong>{shown ? template.name : "Unknown"}</strong>
       <em>{shown ? ROLE_LABEL[template.role] : "Unrecorded"}</em>
-      {shown && size !== "compact" ? <TraitChips traits={template.traits} compact /> : null}
+      {shown && size !== "compact" && !hideTraits ? <TraitChips traits={template.traits} compact /> : null}
     </span>
   );
 

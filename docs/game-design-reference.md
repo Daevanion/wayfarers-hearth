@@ -24,7 +24,8 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 - HUD menu buttons (Tavern / Collection / Full catalogue) are thin-lined, slightly transparent plaques, set below the resource strip
 - Quest Board icon (`questboard_icon.png`) swaps the plaza to swaying `questboard_bg2.jpg` and lists available / in-progress / completed bounties. “Today’s bounties” is hidden while the board is open
 - Quest entries sit on `quest_page_1.png` parchment with the quest painting and bounty copy on top. The board painting does not sway. Click an open bounty to open assignment (`quest_click.mp3`). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma). Completed cards grey-green with “Quest Complete”; in-progress cards show the time mark. Returned bounties tap to resolve.
-- Companies on the road appear as a **left-hand progress rail** (art, name, timer bar). Click for a full-view of the quest art with the assigned party.
+- Companies on the road appear as a **left-hand progress rail** (art, name, timer bar). Click for a near-full-screen view of the quest painting, lore, and **Party Members**. Returned companies offer **Hear the report**.
+- The report uses the Collection ledger frame. Loot is the large gold / token / XP piles. Each party card shows an XP bar toward the next rank; hover or click opens the dossier.
 - Dispatch loadout uses the quest painting as the header with time, power needed, team size, and favor on it, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
 - HUD: Gold, Tokens, Tavern, Collection, Full catalogue
 - Collection and Full catalogue are the same bound volume: parchment page, `The Ledger` kicker, All / Set chips plus dropdowns for Element, Role, and Status (Collection) or Obtain (Catalogue). Set view is fellowship rows of three
