@@ -21,6 +21,7 @@ import merchantRoad from "../Assets/bg/merchant_road.jpg";
 import brokenChapel from "../Assets/bg/broken_chapel.jpg";
 import corruptionEdge from "../Assets/bg/corruption_edge.jpg";
 import abyss from "../Assets/bg/abyss.jpg";
+import bridgeGang from "../Assets/bg/bridge_gang.jpg";
 
 export const BACKGROUNDS = {
   town,
@@ -46,6 +47,7 @@ export const BACKGROUNDS = {
   brokenChapel,
   corruptionEdge,
   abyss,
+  bridgeGang,
 } as const;
 
 const LOCATION_SCENE: Record<string, string> = {

@@ -610,7 +610,7 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 
 ## 8. Quest Board (49 Templates)
 
-Pool in `src/data/quests.ts`. Each template has `flavor` (card hook), `lore` (2–4 sentences in dispatch), `tier`, `teamMin`/`teamMax`, `art`. Dedicated paintings: Named Raider `goblinquest_bg.jpg`, Eyes on the Brotherhood `brotherhood_quest1.jpg`, Merchant Road `merchant_road.jpg`, Broken Chapel `broken_chapel.jpg`, Caravan `caravan.jpg`, Glade's Edge `corruption_edge.jpg`, Dark Glade survey `abyss.jpg`. All others cycle Whispering Woods / Old King's Road / Mirefen / Ruins of Caldara.
+Pool in `src/data/quests.ts`. Each template has `flavor` (card hook), `lore` (2–4 sentences in dispatch), `tier`, `teamMin`/`teamMax`, `art`. Dedicated paintings: Named Raider `goblinquest_bg.jpg`, Eyes on the Brotherhood `brotherhood_quest1.jpg`, Merchant Road `merchant_road.jpg`, Broken Chapel `broken_chapel.jpg`, The Bridge Gang `bridge_gang.jpg`, Caravan `caravan.jpg`, Glade's Edge `corruption_edge.jpg`, Dark Glade survey `abyss.jpg`. All others cycle Whispering Woods / Old King's Road / Mirefen / Ruins of Caldara.
 
 World tier is typed; **zero templates** until prerequisites are specified. Character-specific locks are **not wired**.
 
@@ -625,7 +625,7 @@ Alastor remains Extreme fiction only. Samara is a catalogue / quest-bound card �
 | `rogue-greatwolf` | The Rogue Greatwolf | earth | 70 | 32 | 42 | earth |
 | `merchant-road` | Hold the Merchant Road | — | 60 | 28 | 36 | tank |
 | `marsh-sage` | Marsh Sage Before Dark | water | 40 | 14 | 20 | healer |
-| `bridge-gang` | The Bridge Gang | — | 65 | 30 | 38 | scout |
+| `bridge-gang` | The Bridge Gang | — | 65 | 30 | 38 | scout · `bridge_gang.jpg` |
 | `wolves-at-fold` | Wolves at the Fold | earth | 45 | 18 | 24 | ranger |
 | `chapel-watch` | Watch at the Broken Chapel | light | 50 | 22 | 30 | cleric · `broken_chapel.jpg` |
 | `night-letter` | The Night Letter | dark | 55 | 24 | 30 | scout |

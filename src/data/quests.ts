@@ -15,6 +15,7 @@ const merchantRoad = BACKGROUNDS.merchantRoad;
 const brokenChapel = BACKGROUNDS.brokenChapel;
 const corruptionEdge = BACKGROUNDS.corruptionEdge;
 const abyss = BACKGROUNDS.abyss;
+const bridgeGang = BACKGROUNDS.bridgeGang;
 
 /** Daily board draws 3 low, 2 mid, 1 high, 1 extreme. World templates are reserved. Character locks are not wired yet. */
 export const QUEST_TEMPLATES: QuestTemplate[] = [
@@ -123,7 +124,7 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
     power: 65,
     teamMin: 1,
     teamMax: 3,
-    art: kings,
+    art: bridgeGang,
     advantages: [{ type: "trait", id: "charismatic", pct: 20 }],
     hazards: [{ type: "trait", id: "hotheaded", pct: -25 }],
     crit: { type: "role", id: "scout", note: "A scout cuts the chain in the dark and the carts roll before dawn." },
