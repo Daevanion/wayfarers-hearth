@@ -65,6 +65,14 @@ export const SETS: SetDef[] = [
     description:
       "Not sold at the tavern. A grieving paladin, the goddess who sealed the first darkness, and the calamity they must face again.",
   },
+  {
+    id: "blackheart-kin",
+    name: "Blackheart Kin",
+    members: ["rin-blackheart", "alastor-blackheart", "freya-blackheart"],
+    obtain: "quest",
+    description:
+      "Not sold at the tavern. The ember who fled the citadel, the first of their blood, and the Great Cold who shed her church mask.",
+  },
 ];
 
 export const SET_BY_ID = Object.fromEntries(SETS.map((s) => [s.id, s])) as Record<string, SetDef>;

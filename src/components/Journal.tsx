@@ -6,9 +6,6 @@ export function Journal() {
   const [open, setOpen] = useState(false);
   return (
     <div className={`journal ${open ? "open" : ""}`}>
-      <button className="journal-toggle" onClick={() => setOpen((v) => !v)}>
-        Chronicle
-      </button>
       {open ? (
         <>
           <ol>
@@ -24,6 +21,9 @@ export function Journal() {
           </button>
         </>
       ) : null}
+      <button className="journal-toggle" onClick={() => setOpen((v) => !v)}>
+        Chronicle
+      </button>
     </div>
   );
 }

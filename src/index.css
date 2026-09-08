@@ -2204,17 +2204,21 @@ p.muted.tight {
 
 .toasts {
   position: fixed;
-  right: 18px;
-  top: 132px;
+  left: 50%;
+  bottom: 76px;
+  top: auto;
+  right: auto;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 8px;
   z-index: 40;
-  width: min(360px, calc(100% - 24px));
+  width: min(420px, calc(100% - 24px));
 }
 
 .toast {
-  text-align: left;
+  text-align: center;
   border: 1px solid var(--gold-deep);
   background: #12182a;
   color: var(--parchment);
@@ -2236,11 +2240,15 @@ p.muted.tight {
 
 .journal {
   position: fixed;
-  left: 16px;
+  left: 50%;
   bottom: 16px;
   top: auto;
+  transform: translateX(-50%);
   z-index: 12;
-  width: min(320px, calc(100% - 32px));
+  width: min(360px, calc(100% - 32px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .journal-toggle {
@@ -2252,12 +2260,18 @@ p.muted.tight {
 }
 
 .journal.open ol {
+  width: 100%;
   max-height: 240px;
   overflow: auto;
-  margin: 8px 0;
+  margin: 0 0 8px;
   padding: 10px 10px 10px 28px;
   background: rgba(16, 12, 10, 0.92);
   border: 1px solid #5a4633;
+  text-align: left;
+}
+
+.journal .ghost.tiny {
+  margin-bottom: 8px;
 }
 
 .journal li {
@@ -2646,10 +2660,10 @@ p.muted.tight {
 
 .collection-modal.ledger-volume .ledger-toolbar .chip,
 .collection-modal.ledger-volume .ledger-drops .drop-btn {
-  border: 1px solid rgba(201, 162, 39, 0.48);
+  border: 1px solid var(--gold-deep);
   border-radius: 2px;
-  background: rgba(12, 16, 32, 0.38);
-  color: #f4ebd6;
+  background: rgba(12, 16, 32, 0.9);
+  color: var(--gold);
   font-family: Cinzel, serif;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -2658,23 +2672,23 @@ p.muted.tight {
 }
 
 .collection-modal.ledger-volume .ledger-toolbar .chip {
-  padding: 7px 16px;
-  font-size: 0.74rem;
+  padding: 10px 22px;
+  font-size: 0.88rem;
   font-weight: 500;
 }
 
 .collection-modal.ledger-volume .ledger-toolbar .chip:hover,
 .collection-modal.ledger-volume .ledger-drops .drop-btn:hover {
   transform: translateY(1px);
-  border-color: rgba(201, 162, 39, 0.78);
-  background: rgba(12, 16, 32, 0.52);
+  border-color: var(--gold);
+  background: rgba(12, 16, 32, 0.96);
 }
 
 .collection-modal.ledger-volume .ledger-toolbar .chip.on,
 .collection-modal.ledger-volume .ledger-drops .drop-btn[aria-expanded="true"] {
   color: var(--gold);
-  border-color: rgba(201, 162, 39, 0.85);
-  background: rgba(12, 16, 32, 0.58);
+  border-color: var(--gold);
+  background: rgba(16, 20, 36, 0.97);
 }
 
 .ledger-drops {
@@ -2685,8 +2699,8 @@ p.muted.tight {
 }
 
 .ledger-drops .drop {
-  flex: 0 1 148px;
-  min-width: 124px;
+  flex: 0 1 168px;
+  min-width: 140px;
 }
 
 .ledger-drops .drop-btn {
@@ -2694,17 +2708,17 @@ p.muted.tight {
   align-items: baseline;
   gap: 8px;
   width: 100%;
-  padding: 7px 12px;
+  padding: 10px 16px;
 }
 
 .ledger-drops .drop-btn span {
-  font-size: 0.58rem;
-  color: rgba(244, 235, 214, 0.72);
+  font-size: 0.66rem;
+  color: rgba(244, 235, 214, 0.78);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
 }
 
 .ledger-drops .drop-btn strong {
-  font-size: 0.74rem;
+  font-size: 0.88rem;
   font-weight: 500;
 }
 
@@ -2725,8 +2739,8 @@ p.muted.tight {
 }
 
 .ledger-drops .drop-list button {
-  padding: 6px 8px;
-  font-size: 0.74rem;
+  padding: 8px 10px;
+  font-size: 0.82rem;
   color: #f4ebd6;
   border-radius: 2px;
 }
@@ -2760,7 +2774,7 @@ p.muted.tight {
 .filter-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .view-fade {
