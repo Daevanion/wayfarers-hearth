@@ -457,6 +457,59 @@ export const CARDS: CardTemplate[] = [
     accent: "#5a1a2a",
     portrait: PORTRAITS["samara-blackheart"],
   },
+
+  // — Blackheart Kin (quest-only) —
+  {
+    id: "rin-blackheart",
+    name: "Rin Blackheart",
+    title: "The Obsidian Ember",
+    element: "fire",
+    role: "warrior",
+    combat: ["melee"],
+    power: 75,
+    rarity: "epic",
+    traits: ["kindhearted", "loyal", "distrustful"],
+    setId: "blackheart-kin",
+    obtain: "quest",
+    flavor:
+      "A half-demon who chose humanity and paid for it in the citadel dungeons. Morrigan cut her free. They are walking the glade toward the Frozen Berg.",
+    accent: "#c45a28",
+    portrait: PORTRAITS["rin-blackheart"],
+  },
+  {
+    id: "alastor-blackheart",
+    name: "Alastor Blackheart",
+    title: "Master of Darkness",
+    element: "earth",
+    role: "warrior",
+    combat: ["melee", "magic"],
+    power: 85,
+    rarity: "epic",
+    traits: ["legendary", "wise", "reclusive"],
+    setId: "blackheart-kin",
+    obtain: "quest",
+    flavor:
+      "The first half-demon, blamed for the elven king's fall. He fought beside Marpha, then vanished into the Frozen Berg for five centuries. He has stepped out again.",
+    accent: "#6a4a28",
+    portrait: PORTRAITS["alastor-blackheart"],
+  },
+  {
+    id: "freya-blackheart",
+    name: "Freya Blackheart",
+    title: "The Great Cold",
+    element: "dark",
+    role: "berserker",
+    combat: ["melee"],
+    power: 65,
+    rarity: "epic",
+    traits: ["mighty", "battlehungry", "scheming"],
+    setId: "blackheart-kin",
+    obtain: "quest",
+    flavor:
+      "The church's timid aide was a mask. Beneath it is a Frozen Berg shapeshifter who came for Serilla and a captive kin — loud, mad, and hungry for the fight.",
+    accent: "#3a5a7a",
+    portrait: PORTRAITS["freya-blackheart"],
+  },
 ];
 
 export const CARD_BY_ID = Object.fromEntries(CARDS.map((c) => [c.id, c])) as Record<string, CardTemplate>;

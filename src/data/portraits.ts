@@ -25,6 +25,9 @@ import evaHearthgale from "../Assets/cards/eva_hearthgale.jpg";
 import branBloodseeker from "../Assets/cards/bran_bloodseeker.jpg";
 import marpha from "../Assets/cards/marpha.jpg";
 import samaraBlackheart from "../Assets/cards/samara_blackheart.jpg";
+import rinBlackheart from "../Assets/cards/rin_blackheart.jpg";
+import alastorBlackheart from "../Assets/cards/alastor_blackheart.jpg";
+import freyaBlackheart from "../Assets/cards/freya_alter.jpg";
 import cardBack from "../Assets/cards/back_cover_card.jpg";
 
 export const CARD_BACK = cardBack;
@@ -57,4 +60,7 @@ export const PORTRAITS = {
   "bran-bloodseeker": branBloodseeker,
   marpha,
   "samara-blackheart": samaraBlackheart,
+  "rin-blackheart": rinBlackheart,
+  "alastor-blackheart": alastorBlackheart,
+  "freya-blackheart": freyaBlackheart,
 } as const;

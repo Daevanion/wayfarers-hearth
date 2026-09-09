@@ -28,7 +28,8 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 - The report uses the Collection ledger frame. Loot is the large gold / token / XP piles. Each party card shows an XP bar toward the next rank; hover or click opens the dossier.
 - Dispatch loadout uses the quest painting as the header with time, power needed, team size, and favor on it, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
 - HUD: Gold, Tokens, Tavern, Collection, Full catalogue
-- Collection and Full catalogue are the same bound volume: parchment page, `The Ledger` kicker, All / Set chips plus dropdowns for Element, Role, and Status (Collection) or Obtain (Catalogue). Set view is fellowship rows of three
+- Collection and Full catalogue are the same bound volume: parchment page, `The Ledger` kicker, All / Set chips plus dropdowns for Element, Role, and Status (Collection) or Obtain (Catalogue). Filter plaques match Chronicle: opaque dark gold-edged, larger type. Set view is fellowship rows of three
+- Toasts and the Chronicle log sit at the bottom center; the log opens above the Chronicle button
 - Collection = owned company. Catalogue = every face, owned or not. Quest-only cards caption **Quest-bound**
 - Collection hides empty quest-only sets until a member is owned
 - Tavern packs roll from `TAVERN_CARDS` only (`obtain !== "quest"`)
@@ -38,7 +39,7 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 - Opening draw: **Hearthbound trio** (Hera, Caelan, Cedric)
 - Visual novel: arrival scene (Hera / Cedric idle sprites, parchment box). Sprites stand on the bottom edge of the game display. Triggered from Settings for now; 2s lock before a line can be skipped
 - Tavern pack: fade in `pack_open3.mp4` and wait until the clip finishes, then a white fade to a sealed card on blurred `tavern3.jpg`. Name, title, and traits fade in after the click. 1s later, Back to Tavern / Go to Collection (opens that card’s dossier)
-- BGM: `src/Assets/sfx/thepire.mp3` then `src/Assets/sfx/whispering_elven_woods.mp3`, looping
+- BGM: `src/Assets/sfx/thepire.mp3` then `src/Assets/sfx/whispering_elven_woods.mp3` then `src/Assets/sfx/village_dance.mp3`, looping
 
 ### File map (content work)
 
@@ -65,7 +66,7 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 - Traits: **2–4 per card**, at least one **negative** if the lore has a flaw. Reuse existing trait IDs before creating new ones.
 - `wild` matches **every** quest element (Odin). `null` matches none.
 - Combat can be multiple (`morrigan-crow` is melee + ranged).
-- Special IDs: `freya` (file `freya.jpg`, not `freya_icewalker`); `kaelen-duskwalker` even if the sheet says “kaelen duskwalk”; `serilla` (file `serilla.jpg`); `marpha` (file `marpha.jpg`).
+- Special IDs: `freya` (file `freya.jpg`, not `freya_icewalker`); `freya-blackheart` (file `freya_alter.jpg`); `kaelen-duskwalker` even if the sheet says “kaelen duskwalk”; `serilla` (file `serilla.jpg`); `marpha` (file `marpha.jpg`).
 - Voice: gold/blue/parchment, medieval, no modern slang.
 - Do not commit or push unless the user asks.
 
@@ -77,7 +78,7 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 1. [Active Game Loop](#1-active-game-loop)
 2. [Core Formulas](#2-core-formulas)
 3. [Progression & Economy](#3-progression--economy)
-4. [Full Roster (27 Cards)](#4-full-roster-27-cards)
+4. [Full Roster (30 Cards)](#4-full-roster-30-cards)
 5. [Power Output Tables](#5-power-output-tables)
 6. [Sets & Synergies](#6-sets--synergies)
 7. [Traits Reference (51)](#7-traits-reference-51)
@@ -270,7 +271,7 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 ---
 
-## 4. Full Roster (27 Cards)
+## 4. Full Roster (30 Cards)
 
 ### Hearthbound — `hearthbound`
 
@@ -390,6 +391,20 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 ---
 
+### Blackheart Kin — `blackheart-kin` (quest-only)
+
+| ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
+|----|------|-------|-----|--------|---------|------|--------|--------|--------|
+| `rin-blackheart` | Rin Blackheart | The Obsidian Ember | 75 | 79 | fire | warrior | melee | epic | kindhearted, loyal, distrustful |
+| `alastor-blackheart` | Alastor Blackheart | Master of Darkness | 85 | 89 | earth | warrior | melee + magic | epic | legendary, wise, reclusive |
+| `freya-blackheart` | Freya Blackheart | The Great Cold | 65 | 69 | dark | berserker | melee | epic | mighty, battlehungry, scheming |
+
+**Set total:** L1 = 225 | L5 = 237
+
+**Note:** `obtain: "quest"`. Full catalogue only — never tavern. No obtain-quest yet. This is **not** church Freya (`freya` / Penitent Order). Portrait file is `freya_alter.jpg`. Sheet element for Alastor is Earth, Fire; stored as `earth` (first listed). Fire is lore-highlighted only.
+
+---
+
 ### Rarity Power Bands (L1 base)
 
 | Rarity | Power range | Cards |
@@ -397,7 +412,7 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 | Common | 25 | Hera, Caelan, Cedric, Yvaine, Elowen |
 | Uncommon | 30–40 | Leona (35), Kaelen (40), Gall (40), Elanor (30), Alden (30), Eamon (35) |
 | Rare | 30–50 | Lysandra (50), Sylas (50), Freya (45), Fenric (45), Seraphina (30), Evander (50), Eva (45) |
-| Epic | 65–75 | Corvus (65), Aurora (70), Morrigan (75), Serilla (75) |
+| Epic | 65–85 | Freya Blackheart (65), Corvus (65), Aurora (70), Rin (75), Morrigan (75), Serilla (75), Alastor (85) |
 | Legendary | 90–100 | Reinhart (90), Bran (90), Samara (95), Odin (100), Marpha (100) |
 
 ---
@@ -414,9 +429,10 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 | Kaelen / Gall | 40 | 41 | 42 | 43 | 44 |
 | Freya / Fenric / Eva | 45 | 46 | 47 | 48 | 49 |
 | Sylas / Lysandra / Evander | 50 | 51 | 52 | 53 | 54 |
-| Corvus | 65 | 66 | 67 | 68 | 69 |
+| Corvus / Freya Blackheart | 65 | 66 | 67 | 68 | 69 |
 | Aurora | 70 | 71 | 72 | 73 | 74 |
-| Morrigan / Serilla | 75 | 76 | 77 | 78 | 79 |
+| Morrigan / Serilla / Rin | 75 | 76 | 77 | 78 | 79 |
+| Alastor | 85 | 86 | 87 | 88 | 89 |
 | Reinhart / Bran | 90 | 91 | 92 | 93 | 94 |
 | Samara | 95 | 96 | 97 | 98 | 99 |
 | Odin / Marpha | 100 | 101 | 102 | 103 | 104 |
@@ -484,6 +500,7 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 | `moonlight-scripture` | Moonlight Scripture | Aurora, Corvus, Serilla | 210 | 222 | When all 3 dispatched |
 | `wolfcrag-exile` | Wolfcrag Exile | Elowen, Evander, Eva | 120 | 132 | When all 3 dispatched |
 | `calamity-seal` | Calamity Seal | Bran, Marpha, Samara | 285 | 297 | Catalogue only — no set crit yet |
+| `blackheart-kin` | Blackheart Kin | Rin, Alastor, Freya Blackheart | 225 | 237 | Catalogue only — no set crit yet |
 
 ### Set-Specific Crit Quests (existing)
 
@@ -514,6 +531,9 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 | Leona | prodigy | hotheaded |
 | Sylas | devout, protective | guiltridden |
 | Freya | mighty | cowardly, eccentric |
+| Rin | kindhearted, loyal | distrustful |
+| Alastor | legendary, wise | reclusive |
+| Freya Blackheart | mighty | battlehungry, scheming |
 | Morrigan | lethal, mercenary | distrustful |
 | Odin | legendary, scholarly | scheming |
 | Reinhart | fearless, charismatic | battlehungry |
@@ -614,7 +634,7 @@ Pool in `src/data/quests.ts`. Each template has `flavor` (card hook), `lore` (2�
 
 World tier is typed; **zero templates** until prerequisites are specified. Character-specific locks are **not wired**.
 
-Alastor remains Extreme fiction only. Samara is a catalogue / quest-bound card — not tavern-obtainable, no recruit quest yet.
+Alastor, Rin, Freya Blackheart, and Samara are catalogue / quest-bound cards — not tavern-obtainable, no recruit quests yet. Whereabouts of General Alastor remains Extreme fiction.
 
 ### Low — 16 (seats 1–3, power 40–75, 90s–8m)
 
@@ -844,7 +864,7 @@ Extended lore lives in `src/data/lore.ts`. Below: narrative hooks mapped to mech
 |--------------|-----------------|
 | Odin ↔ Leona | Stormrage legacy training (wild + fire) |
 | Sylas ↔ Kaelen | Duskwalker siblings (separated) reunion quest |
-| Morrigan ↔ Rin Blackheart | Rescue/imprisonment arc (Rin art exists, no card yet) |
+| Morrigan ↔ Rin Blackheart | Escape from the citadel / Frozen Berg crossing (blackheart-kin; obtain quests not designed) |
 | Reinhart ↔ Azoth | Rivalry duel (Azoth art exists, no card yet) |
 | Fenric ↔ Elanor | Spear training mission; softspoken + spearmaiden |
 | Alden ↔ Yvaine | Uncle's last honest commission (artisan) |
@@ -852,6 +872,7 @@ Extended lore lives in `src/data/lore.ts`. Below: narrative hooks mapped to mech
 | Aurora ↔ Lysandra | An elven emissary at a human encampment (intolerant hazard) |
 | Elowen ↔ Evander ↔ Eva | Eastern wood crossing / curse mastery (wolfcrag-exile) |
 | Bran ↔ Samara ↔ Marpha | Blood oath / Sunwatch Bay / the first seal (calamity-seal; obtain quests not designed) |
+| Rin ↔ Alastor ↔ Freya Blackheart | Frozen Berg kin / Serilla's prisoner / the church mask (blackheart-kin; obtain quests not designed) |
 
 ---
 
@@ -862,8 +883,6 @@ Portrait art exists in `src/Assets/cards/` but **no card data** yet (no Excel ro
 | Asset file | Likely character | Lore connection |
 |------------|------------------|-----------------|
 | `azoth_sharpedge.jpg` | Azoth Sharpedge | Reinhart's rival (half-beastfolk warrior) |
-| `rin_blackheart.jpg` | Rin Blackheart | Morrigan's imprisoned partner |
-| `alastor_blackheart.jpg` | Alastor Blackheart | Blackheart family |
 | `leander_hearthkeep.jpg` | Leander Hearthkeep | Unknown |
 | `rowena_windmere.jpg` | Rowena Windmere | Unknown |
 | `zephyr_starling.jpg` | Zephyr Starling | Starling surname (Aurora family?) |
@@ -904,7 +923,7 @@ Path: `c:\Users\daeva\Desktop\lores.xlsx` (not in git). Dump with Python/`openpy
 
 | Column | Maps to |
 |--------|---------|
-| `name` | `CardTemplate.name`; id = kebab-case (`Hera Starfall` → `hera-starfall`). Exceptions: `freya`, `kaelen-duskwalker` |
+| `name` | `CardTemplate.name`; id = kebab-case (`Hera Starfall` → `hera-starfall`). Exceptions: `freya`, `freya-blackheart` (`freya_alter.jpg`), `kaelen-duskwalker` |
 | `title` | `CardTemplate.title` |
 | `element` | lowercase `ElementId`. Sheet values: Fire, Water, Earth, Air, Light, Dark, Null / No, Wild |
 | `role` | lowercase `RoleId`. Sheet “ArachMage” / “Arch Mage” → `archmage`. “Tank” / “Warrior” stay distinct (`gall` is tank, `fenric` is warrior) |
@@ -991,4 +1010,4 @@ Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary"
 
 ---
 
-*Document version: save v13, 27 cards, 9 sets of 3, 49 quest templates, 51 traits. Update the counts in this line whenever they change.*
+*Document version: save v13, 30 cards, 10 sets of 3, 49 quest templates, 51 traits. Update the counts in this line whenever they change.*

@@ -3,6 +3,7 @@ import cardFlip from "../Assets/sfx/card_flip.mp3";
 import tavernChatter from "../Assets/sfx/tavern_chatter.mp3";
 import thePire from "../Assets/sfx/thepire.mp3";
 import whisperingWoods from "../Assets/sfx/whispering_elven_woods.mp3";
+import villageDance from "../Assets/sfx/village_dance.mp3";
 import uiClick from "../Assets/sfx/ui_click.mp3";
 import billboard from "../Assets/sfx/billboard_sfx.mp3";
 import questClick from "../Assets/sfx/quest_click.mp3";
@@ -41,7 +42,7 @@ const sfxNodes: Partial<Record<SfxKind, HTMLAudioElement[]>> = {};
 const sfxRaw: Partial<Record<SfxKind, ArrayBuffer>> = {};
 let sfxFetch: Promise<void> | null = null;
 
-const BGM_TRACKS = [thePire, whisperingWoods];
+const BGM_TRACKS = [thePire, whisperingWoods, villageDance];
 
 const BGM_KEY = "wayfarers-hearth-bgm";
 
