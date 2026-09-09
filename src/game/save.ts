@@ -1,10 +1,21 @@
 import { STARTER_IDS } from "../data/cards";
 import { makeOwned, normalizeOwned } from "./formulas";
-import { dateKey, makeBoard } from "./quests";
+import { dateKey, makeBoard, syncSecretQuests } from "./quests";
 import type { GameState } from "../types";
 
 export const SAVE_KEY = "wayfarers-hearth-board-v1";
-export const SAVE_VERSION = 13;
+export const SAVE_VERSION = 14;
+
+function withSecretFields(state: GameState): GameState {
+  return syncSecretQuests({
+    ...state,
+    version: SAVE_VERSION,
+    specialBoard: state.specialBoard ?? [],
+    unlockedChapters: state.unlockedChapters ?? [],
+    secretNoticesDismissed: state.secretNoticesDismissed ?? [],
+    cards: (state.cards ?? []).map(normalizeOwned),
+  });
+}
 
 export function createNewGame(): GameState {
   const now = Date.now();
@@ -16,6 +27,9 @@ export function createNewGame(): GameState {
     cards: STARTER_IDS.map((id) => makeOwned(id)),
     boardDate: day,
     board: makeBoard(day),
+    specialBoard: [],
+    unlockedChapters: [],
+    secretNoticesDismissed: [],
     journal: [
       {
         id: "welcome",
@@ -33,11 +47,10 @@ export function loadSave(): GameState | null {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as GameState;
-    if (!parsed || parsed.version !== SAVE_VERSION) return null;
-    return {
-      ...parsed,
-      cards: (parsed.cards ?? []).map(normalizeOwned),
-    };
+    if (!parsed) return null;
+    if (parsed.version === SAVE_VERSION) return withSecretFields(parsed);
+    if (parsed.version === 13) return withSecretFields(parsed);
+    return null;
   } catch {
     return null;
   }

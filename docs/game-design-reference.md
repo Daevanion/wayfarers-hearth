@@ -6,7 +6,7 @@
 >
 > **Writer truth:** `c:\Users\daeva\Desktop\lores.xlsx` (outside the repo). Columns: `name | title | element | role | power | combat | lore`. Sets of **3** are separated by a repeated header row.
 >
-> **Repo:** https://github.com/Daevanion/wayfarers-hearth — save key `wayfarers-hearth-board-v1`, **SAVE_VERSION 13**. Adding cards does **not** require a version bump. Bump if `GameState` shape or daily board template IDs change (old boards would fade).
+> **Repo:** https://github.com/Daevanion/wayfarers-hearth — save key `wayfarers-hearth-board-v1`, **SAVE_VERSION 14**. Adding cards does **not** require a version bump. Bump if `GameState` shape or daily board template IDs change (old boards would fade). v13 saves migrate (secret board / chapters).
 >
 > After any roster or quest change, **update this document** (counts, tables, unused-trait list) so the next session starts accurate.
 
@@ -21,24 +21,28 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 ### What the player sees
 
 - Full-bleed swaying `town3.jpg` plaza; Tavern swaps to swaying `tavern3.jpg`, Collection and Full catalogue to swaying `collection_bg.jpg`, both under a light dim
-- HUD menu buttons (Tavern / Collection / Full catalogue) are thin-lined, slightly transparent plaques, set below the resource strip
-- Quest Board icon (`questboard_icon.png`) swaps the plaza to swaying `questboard_bg2.jpg` and lists available / in-progress / completed bounties. “Today’s bounties” is hidden while the board is open
-- Quest entries sit on `quest_page_1.png` parchment with the quest painting and bounty copy on top. The board painting does not sway. Click an open bounty to open assignment (`quest_click.mp3`). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma). Completed cards grey-green with “Quest Complete”; in-progress cards show the time mark. Returned bounties tap to resolve.
+- HUD menu buttons (Tavern / Collection / Full catalogue / Full Lorebook) are thin-lined, slightly transparent plaques, set below the resource strip. Opening one closes the Quest Board and the other menus
+- Quest Board icon (`questboard_icon.png`) swaps the plaza to swaying `questboard_bg2.jpg` and lists available / in-progress / completed bounties. Tabs: **Today's bounties** / **Special Orders**. Special Orders uses `faithless_shield_bg.jpg` and shows only unlocked secret quests. “Today’s bounties” is hidden while the board is open
+- Quest entries sit on `quest_page_1.png` parchment with the quest painting and bounty copy on top. The board painting does not sway. Click an open bounty to open assignment (`quest_click.mp3`). Cards glow by tier (Low white, Mid green, High orange, Extreme red, World purple miasma, **Special gold**). Completed cards grey-green with “Quest Complete”; in-progress cards show the time mark. Returned bounties tap to resolve.
+- Owning every character named in a World Lore chapter posts a plaza notice: `Secret quest: 'The Faithless Shield' is now available.` Click opens Special Orders. Dispatch requires those named cards at **shown level 2+**. Duration scales with their total power (60 → 3m, 120 → 15m, 250+ → 50m). Success is certain; completing unseals the chapter on each named dossier.
+- Owned dossiers show four secret-chapter plaques (`???`) under the portrait and Level up column. An unsealed chapter becomes an opaque Chronicle-style button with the story title. Click to read the Word-doc text and story portraits.
+- Full Lorebook lists every World Lore chapter as a card. Unsealed cards open the same story reader; sealed cards stay dimmed until the special order is done.
 - Companies on the road appear as a **left-hand progress rail** (art, name, timer bar). Click for a near-full-screen view of the quest painting, lore, and **Party Members**. Returned companies offer **Hear the report**.
-- The report uses the Collection ledger frame. Loot is the large gold / token / XP piles. Each party card shows an XP bar toward the next rank; hover or click opens the dossier.
+- The report uses the Collection ledger frame. Loot is the large gold / token / XP piles. Each party card shows an XP bar toward the next rank; hover 1.5s or click opens the dossier.
 - Dispatch loadout uses the quest painting as the header with time, power needed, team size, and favor on it, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
-- HUD: Gold, Tokens, Tavern, Collection, Full catalogue
+- HUD: Gold, Tokens, Tavern, Collection, Full catalogue, Full Lorebook
 - Collection and Full catalogue are the same bound volume: parchment page, `The Ledger` kicker, All / Set chips plus dropdowns for Element, Role, and Status (Collection) or Obtain (Catalogue). Filter plaques match Chronicle: opaque dark gold-edged, larger type. Set view is fellowship rows of three
 - Toasts and the Chronicle log sit at the bottom center; the log opens above the Chronicle button
 - Collection = owned company. Catalogue = every face, owned or not. Quest-only cards caption **Quest-bound**
 - Collection hides empty quest-only sets until a member is owned
 - Tavern packs roll from `TAVERN_CARDS` only (`obtain !== "quest"`)
-- Click a card in Collection or Catalogue → full dossier (Excel lore + highlighted elements/traits + titled stats). Owned dossiers show **Level up +XP** and a duplicate count as menu plaques under the portrait; pack likenesses wait there instead of applying on pull
+- Click a card in Collection or Catalogue → full dossier (Excel lore + highlighted elements/traits + titled stats). Owned dossiers show **Level up +XP** and a duplicate count as menu plaques under the portrait; pack likenesses wait there instead of applying on pull. Collection cards with banked likenesses (and room to rank up) show a red dot.
 - Card level sits at the bottom-left of the portrait. Fresh cards are 0 and show no mark; the first rank-up shows 1
 - Hover 1.5s on dossier art → full-size visual zoom (dim only; zoom 1× / 1.25× / 1.5×)
 - Opening draw: **Hearthbound trio** (Hera, Caelan, Cedric)
 - Visual novel: arrival scene (Hera / Cedric idle sprites, parchment box). Sprites stand on the bottom edge of the game display. Triggered from Settings for now; 2s lock before a line can be skipped
-- Tavern pack: fade in `pack_open3.mp4` and wait until the clip finishes, then a white fade to a sealed card on blurred `tavern3.jpg`. Name, title, and traits fade in after the click. 1s later, Back to Tavern / Go to Collection (opens that card’s dossier)
+- Settings debug (plaza): +gold/tokens, **Get new quest** (redraw daily board, underway kept), **Complete quests** (underway return now), **Unlock lore** (all chapters)
+- Tavern pack: Open 3 / Open 10 toggles buy that many if the purse can pay. Fade in `pack_open3.mp4` (Skip jumps to the last 2s). After the clip, a sealed card on blurred `tavern3.jpg`. One pack shows name/title/traits; 3 or 10 fan like the opening draw. Back to Tavern / Go to Collection
 - BGM: `src/Assets/sfx/thepire.mp3` then `src/Assets/sfx/whispering_elven_woods.mp3` then `src/Assets/sfx/village_dance.mp3`, looping
 
 ### File map (content work)
@@ -53,6 +57,8 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 | Lore keyword highlights | `src/components/LoreText.tsx` (`ELEMENT_ALIASES`, `TRAIT_ALIASES`) |
 | Shared Collection / Catalogue ledger | `src/components/LedgerFilters.tsx` |
 | Quest pool | `src/data/quests.ts` |
+| Secret chapters / Special Orders | `src/data/chapters.ts`, `src/data/chapterBodies.ts` (`World Lore.docx`) |
+| Story portraits / map | `src/data/storyPortraits.ts` + `src/Assets/cards/portraits/*` + `worldmap2_small.jpg` |
 | Success math, board, packs | `src/game/quests.ts` |
 | XP / power per level | `src/game/formulas.ts` |
 | Icons (element / combat) | `src/data/icons.ts` + `src/Assets/bg/{fire,water,earth,air,light,dark,melee,ranged,magic}.png` |
@@ -632,7 +638,19 @@ Traits modify quest odds when any team member possesses them. **Good traits** ap
 
 Pool in `src/data/quests.ts`. Each template has `flavor` (card hook), `lore` (2–4 sentences in dispatch), `tier`, `teamMin`/`teamMax`, `art`. Dedicated paintings: Named Raider `goblinquest_bg.jpg`, Eyes on the Brotherhood `brotherhood_quest1.jpg`, Merchant Road `merchant_road.jpg`, Broken Chapel `broken_chapel.jpg`, The Bridge Gang `bridge_gang.jpg`, Caravan `caravan.jpg`, Glade's Edge `corruption_edge.jpg`, Dark Glade survey `abyss.jpg`. All others cycle Whispering Woods / Old King's Road / Mirefen / Ruins of Caldara.
 
-World tier is typed; **zero templates** until prerequisites are specified. Character-specific locks are **not wired**.
+World tier is typed; **zero templates** until prerequisites are specified.
+
+### Special Orders (5 secret chapters)
+
+From `World Lore.docx`, wired in `src/data/chapters.ts`. Not drawn on the daily board. Appear on **Special Orders** once every named character is owned. Named company only; each card needs **shown level 2**. Duration interpolates from company power: 60 → 3 minutes, 120 → 15 minutes, 250+ → 50 minutes. Always succeeds. Completing unseals that chapter on each named dossier (4 slots per card; unused stay `???`).
+
+| ID | Title | Company | Map |
+|----|-------|---------|-----|
+| `the-faithless-shield` | The Faithless Shield | Seraphina, Fenric | Lightspear · `faithless_shield_bg.jpg` |
+| `sixty-percent-of-a-hero` | Sixty Percent of a Hero | Alden, Yvaine, Eamon | East Silver Gale |
+| `a-lesson-in-the-dark` | A Lesson in the Dark | Lysandra, Kaelan | Dark forest |
+| `the-silence-of-the-hollow-blade` | The Silence of the Hollow Blade | Corvus, Aurora, Serilla | Dark Glade |
+| `the-beastmasters-detour` | The Beastmaster's Detour | Eva, Elowen, Evander | Dark forest |
 
 Alastor, Rin, Freya Blackheart, and Samara are catalogue / quest-bound cards — not tavern-obtainable, no recruit quests yet. Whereabouts of General Alastor remains Extreme fiction.
 

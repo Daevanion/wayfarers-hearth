@@ -1110,6 +1110,245 @@ button {
   top: auto;
 }
 
+.secret-notices {
+  position: absolute;
+  left: 50%;
+  top: 92px;
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: min(420px, calc(100% - 32px));
+}
+
+.secret-notice {
+  width: 100%;
+  border: 1px solid var(--gold-deep);
+  border-radius: 2px;
+  background: rgba(12, 16, 32, 0.9);
+  color: var(--gold);
+  font-family: Cinzel, serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  padding: 10px 16px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+
+.secret-notice:hover {
+  border-color: var(--gold);
+  background: rgba(16, 20, 36, 0.96);
+}
+
+.secret-chapter-slots {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.secret-chapter-btn {
+  min-width: 0;
+  min-height: 44px;
+  padding: 12px 14px;
+  font-size: 0.78rem;
+}
+
+.secret-chapter-btn.unsealed {
+  background: rgba(12, 16, 32, 0.9);
+  color: var(--gold);
+  border-color: var(--gold-deep);
+}
+
+.secret-chapter-btn:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.lorebook-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  padding: 8px 4px 18px;
+}
+
+.lorebook-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  border: 1px solid var(--gold-deep);
+  border-radius: 2px;
+  background: rgba(12, 16, 32, 0.9);
+  color: var(--gold);
+  text-align: left;
+}
+
+.lorebook-card.sealed {
+  opacity: 0.55;
+}
+
+.lorebook-card:disabled {
+  cursor: default;
+}
+
+.lorebook-card-art {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.lorebook-card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+}
+
+.lorebook-card.sealed .lorebook-card-art img {
+  filter: grayscale(0.35) brightness(0.7);
+}
+
+.lorebook-card strong {
+  font-family: Cinzel, serif;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  padding: 0 10px 10px;
+}
+
+.secret-company-note {
+  margin: 0 0 12px;
+  color: #3a2a14;
+  font-size: 0.92rem;
+}
+
+.chapter-reader {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(8, 12, 28, 0.78);
+}
+
+.chapter-reader-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(200px, 260px) minmax(0, 1fr);
+  gap: 22px 28px;
+  width: min(1360px, 97vw);
+  max-height: min(90vh, 920px);
+  overflow: auto;
+  padding: 46px 28px 20px;
+  color: #1c160e;
+  background:
+    radial-gradient(ellipse at 18% 8%, rgba(196, 161, 90, 0.16), transparent 44%),
+    radial-gradient(ellipse at 82% 92%, rgba(90, 61, 34, 0.14), transparent 48%),
+    repeating-linear-gradient(0deg, rgba(120, 90, 40, 0.055) 0 2px, transparent 2px 4px),
+    #e8d4a8;
+  border: 2px solid #c4a15a;
+  box-shadow:
+    0 0 0 4px #3d2918,
+    0 28px 60px rgba(8, 6, 4, 0.45),
+    inset 0 0 0 1px rgba(255, 244, 214, 0.42);
+}
+
+.chapter-reader-close {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--gold-deep);
+  background: #f7efd8;
+  color: var(--gold-deep);
+  font-size: 1rem;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(8, 12, 28, 0.12);
+}
+
+.chapter-cast {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow: auto;
+}
+
+.chapter-cast ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chapter-cast li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chapter-cast img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #c4a15a, 0 8px 18px rgba(8, 12, 28, 0.25);
+}
+
+.chapter-cast span {
+  font-family: Cinzel, serif;
+  font-size: 0.78rem;
+  color: #3a2a14;
+}
+
+.chapter-prose {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  color: #2c2114;
+}
+
+.chapter-prose h2 {
+  margin: 0 0 12px;
+  font-family: Cinzel, serif;
+  font-size: 1.6rem;
+  color: #3a2410;
+}
+
+.chapter-prose p {
+  margin: 0 0 12px;
+  line-height: 1.55;
+  font-size: 0.98rem;
+}
+
+@media (max-width: 780px) {
+  .chapter-reader-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-cast {
+    max-width: none;
+  }
+
+  .chapter-cast ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .chapter-cast li {
+    flex: 1 1 110px;
+  }
+}
+
 .dossier-art-hit {
   display: block;
   width: 100%;
@@ -2950,6 +3189,19 @@ p.muted.tight {
   z-index: 1;
 }
 
+.collection-level-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 9;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d3222a;
+  box-shadow: 0 0 0 2px #efe4c8, 0 0 8px rgba(180, 24, 24, 0.55);
+  pointer-events: none;
+}
+
 .collection-card:hover,
 .collection-card:focus-within {
   z-index: 8;
@@ -3801,8 +4053,27 @@ p.muted.tight {
   box-shadow: 0 0 0 1px #ff4a3c, 0 0 10px rgba(220, 40, 30, 0.34);
 }
 
-.quest-card.tier-world .quest-card-art-frame {
-  box-shadow: 0 0 0 1px #c9a0ff, 0 0 12px rgba(140, 40, 200, 0.38);
+.quest-card.tier-special .quest-card-art-frame {
+  box-shadow: 0 0 0 2px var(--gold), 0 0 16px rgba(201, 162, 39, 0.55);
+}
+
+.quest-tier.tier-special {
+  border-color: var(--gold);
+  color: #ffe7a8;
+  box-shadow: 0 0 12px rgba(201, 162, 39, 0.45);
+}
+
+.quest-card.tier-special .quest-card-face:not(:disabled):hover .quest-card-art-frame {
+  box-shadow: 0 0 0 2px #ffe7a8, 0 0 18px rgba(201, 162, 39, 0.7);
+}
+
+.quest-track-card.tier-special {
+  border-color: var(--gold);
+  box-shadow: 0 0 16px rgba(201, 162, 39, 0.45);
+}
+
+.loadout-head-glow.tier-special {
+  box-shadow: inset 0 0 0 3px rgba(201, 162, 39, 0.9), inset 0 0 36px rgba(201, 162, 39, 0.28);
 }
 
 .quest-card.tier-world .quest-card-art-frame::after {
@@ -4012,6 +4283,26 @@ p.muted.tight {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+.quest-board-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.quest-board-tabs .menu-btn {
+  min-width: 168px;
+  background: rgba(12, 16, 32, 0.9);
+  color: var(--gold);
+  border-color: var(--gold-deep);
+}
+
+.quest-board-tabs .menu-btn.on {
+  background: rgba(16, 20, 36, 0.97);
+  border-color: var(--gold);
 }
 
 .quest-overview-section h3 {
@@ -5155,6 +5446,26 @@ p.muted.tight {
   place-items: center;
 }
 
+.tavern-count {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.tavern-count .menu-btn {
+  min-width: 120px;
+  background: rgba(12, 16, 32, 0.9);
+  color: var(--gold);
+  border-color: var(--gold-deep);
+}
+
+.tavern-count .menu-btn.on {
+  border-color: var(--gold);
+  background: rgba(16, 20, 36, 0.97);
+}
+
 .tavern-actions {
   flex: 0 0 auto;
   display: flex;
@@ -5466,6 +5777,21 @@ p.muted.tight {
   animation: pack-open-fade-in 1.1s ease forwards;
 }
 
+.pack-open-skip {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 4;
+  transform: translateX(-50%);
+  border: 1px solid var(--gold-deep);
+  background: rgba(12, 16, 32, 0.9);
+  color: var(--gold);
+  font-family: Cinzel, serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 10px 22px;
+}
+
 .pack-open-bg {
   position: absolute;
   inset: -8%;
@@ -5676,6 +6002,60 @@ p.muted.tight {
 
 .pack-open-face.rarity-legendary .pack-open-glow {
   background: radial-gradient(circle, rgba(243, 198, 74, 0.55), transparent 68%);
+}
+
+.pack-open-fan {
+  position: relative;
+  width: min(780px, 92vw);
+  height: min(420px, 58vh);
+}
+
+.pack-open-fan.many {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(92px, 132px));
+  justify-content: center;
+  align-content: center;
+  gap: 10px 12px;
+  width: min(860px, 96vw);
+  height: auto;
+  max-height: min(68vh, 560px);
+}
+
+.pack-open-fan.many .fan-card {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: auto;
+  margin: 0;
+  transform: none;
+}
+
+.pack-open-fan-note {
+  margin: 2px 0 0;
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d4e2ff;
+  text-shadow: 0 2px 8px #000;
+}
+
+.pack-open-fan-note.new {
+  color: #ffe7a8;
+}
+
+.pack-open.many .pack-open-focus.fan-focus {
+  justify-content: flex-start;
+  padding-top: 4vh;
+  gap: 12px;
+}
+
+.pack-open-fan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  z-index: 3;
 }
 
 .pack-open-actions {

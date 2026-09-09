@@ -3,7 +3,7 @@ import { loadBgmSettings, saveBgmSettings, startMenuBgm, type BgmSettings } from
 import { useGame } from "../store/GameContext";
 
 export function Settings() {
-  const { ui, grantDebugFunds, startVn } = useGame();
+  const { ui, grantDebugFunds, debugRedrawBoard, debugCompleteQuests, debugUnlockLore, startVn } = useGame();
   const [open, setOpen] = useState(false);
   const [bgm, setBgm] = useState<BgmSettings>(() => loadBgmSettings());
   const box = useRef<HTMLDivElement>(null);
@@ -58,6 +58,30 @@ export function Settings() {
             onClick={grantDebugFunds}
           >
             Debug: +1000 gold, +100 tokens
+          </button>
+          <button
+            type="button"
+            className="settings-debug"
+            disabled={ui.screen !== "plaza"}
+            onClick={debugRedrawBoard}
+          >
+            Get new quest
+          </button>
+          <button
+            type="button"
+            className="settings-debug"
+            disabled={ui.screen !== "plaza"}
+            onClick={debugCompleteQuests}
+          >
+            Complete quests
+          </button>
+          <button
+            type="button"
+            className="settings-debug"
+            disabled={ui.screen !== "plaza"}
+            onClick={debugUnlockLore}
+          >
+            Unlock lore
           </button>
           <button
             type="button"

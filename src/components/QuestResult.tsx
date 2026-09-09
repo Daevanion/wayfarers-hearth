@@ -14,12 +14,21 @@ export function QuestResult() {
   const { state, ui, inspect, dismissOutcome } = useGame();
   const outcome = ui.outcome;
   const hoverTimer = useRef(0);
+
+  useEffect(() => () => window.clearTimeout(hoverTimer.current), [outcome]);
+
   if (!outcome) return null;
   const template = QUEST_BY_ID[outcome.templateId];
   if (!template) return null;
 
   const headline =
-    outcome.result === "crit" ? "A triumph" : outcome.result === "success" ? "The work is done" : "They come back empty-handed";
+    template.secret && outcome.result !== "fail"
+      ? "The chapter is unsealed"
+      : outcome.result === "crit"
+        ? "A triumph"
+        : outcome.result === "success"
+          ? "The work is done"
+          : "They come back empty-handed";
   const won = outcome.result !== "fail";
   const inspectedOwned = ui.inspecting ? state.cards.find((card) => card.id === ui.inspecting) : null;
   const inspectedTemplate = ui.inspecting ? CARD_BY_ID[ui.inspecting] : null;
@@ -31,7 +40,7 @@ export function QuestResult() {
 
   function hoverCard(id: string, active: boolean) {
     window.clearTimeout(hoverTimer.current);
-    if (active) hoverTimer.current = window.setTimeout(() => inspect(id), 280);
+    if (active) hoverTimer.current = window.setTimeout(() => inspect(id), 1500);
   }
 
   return (

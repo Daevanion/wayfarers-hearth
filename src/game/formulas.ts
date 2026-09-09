@@ -40,6 +40,10 @@ export function cardPower(owned: OwnedCard): number {
   return base + Math.max(0, owned.level - 1) * POWER_PER_LEVEL;
 }
 
+export function canSpendDuplicates(owned: OwnedCard): boolean {
+  return (owned.duplicateXp ?? 0) > 0 && owned.level < MAX_LEVEL;
+}
+
 /** Spend banked duplicate likenesses into this card's XP. */
 export function spendDuplicateXp(owned: OwnedCard): { card: OwnedCard; leveled: boolean } {
   const amount = owned.duplicateXp ?? 0;
@@ -71,6 +75,28 @@ export function formatDuration(ms: number): string {
   if (h > 0) return m > 0 ? `${h}h ${m}m` : `${h}h`;
   if (m > 0) return `${m}m ${s.toString().padStart(2, "0")}s`;
   return `${s}s`;
+}
+
+const MINUTE = 60_000;
+
+/** Special-order length from named-company power: 60 → 3m, 120 → 15m, 250+ → 50m. */
+export function secretDurationMs(totalPower: number): number {
+  const points = [
+    { power: 60, ms: 3 * MINUTE },
+    { power: 120, ms: 15 * MINUTE },
+    { power: 250, ms: 50 * MINUTE },
+  ];
+  if (totalPower <= points[0].power) return points[0].ms;
+  if (totalPower >= points[2].power) return points[2].ms;
+  for (let i = 0; i < points.length - 1; i += 1) {
+    const from = points[i];
+    const to = points[i + 1];
+    if (totalPower <= to.power) {
+      const t = (totalPower - from.power) / (to.power - from.power);
+      return Math.round(from.ms + t * (to.ms - from.ms));
+    }
+  }
+  return points[2].ms;
 }
 
 export function signedPct(n: number): string {

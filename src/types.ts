@@ -88,7 +88,13 @@ export interface CritRef {
   note: string;
 }
 
-export type QuestTier = "low" | "mid" | "high" | "extreme" | "world";
+export type QuestTier = "low" | "mid" | "high" | "extreme" | "world" | "special";
+
+export interface SecretQuestRef {
+  chapterId: string;
+  requiredCardIds: string[];
+  minShownLevel: number;
+}
 
 export interface QuestTemplate {
   id: string;
@@ -107,6 +113,7 @@ export interface QuestTemplate {
   crit?: CritRef;
   gold: number;
   xp: number;
+  secret?: SecretQuestRef;
 }
 
 export type QuestStatus = "open" | "underway" | "done";
@@ -174,6 +181,9 @@ export interface GameState {
   cards: OwnedCard[];
   boardDate: string;
   board: BoardQuest[];
+  specialBoard: BoardQuest[];
+  unlockedChapters: string[];
+  secretNoticesDismissed: string[];
   journal: JournalEntry[];
   createdAt: number;
 }
@@ -184,7 +194,9 @@ export interface UiState {
   guildOpen: boolean;
   catalogueOpen: boolean;
   tavernOpen: boolean;
+  lorebookOpen: boolean;
   questBoardOpen: boolean;
+  questBoardView: "bounties" | "special";
   intro: IntroPhase;
   vnScene: string | null;
   outcome: QuestOutcome | null;

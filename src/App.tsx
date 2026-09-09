@@ -13,6 +13,7 @@ import { BgmRoot } from "./components/BgmRoot";
 import { Settings } from "./components/Settings";
 import { OpeningDraw } from "./components/OpeningDraw";
 import { VisualNovel } from "./components/VisualNovel";
+import { Lorebook } from "./components/Lorebook";
 
 function Shell() {
   const { ui } = useGame();
@@ -34,6 +35,7 @@ function Shell() {
       {ui.guildOpen ? <Guild /> : null}
       {ui.catalogueOpen ? <Catalogue /> : null}
       {ui.tavernOpen ? <TavernShop /> : null}
+      {ui.lorebookOpen ? <Lorebook /> : null}
       <QuestResult />
       {ui.intro ? null : <Journal />}
       {ui.intro ? null : <Toasts />}

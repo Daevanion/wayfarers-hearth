@@ -1,9 +1,10 @@
 import { CARD_BY_ID, TAVERN_CARDS } from "../data/cards";
+import { CHAPTERS, chapterQuestId } from "../data/chapters";
 import { QUEST_BY_ID, QUEST_TEMPLATES } from "../data/quests";
 import { SET_BY_ID } from "../data/sets";
 import { ELEMENT_LABEL, ROLE_LABEL } from "../data/icons";
 import { traitLabel } from "../data/traits";
-import { cardPower, clamp, grantXp, makeOwned, uid } from "./formulas";
+import { cardPower, clamp, grantXp, makeOwned, secretDurationMs, shownLevel, uid } from "./formulas";
 import type {
   BoardQuest,
   CardTemplate,
@@ -22,6 +23,7 @@ export const DAILY_BY_TIER: Record<QuestTier, number> = {
   high: 1,
   extreme: 1,
   world: 0,
+  special: 0,
 };
 
 export const TIER_LABEL: Record<QuestTier, string> = {
@@ -30,12 +32,44 @@ export const TIER_LABEL: Record<QuestTier, string> = {
   high: "High",
   extreme: "Extreme",
   world: "World",
+  special: "Special",
 };
 
 export function critTokens(tier: QuestTier): number {
+  if (tier === "special") return 0;
   if (tier === "extreme" || tier === "world") return 3;
   if (tier === "high") return 2;
   return 1;
+}
+
+export function allQuests(state: GameState): BoardQuest[] {
+  return [...state.board, ...(state.specialBoard ?? [])];
+}
+
+export function boardQuestByKey(state: GameState, key: string): BoardQuest | undefined {
+  return allQuests(state).find((quest) => quest.key === key);
+}
+
+export function namedCompanyPower(state: GameState, cardIds: string[]): number {
+  return cardIds.reduce((sum, id) => {
+    const owned = state.cards.find((card) => card.id === id);
+    return sum + (owned ? cardPower(owned) : 0);
+  }, 0);
+}
+
+export function questDurationMs(template: QuestTemplate, power: number): number {
+  if (template.secret) return secretDurationMs(power);
+  return template.durationMs;
+}
+
+function patchBoard(state: GameState, quest: BoardQuest, next: BoardQuest): GameState {
+  if (state.board.some((entry) => entry.key === quest.key)) {
+    return { ...state, board: state.board.map((entry) => (entry.key === quest.key ? next : entry)) };
+  }
+  return {
+    ...state,
+    specialBoard: (state.specialBoard ?? []).map((entry) => (entry.key === quest.key ? next : entry)),
+  };
 }
 
 export function seatsLabel(quest: QuestTemplate): string {
@@ -151,13 +185,129 @@ export function makeBoard(day: string): BoardQuest[] {
   }));
 }
 
+export function debugRedrawBoard(state: GameState, now: number): GameState {
+  const salt = `debug-${now}`;
+  const underway = state.board.filter((q) => q.status === "underway");
+  const fresh = makeBoard(salt).filter((q) => !underway.some((u) => u.templateId === q.templateId));
+  return { ...state, board: [...underway, ...fresh] };
+}
+
+export function debugCompleteQuests(state: GameState, now: number): GameState {
+  function finish(quest: BoardQuest): BoardQuest {
+    if (quest.status !== "underway" || now >= quest.endsAt) return quest;
+    return { ...quest, endsAt: now - 1 };
+  }
+  return {
+    ...state,
+    board: state.board.map(finish),
+    specialBoard: (state.specialBoard ?? []).map(finish),
+  };
+}
+
+export function debugUnlockLore(state: GameState): GameState {
+  const ids = CHAPTERS.map((chapter) => chapter.id);
+  return syncSecretQuests({
+    ...state,
+    unlockedChapters: ids,
+    secretNoticesDismissed: [...new Set([...(state.secretNoticesDismissed ?? []), ...ids])],
+  });
+}
+
 /** Refresh open/done quests when the local date rolls over; quests underway keep running. */
 export function rolloverBoard(state: GameState, now: number): GameState {
   const day = dateKey(now);
-  if (state.boardDate === day) return state;
-  const underway = state.board.filter((q) => q.status === "underway");
-  const fresh = makeBoard(day).filter((q) => !underway.some((u) => u.templateId === q.templateId));
-  return { ...state, boardDate: day, board: [...underway, ...fresh] };
+  const rolled =
+    state.boardDate === day
+      ? state
+      : (() => {
+          const underway = state.board.filter((q) => q.status === "underway");
+          const fresh = makeBoard(day).filter((q) => !underway.some((u) => u.templateId === q.templateId));
+          return { ...state, boardDate: day, board: [...underway, ...fresh] };
+        })();
+  return syncSecretQuests(rolled);
+}
+
+export function pendingSecretNotices(state: GameState): { chapterId: string; title: string }[] {
+  const owned = new Set(state.cards.map((card) => card.id));
+  const unlocked = new Set(state.unlockedChapters ?? []);
+  const dismissed = new Set(state.secretNoticesDismissed ?? []);
+  const special = state.specialBoard ?? [];
+  return CHAPTERS.filter((chapter) => {
+    if (unlocked.has(chapter.id) || dismissed.has(chapter.id)) return false;
+    if (!chapter.cardIds.every((id) => owned.has(id))) return false;
+    const quest = special.find((entry) => entry.templateId === chapterQuestId(chapter.id));
+    return quest?.status === "open";
+  }).map((chapter) => ({ chapterId: chapter.id, title: chapter.title }));
+}
+
+export function dismissSecretNotice(state: GameState, chapterId: string): GameState {
+  const dismissed = new Set(state.secretNoticesDismissed ?? []);
+  if (dismissed.has(chapterId)) return state;
+  return { ...state, secretNoticesDismissed: [...dismissed, chapterId] };
+}
+
+/** Open a special order once every named character is owned. */
+export function syncSecretQuests(state: GameState, opts: { logNew?: boolean } = {}): GameState {
+  const owned = new Set(state.cards.map((card) => card.id));
+  const unlocked = new Set(state.unlockedChapters ?? []);
+  let specialBoard = [...(state.specialBoard ?? [])];
+  const addedTitles: string[] = [];
+  let changed = false;
+
+  for (const chapter of CHAPTERS) {
+    const questId = chapterQuestId(chapter.id);
+    const existing = specialBoard.find((quest) => quest.templateId === questId);
+    const haveAll = chapter.cardIds.every((id) => owned.has(id));
+
+    if (unlocked.has(chapter.id)) {
+      if (existing && existing.status !== "underway") {
+        specialBoard = specialBoard.filter((quest) => quest.templateId !== questId);
+        changed = true;
+      }
+      continue;
+    }
+
+    if (!haveAll || existing) continue;
+
+    specialBoard.push({
+      key: `secret-${chapter.id}`,
+      templateId: questId,
+      status: "open",
+      team: [],
+      startedAt: 0,
+      endsAt: 0,
+      success: 100,
+      crit: 0,
+      critMatched: false,
+    });
+    addedTitles.push(chapter.title);
+    changed = true;
+  }
+
+  if (!changed) {
+    if (!state.specialBoard || !state.unlockedChapters || !state.secretNoticesDismissed) {
+      return {
+        ...state,
+        specialBoard: state.specialBoard ?? [],
+        unlockedChapters: state.unlockedChapters ?? [],
+        secretNoticesDismissed: state.secretNoticesDismissed ?? [],
+      };
+    }
+    return state;
+  }
+
+  let next: GameState = {
+    ...state,
+    specialBoard,
+    unlockedChapters: state.unlockedChapters ?? [],
+    secretNoticesDismissed: state.secretNoticesDismissed ?? [],
+  };
+  if (opts.logNew) {
+    for (const title of addedTitles) {
+      next = log(next, "system", `A special order is waiting: ${title}.`);
+    }
+  }
+  return next;
 }
 
 // ————— team assessment —————
@@ -250,7 +400,7 @@ function log(state: GameState, kind: JournalEntry["kind"], text: string): GameSt
 // ————— dispatch / resolve —————
 
 export function isBusy(state: GameState, cardId: string): boolean {
-  return state.board.some((q) => q.status === "underway" && q.team.includes(cardId));
+  return allQuests(state).some((q) => q.status === "underway" && q.team.includes(cardId));
 }
 
 export function isExhausted(state: GameState, cardId: string, now: number): boolean {
@@ -264,32 +414,42 @@ export function dispatchQuest(
   team: string[],
   now: number,
 ): { state: GameState; error?: string } {
-  const quest = state.board.find((q) => q.key === key);
+  const quest = boardQuestByKey(state, key);
   if (!quest || quest.status !== "open") return { state, error: "That bounty is no longer open." };
   const template = QUEST_BY_ID[quest.templateId];
   if (!template) return { state, error: "The bounty has faded." };
   if (team.length < template.teamMin || team.length > template.teamMax)
     return { state, error: `This bounty needs ${seatsLabel(template)} in the company.` };
+  if (template.secret) {
+    const required = template.secret.requiredCardIds;
+    if (required.length !== team.length || required.some((id) => !team.includes(id))) {
+      return { state, error: "This special order names its own company." };
+    }
+  }
   for (const id of team) {
     if (!ownedById(state, id)) return { state, error: "That name is not in your company." };
     if (isBusy(state, id)) return { state, error: `${CARD_BY_ID[id]?.name ?? id} is already out.` };
     if (isExhausted(state, id, now)) return { state, error: `${CARD_BY_ID[id]?.name ?? id} needs rest.` };
+    if (template.secret && shownLevel(ownedById(state, id)!.level) < template.secret.minShownLevel) {
+      return { state, error: `${CARD_BY_ID[id]?.name ?? id} must stand at level ${template.secret.minShownLevel}.` };
+    }
   }
 
   const a = assessTeam(state, template, team);
-  const next: BoardQuest = {
+  const duration = questDurationMs(template, a.power);
+  const nextQuest: BoardQuest = {
     ...quest,
     status: "underway",
     team: [...team],
     startedAt: now,
-    endsAt: now + template.durationMs,
-    success: a.success,
-    crit: a.crit,
-    critMatched: a.critMatched,
+    endsAt: now + duration,
+    success: template.secret ? 100 : a.success,
+    crit: template.secret ? 0 : a.crit,
+    critMatched: template.secret ? false : a.critMatched,
   };
-  const board = state.board.map((q) => (q.key === key ? next : q));
+  const nextState = patchBoard(state, quest, nextQuest);
   return {
-    state: log({ ...state, board }, "system", `${template.name}: a team of ${team.length} sets out. ${a.success}% odds.`),
+    state: log(nextState, "system", `${template.name}: a team of ${team.length} sets out. ${nextQuest.success}% odds.`),
   };
 }
 
@@ -298,21 +458,27 @@ export function resolveQuest(
   key: string,
   now: number,
 ): { state: GameState; outcome?: QuestOutcome; error?: string } {
-  const quest = state.board.find((q) => q.key === key);
+  const quest = boardQuestByKey(state, key);
   if (!quest || quest.status !== "underway") return { state, error: "No team is out on that bounty." };
   if (now < quest.endsAt) return { state, error: "The team has not returned yet." };
   const template = QUEST_BY_ID[quest.templateId];
   if (!template) return { state, error: "The bounty has faded." };
 
-  const roll = 1 + Math.floor(Math.random() * 100);
-  const result: QuestOutcome["result"] = roll <= quest.crit ? "crit" : roll <= quest.success ? "success" : "fail";
+  const roll = template.secret ? 1 : 1 + Math.floor(Math.random() * 100);
+  const result: QuestOutcome["result"] = template.secret
+    ? "success"
+    : roll <= quest.crit
+      ? "crit"
+      : roll <= quest.success
+        ? "success"
+        : "fail";
   const won = result !== "fail";
 
   let gold = won ? template.gold : 0;
   if (won && quest.critMatched) gold = Math.round(gold * CRIT_LOOT_MULT);
   const tokens = result === "crit" ? critTokens(template.tier) : 0;
   const xpEach = won ? template.xp : Math.max(1, Math.round(template.xp * 0.25));
-  const restMs = template.durationMs * (won ? 0.5 : 2);
+  const restMs = (quest.endsAt - quest.startedAt) * (won ? 0.5 : 2);
 
   const leveled: string[] = [];
   const xpGains: QuestOutcome["xpGains"] = [];
@@ -331,15 +497,28 @@ export function resolveQuest(
     return { ...card, exhaustedUntil: now + restMs };
   });
 
-  const board = state.board.map((q) => (q.key === key ? { ...q, status: "done" as const } : q));
-  let next: GameState = { ...state, cards, board, gold: state.gold + gold, tokens: state.tokens + tokens };
+  let next: GameState = patchBoard(
+    { ...state, cards, gold: state.gold + gold, tokens: state.tokens + tokens },
+    quest,
+    { ...quest, status: "done" },
+  );
+  if (won && template.secret) {
+    const chapterId = template.secret.chapterId;
+    if (!(next.unlockedChapters ?? []).includes(chapterId)) {
+      next = { ...next, unlockedChapters: [...(next.unlockedChapters ?? []), chapterId] };
+    }
+    next = dismissSecretNotice(next, chapterId);
+  }
   next = log(
     next,
     won ? "success" : "fail",
     won
-      ? `${template.name}: ${result === "crit" ? "a triumph" : "done"}. ${gold} gold${tokens ? `, ${tokens} token${tokens > 1 ? "s" : ""}` : ""}.`
+      ? template.secret
+        ? `${template.name}: the chapter is unsealed.`
+        : `${template.name}: ${result === "crit" ? "a triumph" : "done"}. ${gold} gold${tokens ? `, ${tokens} token${tokens > 1 ? "s" : ""}` : ""}.`
       : `${template.name}: the team returns empty-handed and spent.`,
   );
+  next = syncSecretQuests(next);
 
   const outcome: QuestOutcome = {
     key,
@@ -364,6 +543,7 @@ export function resolveQuest(
 export function buyPack(
   state: GameState,
   kind: "gold" | "token",
+  opts: { silent?: boolean } = {},
 ): { state: GameState; result?: PackResult; error?: string } {
   if (kind === "gold" && state.gold < GOLD_PACK_COST) return { state, error: "Not enough gold." };
   if (kind === "token" && state.tokens < TOKEN_PACK_COST) return { state, error: "No recruitment tokens." };
@@ -395,14 +575,41 @@ export function buyPack(
     gold: kind === "gold" ? state.gold - GOLD_PACK_COST : state.gold,
     tokens: kind === "token" ? state.tokens - TOKEN_PACK_COST : state.tokens,
   };
-  next = log(
-    next,
-    "recruit",
-    isNew
-      ? `${pick.name} joins the company.`
-      : `Another likeness of ${pick.name} is held in reserve (${dupeXp} XP).`,
-  );
-  return { state: next, result: { cardId: pick.id, isNew, xp: isNew ? 0 : dupeXp } };
+  if (!opts.silent) {
+    next = log(
+      next,
+      "recruit",
+      isNew
+        ? `${pick.name} joins the company.`
+        : `Another likeness of ${pick.name} is held in reserve (${dupeXp} XP).`,
+    );
+  }
+  return { state: syncSecretQuests(next, { logNew: !opts.silent }), result: { cardId: pick.id, isNew, xp: isNew ? 0 : dupeXp } };
+}
+
+export function buyPacks(
+  state: GameState,
+  kind: "gold" | "token",
+  count: number,
+): { state: GameState; results?: PackResult[]; error?: string } {
+  const n = Math.max(1, Math.floor(count));
+  const goldNeed = kind === "gold" ? GOLD_PACK_COST * n : 0;
+  const tokenNeed = kind === "token" ? TOKEN_PACK_COST * n : 0;
+  if (kind === "gold" && state.gold < goldNeed) return { state, error: "Not enough gold." };
+  if (kind === "token" && state.tokens < tokenNeed) return { state, error: "No recruitment tokens." };
+
+  let next = state;
+  const results: PackResult[] = [];
+  for (let i = 0; i < n; i += 1) {
+    const step = buyPack(next, kind, { silent: n > 1 });
+    if (!step.result) return { state, error: step.error };
+    next = step.state;
+    results.push(step.result);
+  }
+  if (n > 1) {
+    next = log(next, "recruit", `${n} names from the road.`);
+  }
+  return { state: next, results };
 }
 
 // ————— display helpers —————

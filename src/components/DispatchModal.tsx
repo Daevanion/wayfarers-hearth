@@ -12,16 +12,18 @@ import {
 import { QUEST_BY_ID } from "../data/quests";
 import { SETS } from "../data/sets";
 import { traitLabel } from "../data/traits";
-import { cardPower, formatDuration, signedPct } from "../game/formulas";
 import {
   assessTeam,
+  boardQuestByKey,
   cardQuestFit,
   critLabel,
   isBusy,
   isExhausted,
+  questDurationMs,
   seatsLabel,
   TIER_LABEL,
 } from "../game/quests";
+import { cardPower, formatDuration, shownLevel, signedPct } from "../game/formulas";
 import { useGame } from "../store/GameContext";
 import type { CardTemplate, CombatId, ElementId, OwnedCard, QuestTemplate, RoleId } from "../types";
 import { PortraitCard } from "./PortraitCard";
@@ -51,8 +53,12 @@ export function DispatchModal({
   const [pickId, setPickId] = useState<string | null>(null);
   const [pickOut, setPickOut] = useState(false);
 
-  const quest = state.board.find((q) => q.key === questKey);
+  const quest = boardQuestByKey(state, questKey);
   const template = quest ? QUEST_BY_ID[quest.templateId] : null;
+
+  useEffect(() => {
+    if (template?.secret) setTeam([...template.secret.requiredCardIds]);
+  }, [template]);
 
   const assessment = useMemo(
     () => (template ? assessTeam(state, template, team) : null),
@@ -75,6 +81,7 @@ export function DispatchModal({
     const list = state.cards.filter((owned) => {
       const t = CARD_BY_ID[owned.id];
       if (!t) return false;
+      if (template.secret && !template.secret.requiredCardIds.includes(owned.id)) return false;
       if (element !== "all" && t.element !== element) return false;
       if (role !== "all" && t.role !== role) return false;
       if (combat !== "all" && !t.combat.includes(combat)) return false;
@@ -105,6 +112,7 @@ export function DispatchModal({
   const teamFull = team.length >= template.teamMax;
 
   function toggle(id: string) {
+    if (template?.secret) return;
     setTeam((prev) => {
       if (prev.includes(id)) return prev.filter((x) => x !== id);
       if (!template || prev.length >= template.teamMax) return prev;
@@ -132,6 +140,18 @@ export function DispatchModal({
   }
 
   const pickOwned = pickId ? state.cards.find((c) => c.id === pickId) : null;
+  const secret = template.secret;
+  const durationMs = questDurationMs(template, assessment.power);
+  const underleveled = secret
+    ? secret.requiredCardIds
+        .map((id) => {
+          const owned = state.cards.find((card) => card.id === id);
+          if (!owned || shownLevel(owned.level) >= secret.minShownLevel) return null;
+          return CARD_BY_ID[id]?.name ?? id;
+        })
+        .filter((name): name is string => Boolean(name))
+    : [];
+  const secretBlocked = Boolean(secret && underleveled.length > 0);
 
   return (
     <div className={`assign-back ${leaving ? "out" : ""}`} onClick={onClose} role="presentation">
@@ -147,22 +167,28 @@ export function DispatchModal({
           <span className={`loadout-head-glow tier-${template.tier}`} aria-hidden />
           <span className="loadout-head-veil" aria-hidden />
           <div className="loadout-head-copy">
-            <p className="kicker">{TIER_LABEL[template.tier]} bounty</p>
+            <p className="kicker">{TIER_LABEL[template.tier]} {secret ? "order" : "bounty"}</p>
             <h3>{template.name}</h3>
             <p className="quest-flavor">{template.flavor}</p>
             <ul className="quest-facts loadout-head-facts">
               <li>
                 <img src={TIME_ICON} alt="" />
-                {formatDuration(template.durationMs)}
+                {formatDuration(durationMs)}
               </li>
-              <li>
-                <strong>{template.power}</strong> power needed
-              </li>
-              <li>
-                {template.teamMin === template.teamMax
-                  ? `Team of ${template.teamMin}`
-                  : `Team of ${seatsLabel(template)}`}
-              </li>
+              {secret ? (
+                <li>Named company of {template.teamMin}</li>
+              ) : (
+                <>
+                  <li>
+                    <strong>{template.power}</strong> power needed
+                  </li>
+                  <li>
+                    {template.teamMin === template.teamMax
+                      ? `Team of ${template.teamMin}`
+                      : `Team of ${seatsLabel(template)}`}
+                  </li>
+                </>
+              )}
               {template.element ? (
                 <li className="quest-element">{ELEMENT_LABEL[template.element]} favored</li>
               ) : (
@@ -178,42 +204,48 @@ export function DispatchModal({
         <div className="loadout-body">
           <p className="quest-lore">{template.lore}</p>
 
-          <div className="loadout-stats">
-            <StatBlock title="Advantages" tone="good">
-              {template.advantages.length === 0 ? (
-                <p>None listed.</p>
-              ) : (
-                template.advantages.map((adv) => (
-                  <p key={`a-${adv.id}`}>
-                    <strong>{signedPct(adv.pct)}</strong>
-                    <span>{adv.type === "trait" ? traitLabel(adv.id) : ROLE_LABEL[adv.id as never]}</span>
+          {secret ? (
+            <p className="secret-company-note">
+              This order names its own company. Each must stand at level {secret.minShownLevel}.
+            </p>
+          ) : (
+            <div className="loadout-stats">
+              <StatBlock title="Advantages" tone="good">
+                {template.advantages.length === 0 ? (
+                  <p>None listed.</p>
+                ) : (
+                  template.advantages.map((adv) => (
+                    <p key={`a-${adv.id}`}>
+                      <strong>{signedPct(adv.pct)}</strong>
+                      <span>{adv.type === "trait" ? traitLabel(adv.id) : ROLE_LABEL[adv.id as never]}</span>
+                    </p>
+                  ))
+                )}
+              </StatBlock>
+              <StatBlock title="Hazards" tone="bad">
+                {template.hazards.length === 0 ? (
+                  <p>None listed.</p>
+                ) : (
+                  template.hazards.map((haz) => (
+                    <p key={`h-${haz.id}`}>
+                      <strong>{signedPct(haz.pct)}</strong>
+                      <span>{haz.type === "trait" ? traitLabel(haz.id) : ROLE_LABEL[haz.id as never]}</span>
+                    </p>
+                  ))
+                )}
+              </StatBlock>
+              <StatBlock title="Critical" tone="crit">
+                {template.crit ? (
+                  <p>
+                    <strong>{critLabel(template)}</strong>
+                    <span>{template.crit.note}</span>
                   </p>
-                ))
-              )}
-            </StatBlock>
-            <StatBlock title="Hazards" tone="bad">
-              {template.hazards.length === 0 ? (
-                <p>None listed.</p>
-              ) : (
-                template.hazards.map((haz) => (
-                  <p key={`h-${haz.id}`}>
-                    <strong>{signedPct(haz.pct)}</strong>
-                    <span>{haz.type === "trait" ? traitLabel(haz.id) : ROLE_LABEL[haz.id as never]}</span>
-                  </p>
-                ))
-              )}
-            </StatBlock>
-            <StatBlock title="Critical" tone="crit">
-              {template.crit ? (
-                <p>
-                  <strong>{critLabel(template)}</strong>
-                  <span>{template.crit.note}</span>
-                </p>
-              ) : (
-                <p>No special match.</p>
-              )}
-            </StatBlock>
-          </div>
+                ) : (
+                  <p>No special match.</p>
+                )}
+              </StatBlock>
+            </div>
+          )}
 
           {team.length > 0 ? (
             <div className="loadout-picked">
@@ -230,6 +262,7 @@ export function DispatchModal({
             </div>
           ) : null}
 
+          {secret ? null : (
           <div className="loadout-toolbar">
             <div className="filter-chips">
               <button type="button" className={view === "all" ? "chip on" : "chip"} onClick={() => setView("all")}>
@@ -290,6 +323,7 @@ export function DispatchModal({
               />
             </div>
           </div>
+          )}
 
           <div key={`${view}-${element}-${role}-${combat}-${sort}`} className="view-fade">
             {view === "set" ? (
@@ -302,29 +336,49 @@ export function DispatchModal({
 
         <footer className="dispatch-footer">
           <div className="dispatch-odds">
-            <p className="odds-power">
-              <span>Power</span>
-              <strong>{assessment.effPower}</strong>
-              <span className="odds-need">/ {assessment.need}</span>
-              {assessment.effPower !== assessment.power ? <em>affinity counted</em> : null}
-            </p>
-            {assessment.mods.length > 0 ? (
-              <ul className="odds-mods">
-                {assessment.mods.map((m) => (
-                  <li key={m.label} className={m.pct >= 0 ? "good" : "bad"}>
-                    {m.label} {signedPct(m.pct)}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            <p className={`odds-line ${assessment.success >= 75 ? "high" : assessment.success >= 45 ? "mid" : "low"}`}>
-              {team.length === 0 ? "Pick a team" : `${assessment.success}% success`}
-              {assessment.crit > 0 ? ` · ${assessment.crit}% triumph` : ""}
-              {assessment.critMatched ? " · bonus loot" : ""}
-            </p>
+            {secret ? (
+              <>
+                <p className="odds-power">
+                  <span>Power</span>
+                  <strong>{assessment.power}</strong>
+                </p>
+                <p className={`odds-line ${secretBlocked ? "low" : "high"}`}>
+                  {secretBlocked
+                    ? `${underleveled.join(", ")} must stand at level ${secret.minShownLevel}.`
+                    : `The chapter waits · ${formatDuration(durationMs)}`}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="odds-power">
+                  <span>Power</span>
+                  <strong>{assessment.effPower}</strong>
+                  <span className="odds-need">/ {assessment.need}</span>
+                  {assessment.effPower !== assessment.power ? <em>affinity counted</em> : null}
+                </p>
+                {assessment.mods.length > 0 ? (
+                  <ul className="odds-mods">
+                    {assessment.mods.map((m) => (
+                      <li key={m.label} className={m.pct >= 0 ? "good" : "bad"}>
+                        {m.label} {signedPct(m.pct)}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <p className={`odds-line ${assessment.success >= 75 ? "high" : assessment.success >= 45 ? "mid" : "low"}`}>
+                  {team.length === 0 ? "Pick a team" : `${assessment.success}% success`}
+                  {assessment.crit > 0 ? ` · ${assessment.crit}% triumph` : ""}
+                  {assessment.critMatched ? " · bonus loot" : ""}
+                </p>
+              </>
+            )}
           </div>
-          <button className="cta" type="button" disabled={!enough} onClick={send}>
-            {enough ? "Send them out" : `Pick ${Math.max(0, template.teamMin - team.length)} more`}
+          <button className="cta" type="button" disabled={!enough || secretBlocked} onClick={send}>
+            {secretBlocked
+              ? "Rank them first"
+              : enough
+                ? "Send them out"
+                : `Pick ${Math.max(0, template.teamMin - team.length)} more`}
           </button>
         </footer>
       </section>
@@ -339,6 +393,10 @@ export function DispatchModal({
           leaving={pickOut}
           onClose={closePick}
           onChoose={() => {
+            if (template.secret) {
+              closePick();
+              return;
+            }
             toggle(pickOwned.id);
             closePick();
           }}
@@ -571,9 +629,11 @@ function LoadoutPick({
           <PickTraits card={t} quest={quest} />
           <TraitChips traits={t.traits} />
           <p className="muted tight">{reason}</p>
-          <button type="button" className="cta" disabled={!canAct} onClick={onChoose}>
-            {action}
-          </button>
+          {quest.secret ? null : (
+            <button type="button" className="cta" disabled={!canAct} onClick={onChoose}>
+              {action}
+            </button>
+          )}
         </div>
       </article>
     </div>

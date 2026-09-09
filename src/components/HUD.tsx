@@ -2,7 +2,7 @@ import { HUD_ICONS } from "../data/hud";
 import { useGame } from "../store/GameContext";
 
 export function HUD() {
-  const { state, now, openGuild, openCatalogue, openTavern, openQuestBoard, ui } = useGame();
+  const { state, now, openGuild, openCatalogue, openTavern, openLorebook, openQuestBoard, ui } = useGame();
   if (ui.intro) return null;
 
   const underway = state.board.filter((q) => q.status === "underway");
@@ -50,6 +50,9 @@ export function HUD() {
         </button>
         <button className={`menu-btn ${ui.catalogueOpen ? "on" : ""}`} onClick={() => openCatalogue(true)}>
           Full catalogue
+        </button>
+        <button className={`menu-btn ${ui.lorebookOpen ? "on" : ""}`} onClick={() => openLorebook(true)}>
+          Full Lorebook
         </button>
       </div>
       <div className="hud-questboard">

@@ -10,7 +10,16 @@ import {
 } from "react";
 import { CARD_BY_ID } from "../data/cards";
 import { spendDuplicateXp } from "../game/formulas";
-import { buyPack, dispatchQuest, resolveQuest, rolloverBoard } from "../game/quests";
+import {
+  buyPacks,
+  debugCompleteQuests as finishDebugQuests,
+  debugRedrawBoard as redrawDebugBoard,
+  debugUnlockLore as unsealDebugLore,
+  dismissSecretNotice,
+  dispatchQuest,
+  resolveQuest,
+  rolloverBoard,
+} from "../game/quests";
 import { createNewGame, loadSave, persist, clearSave } from "../game/save";
 import type { GameState, PackResult, Toast, UiState } from "../types";
 
@@ -24,14 +33,19 @@ interface GameApi {
   inspect: (id: string | null) => void;
   dispatchTeam: (questKey: string, team: string[]) => string | null;
   resolve: (questKey: string) => string | null;
-  buyCardPack: (kind: "gold" | "token") => PackResult | null;
+  buyCardPack: (kind: "gold" | "token", count?: number) => PackResult[] | null;
   spendDuplicates: (cardId: string) => void;
   dismissOutcome: () => void;
   openGuild: (open: boolean) => void;
   openCatalogue: (open: boolean) => void;
   openTavern: (open: boolean) => void;
-  openQuestBoard: (open: boolean) => void;
+  openLorebook: (open: boolean) => void;
+  openQuestBoard: (open: boolean, view?: UiState["questBoardView"]) => void;
+  openSpecialOrder: (chapterId?: string) => void;
   grantDebugFunds: () => void;
+  debugRedrawBoard: () => void;
+  debugCompleteQuests: () => void;
+  debugUnlockLore: () => void;
   startVn: (sceneId: string) => void;
   endVn: () => void;
   dismissToast: (id: string) => void;
@@ -46,7 +60,9 @@ function emptyUi(partial: Partial<UiState> = {}): UiState {
     guildOpen: false,
     catalogueOpen: false,
     tavernOpen: false,
+    lorebookOpen: false,
     questBoardOpen: false,
+    questBoardView: "bounties",
     intro: null,
     vnScene: null,
     outcome: null,
@@ -151,14 +167,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         return null;
       },
-      buyCardPack: (kind) => {
-        const result = buyPack(current(), kind);
+      buyCardPack: (kind, count = 1) => {
+        const result = buyPacks(current(), kind, count);
         if (result.error) {
           pushToast(result.error, "fail");
           return null;
         }
         setState(result.state);
-        return result.result ?? null;
+        return result.results ?? null;
       },
       spendDuplicates: (cardId) => {
         const live = current();
@@ -172,15 +188,78 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (leveled) pushToast(`${CARD_BY_ID[cardId]?.name ?? "A companion"} rises in rank.`, "recruit");
       },
       dismissOutcome: () => setUi((u) => ({ ...u, outcome: null })),
-      openGuild: (open) => setUi((u) => ({ ...u, guildOpen: open, catalogueOpen: false, tavernOpen: false })),
-      openCatalogue: (open) => setUi((u) => ({ ...u, catalogueOpen: open, guildOpen: false, tavernOpen: false })),
-      openTavern: (open) => setUi((u) => ({ ...u, tavernOpen: open, guildOpen: false, catalogueOpen: false })),
-      openQuestBoard: (open) => setUi((u) => ({ ...u, questBoardOpen: open })),
+      openGuild: (open) =>
+        setUi((u) => ({
+          ...u,
+          guildOpen: open,
+          catalogueOpen: false,
+          tavernOpen: false,
+          lorebookOpen: false,
+          questBoardOpen: false,
+        })),
+      openCatalogue: (open) =>
+        setUi((u) => ({
+          ...u,
+          catalogueOpen: open,
+          guildOpen: false,
+          tavernOpen: false,
+          lorebookOpen: false,
+          questBoardOpen: false,
+        })),
+      openTavern: (open) =>
+        setUi((u) => ({
+          ...u,
+          tavernOpen: open,
+          guildOpen: false,
+          catalogueOpen: false,
+          lorebookOpen: false,
+          questBoardOpen: false,
+        })),
+      openLorebook: (open) =>
+        setUi((u) => ({
+          ...u,
+          lorebookOpen: open,
+          guildOpen: false,
+          catalogueOpen: false,
+          tavernOpen: false,
+          questBoardOpen: false,
+        })),
+      openQuestBoard: (open, view) =>
+        setUi((u) => ({
+          ...u,
+          questBoardOpen: open,
+          questBoardView: open ? (view ?? (u.questBoardOpen ? u.questBoardView : "bounties")) : u.questBoardView,
+          guildOpen: open ? false : u.guildOpen,
+          catalogueOpen: open ? false : u.catalogueOpen,
+          tavernOpen: open ? false : u.tavernOpen,
+          lorebookOpen: open ? false : u.lorebookOpen,
+        })),
+      openSpecialOrder: (chapterId) => {
+        if (chapterId) setState((prev) => (prev ? dismissSecretNotice(prev, chapterId) : prev));
+        setUi((u) => ({
+          ...u,
+          questBoardOpen: true,
+          questBoardView: "special",
+          guildOpen: false,
+          catalogueOpen: false,
+          tavernOpen: false,
+          lorebookOpen: false,
+        }));
+      },
       grantDebugFunds: () => {
         setState((prev) => {
           if (!prev) return prev;
           return { ...prev, gold: prev.gold + 1000, tokens: prev.tokens + 100 };
         });
+      },
+      debugRedrawBoard: () => {
+        setState((prev) => (prev ? redrawDebugBoard(prev, Date.now()) : prev));
+      },
+      debugCompleteQuests: () => {
+        setState((prev) => (prev ? finishDebugQuests(prev, Date.now()) : prev));
+      },
+      debugUnlockLore: () => {
+        setState((prev) => (prev ? unsealDebugLore(prev) : prev));
       },
       startVn: (sceneId) =>
         setUi((u) => ({
@@ -189,6 +268,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           guildOpen: false,
           catalogueOpen: false,
           tavernOpen: false,
+          lorebookOpen: false,
           questBoardOpen: false,
         })),
       endVn: () => setUi((u) => ({ ...u, vnScene: null })),

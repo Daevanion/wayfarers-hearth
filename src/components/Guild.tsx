@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { CARD_BY_ID, visibleRoles } from "../data/cards";
 import { ELEMENT_LABEL, ELEMENT_ORDER, ROLE_LABEL } from "../data/icons";
 import { SETS } from "../data/sets";
-import { cardPower, formatDuration, shownLevel } from "../game/formulas";
+import { canSpendDuplicates, cardPower, formatDuration, shownLevel } from "../game/formulas";
 import { isBusy, isExhausted } from "../game/quests";
 import { useGame } from "../store/GameContext";
 import type { ElementId, OwnedCard, RoleId } from "../types";
@@ -198,6 +198,9 @@ function CompanyCard({
   if (!t) return null;
   return (
     <div className="collection-card">
+      {canSpendDuplicates(owned) ? (
+        <span className="collection-level-dot" title="Likenesses ready to spend" />
+      ) : null}
       <PortraitCard
         template={t}
         owned

@@ -1,11 +1,13 @@
 import { useRef, useState, type MouseEvent } from "react";
 import { CARD_BACK } from "../data/portraits";
+import { CHAPTER_SLOT_COUNT, chaptersForCard } from "../data/chapters";
 import { ELEMENT_ICON, ELEMENT_LABEL, ROLE_LABEL } from "../data/icons";
 import { cardLore } from "../data/lore";
 import { TRAITS } from "../data/traits";
-import { MAX_LEVEL, shownLevel } from "../game/formulas";
+import { canSpendDuplicates, MAX_LEVEL, shownLevel } from "../game/formulas";
 import { useGame } from "../store/GameContext";
 import type { CardTemplate } from "../types";
+import { ChapterReader } from "./ChapterReader";
 import { affinityTitle, LoreText } from "./LoreText";
 import { CombatBadges } from "./StatIcons";
 import { ArtLightbox, ZoomButton } from "./CardZoom";
@@ -22,6 +24,7 @@ export function CardDossier({
   const { state, spendDuplicates } = useGame();
   const owned = state.cards.find((card) => card.id === template.id);
   const [artOpen, setArtOpen] = useState(false);
+  const [chapterId, setChapterId] = useState<string | null>(null);
   const hoverTimer = useRef(0);
   const art = shown && template.portrait ? template.portrait : CARD_BACK;
   const lore = shown ? cardLore(template.id, template.flavor) : "";
@@ -30,7 +33,7 @@ export function CardDossier({
   const banked = owned?.duplicateXp ?? 0;
   const copies = owned?.duplicates ?? 0;
   const rank = shownLevel(owned?.level ?? 1);
-  const canSpend = Boolean(owned && banked > 0 && owned.level < MAX_LEVEL);
+  const canSpend = Boolean(owned && canSpendDuplicates(owned));
 
   function openArt(event?: MouseEvent) {
     event?.preventDefault();
@@ -90,6 +93,7 @@ export function CardDossier({
               </span>
             </div>
           ) : null}
+          {owned ? <SecretChapterSlots cardId={template.id} onOpen={setChapterId} /> : null}
         </div>
         <div className="dossier-copy">
           <p className="kicker">
@@ -140,6 +144,35 @@ export function CardDossier({
         </div>
       </article>
       {artOpen ? <ArtLightbox src={art} alt={template.name} onClose={() => setArtOpen(false)} /> : null}
+      {chapterId ? <ChapterReader chapterId={chapterId} onClose={() => setChapterId(null)} /> : null}
     </>
+  );
+}
+
+function SecretChapterSlots({ cardId, onOpen }: { cardId: string; onOpen: (id: string) => void }) {
+  const { state } = useGame();
+  const unlocked = new Set(state.unlockedChapters ?? []);
+  const chapters = chaptersForCard(cardId);
+  const slots = Array.from({ length: CHAPTER_SLOT_COUNT }, (_, index) => chapters[index] ?? null);
+
+  return (
+    <div className="secret-chapter-slots">
+      {slots.map((chapter, index) => {
+        const open = Boolean(chapter && unlocked.has(chapter.id));
+        return (
+          <button
+            key={chapter?.id ?? `locked-${index}`}
+            type="button"
+            className={`menu-btn secret-chapter-btn ${open ? "unsealed" : ""}`}
+            disabled={!open}
+            onClick={() => {
+              if (chapter && open) onOpen(chapter.id);
+            }}
+          >
+            {open && chapter ? chapter.title : "???"}
+          </button>
+        );
+      })}
+    </div>
   );
 }

@@ -3,7 +3,7 @@ import { CARD_BY_ID } from "../data/cards";
 import { QUEST_BY_ID } from "../data/quests";
 import { TRAITS } from "../data/traits";
 import { cardPower, formatDuration } from "../game/formulas";
-import { cardQuestRibbons, questClock, TIER_LABEL } from "../game/quests";
+import { allQuests, cardQuestRibbons, questClock, TIER_LABEL } from "../game/quests";
 import { useGame } from "../store/GameContext";
 import type { BoardQuest, CardTemplate, OwnedCard, QuestTemplate } from "../types";
 import { PortraitCard } from "./PortraitCard";
@@ -13,7 +13,7 @@ export function QuestTrack({ hidden }: { hidden?: boolean }) {
   const [viewKey, setViewKey] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
 
-  const underway = state.board.filter((q) => q.status === "underway");
+  const underway = allQuests(state).filter((q) => q.status === "underway");
 
   const closeView = useCallback(() => {
     if (leaving) return;

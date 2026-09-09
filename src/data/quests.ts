@@ -1,5 +1,6 @@
 import type { QuestTemplate } from "../types";
 import { BACKGROUNDS } from "./backgrounds";
+import { SECRET_QUEST_TEMPLATES } from "./chapters";
 
 const MIN = 60 * 1000;
 const HOUR = 60 * MIN;
@@ -17,7 +18,7 @@ const corruptionEdge = BACKGROUNDS.corruptionEdge;
 const abyss = BACKGROUNDS.abyss;
 const bridgeGang = BACKGROUNDS.bridgeGang;
 
-/** Daily board draws 3 low, 2 mid, 1 high, 1 extreme. World templates are reserved. Character locks are not wired yet. */
+/** Daily board draws 3 low, 2 mid, 1 high, 1 extreme. World templates are reserved. Secret chapters live in `chapters.ts`. */
 export const QUEST_TEMPLATES: QuestTemplate[] = [
   // — Low (16), seats 1–3 —
   {
@@ -954,7 +955,6 @@ export const QUEST_TEMPLATES: QuestTemplate[] = [
   },
 ];
 
-export const QUEST_BY_ID = Object.fromEntries(QUEST_TEMPLATES.map((q) => [q.id, q])) as Record<
-  string,
-  QuestTemplate
->;
+export const QUEST_BY_ID = Object.fromEntries(
+  [...QUEST_TEMPLATES, ...SECRET_QUEST_TEMPLATES].map((q) => [q.id, q]),
+) as Record<string, QuestTemplate>;

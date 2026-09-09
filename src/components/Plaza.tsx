@@ -3,7 +3,7 @@ import { BACKGROUNDS } from "../data/backgrounds";
 import { ELEMENT_ICON, ELEMENT_LABEL, TIME_ICON } from "../data/icons";
 import { QUEST_BY_ID } from "../data/quests";
 import { formatDuration } from "../game/formulas";
-import { seatsLabel, TIER_LABEL } from "../game/quests";
+import { namedCompanyPower, pendingSecretNotices, questDurationMs, seatsLabel, TIER_LABEL } from "../game/quests";
 import { usePointerSway } from "../hooks/usePointerSway";
 import { useGame } from "../store/GameContext";
 import type { BoardQuest } from "../types";
@@ -20,6 +20,9 @@ export function Plaza() {
   const available = board.filter((q) => q.status === "open" || (q.status === "underway" && now >= q.endsAt));
   const progressing = board.filter((q) => q.status === "underway" && now < q.endsAt);
   const completed = board.filter((q) => q.status === "done");
+  const special = (state.specialBoard ?? []).filter((q) => q.status !== "done");
+  const specialView = ui.questBoardView === "special";
+  const notices = pendingSecretNotices(state);
 
   function closePicker() {
     if (pickerOut) return;
@@ -46,19 +49,27 @@ export function Plaza() {
             alt=""
           />
           <img
-            className={`map-art collection-scene ${ui.guildOpen || ui.catalogueOpen ? "on" : ""}`}
+            className={`map-art collection-scene ${ui.guildOpen || ui.catalogueOpen || ui.lorebookOpen ? "on" : ""}`}
             src={BACKGROUNDS.collection}
             alt=""
           />
         </div>
         <img
-          className={`map-art questboard-scene ${ui.questBoardOpen ? "on" : ""}`}
+          className={`map-art questboard-scene ${ui.questBoardOpen && !specialView ? "on" : ""}`}
           src={BACKGROUNDS.questboard2}
+          alt=""
+        />
+        <img
+          className={`map-art questboard-scene ${ui.questBoardOpen && specialView ? "on" : ""}`}
+          src={BACKGROUNDS.faithlessShield}
           alt=""
         />
       </div>
 
       {ui.intro ? null : <QuestTrack hidden={Boolean(openKey)} />}
+      {ui.intro || ui.questBoardOpen || ui.guildOpen || ui.catalogueOpen || ui.tavernOpen || ui.lorebookOpen ? null : (
+        <SecretNotices notices={notices} />
+      )}
 
       <div
         className={`quest-board-layer ${ui.questBoardOpen ? "open" : ""}`}
@@ -74,44 +85,77 @@ export function Plaza() {
           onClick={() => openQuestBoard(false)}
         />
         <div className="quest-board-frame overview">
-          <div className="quest-overview">
-            <OverviewSection title="Currently available" empty="No open bounties." count={available.length}>
-              {available.map((quest) => (
-                <QuestCard
-                  key={quest.key}
-                  quest={quest}
-                  now={now}
-                  boardOpen={ui.questBoardOpen}
-                  onOpen={() => openQuest(quest)}
-                  onResolve={() => resolve(quest.key)}
-                />
-              ))}
-            </OverviewSection>
-            <OverviewSection title="In progress" empty="No companies on the road." count={progressing.length}>
-              {progressing.map((quest) => (
-                <QuestCard
-                  key={quest.key}
-                  quest={quest}
-                  now={now}
-                  boardOpen={ui.questBoardOpen}
-                  onOpen={() => openQuest(quest)}
-                  onResolve={() => resolve(quest.key)}
-                />
-              ))}
-            </OverviewSection>
-            <OverviewSection title="Completed" empty="None finished today." count={completed.length}>
-              {completed.map((quest) => (
-                <QuestCard
-                  key={quest.key}
-                  quest={quest}
-                  now={now}
-                  boardOpen={ui.questBoardOpen}
-                  onOpen={() => openQuest(quest)}
-                  onResolve={() => resolve(quest.key)}
-                />
-              ))}
-            </OverviewSection>
+          <div className="quest-board-tabs">
+            <button
+              type="button"
+              className={`menu-btn ${specialView ? "" : "on"}`}
+              onClick={() => openQuestBoard(true, "bounties")}
+            >
+              Today's bounties
+            </button>
+            <button
+              type="button"
+              className={`menu-btn ${specialView ? "on" : ""}`}
+              onClick={() => openQuestBoard(true, "special")}
+            >
+              Special Orders
+            </button>
           </div>
+          {specialView ? (
+            <div className="quest-overview">
+              <OverviewSection title="Special Orders" empty="No special orders are waiting." count={special.length}>
+                {special.map((quest) => (
+                  <QuestCard
+                    key={quest.key}
+                    quest={quest}
+                    now={now}
+                    boardOpen={ui.questBoardOpen}
+                    onOpen={() => openQuest(quest)}
+                    onResolve={() => resolve(quest.key)}
+                  />
+                ))}
+              </OverviewSection>
+            </div>
+          ) : (
+            <div className="quest-overview">
+              <OverviewSection title="Currently available" empty="No open bounties." count={available.length}>
+                {available.map((quest) => (
+                  <QuestCard
+                    key={quest.key}
+                    quest={quest}
+                    now={now}
+                    boardOpen={ui.questBoardOpen}
+                    onOpen={() => openQuest(quest)}
+                    onResolve={() => resolve(quest.key)}
+                  />
+                ))}
+              </OverviewSection>
+              <OverviewSection title="In progress" empty="No companies on the road." count={progressing.length}>
+                {progressing.map((quest) => (
+                  <QuestCard
+                    key={quest.key}
+                    quest={quest}
+                    now={now}
+                    boardOpen={ui.questBoardOpen}
+                    onOpen={() => openQuest(quest)}
+                    onResolve={() => resolve(quest.key)}
+                  />
+                ))}
+              </OverviewSection>
+              <OverviewSection title="Completed" empty="None finished today." count={completed.length}>
+                {completed.map((quest) => (
+                  <QuestCard
+                    key={quest.key}
+                    quest={quest}
+                    now={now}
+                    boardOpen={ui.questBoardOpen}
+                    onOpen={() => openQuest(quest)}
+                    onResolve={() => resolve(quest.key)}
+                  />
+                ))}
+              </OverviewSection>
+            </div>
+          )}
         </div>
       </div>
 
@@ -152,6 +196,7 @@ function QuestCard({
   onOpen: () => void;
   onResolve: () => void;
 }) {
+  const { state } = useGame();
   const template = QUEST_BY_ID[quest.templateId];
   if (!template) return null;
   const ready = quest.status === "underway" && now >= quest.endsAt;
@@ -160,6 +205,17 @@ function QuestCard({
     quest.status === "done" ? "done" : ready ? "ready" : quest.status === "underway" ? "underway" : "open";
   const elementIcon = template.element ? ELEMENT_ICON[template.element] : null;
   const clickable = quest.status === "open" || ready;
+  const duration =
+    quest.status === "underway"
+      ? ready
+        ? "Returned"
+        : formatDuration(quest.endsAt - now)
+      : formatDuration(
+          questDurationMs(
+            template,
+            template.secret ? namedCompanyPower(state, template.secret.requiredCardIds) : 0,
+          ),
+        );
 
   return (
     <article className={`quest-card ${stateClass} tier-${template.tier} page-1`}>
@@ -191,27 +247,31 @@ function QuestCard({
             <span className="quest-card-facts">
               <span className="quest-card-time">
                 <img src={TIME_ICON} alt="" />
-                {quest.status === "underway"
-                  ? ready
-                    ? "Returned"
-                    : formatDuration(quest.endsAt - now)
-                  : formatDuration(template.durationMs)}
+                {duration}
               </span>
-              {elementIcon ? (
-                <span className="quest-card-el">
-                  <img src={elementIcon} alt="" />
-                  {ELEMENT_LABEL[template.element!]}
-                </span>
+              {template.secret ? (
+                <span>Named company · {template.teamMin}</span>
               ) : (
-                <span className="quest-card-el">No affinity</span>
+                <>
+                  {elementIcon ? (
+                    <span className="quest-card-el">
+                      <img src={elementIcon} alt="" />
+                      {ELEMENT_LABEL[template.element!]}
+                    </span>
+                  ) : (
+                    <span className="quest-card-el">No affinity</span>
+                  )}
+                  <span>
+                    {template.power} power · {seatsLabel(template)} seats
+                  </span>
+                </>
               )}
-              <span>
-                {template.power} power · {seatsLabel(template)} seats
-              </span>
             </span>
             <span className="quest-card-state">
               {quest.status === "open"
-                ? "Open bounty"
+                ? template.secret
+                  ? "Special order"
+                  : "Open bounty"
                 : quest.status === "done"
                   ? "Done for today"
                   : ready
@@ -222,5 +282,24 @@ function QuestCard({
         </span>
       </button>
     </article>
+  );
+}
+
+function SecretNotices({ notices }: { notices: { chapterId: string; title: string }[] }) {
+  const { openSpecialOrder } = useGame();
+  if (notices.length === 0) return null;
+  return (
+    <div className="secret-notices">
+      {notices.map((notice) => (
+        <button
+          key={notice.chapterId}
+          type="button"
+          className="secret-notice"
+          onClick={() => openSpecialOrder(notice.chapterId)}
+        >
+          Secret quest: '{notice.title}' is now available.
+        </button>
+      ))}
+    </div>
   );
 }
