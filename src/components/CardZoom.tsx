@@ -100,10 +100,12 @@ export function CardZoom({
   onClose,
   children,
   wide,
+  raised,
 }: {
   onClose: () => void;
   children: ReactNode;
   wide?: boolean;
+  raised?: boolean;
 }) {
   const [leaving, setLeaving] = useState(false);
   const armed = useArmOverlay();
@@ -126,7 +128,7 @@ export function CardZoom({
 
   return createPortal(
     <div
-      className={`card-zoom-back ${leaving ? "out" : ""} ${armed ? "armed" : ""}`}
+      className={`card-zoom-back ${leaving ? "out" : ""} ${armed ? "armed" : ""} ${raised ? "raised" : ""}`}
       onClick={armed ? requestClose : undefined}
       role="presentation"
     >

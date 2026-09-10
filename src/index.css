@@ -993,6 +993,10 @@ button {
   animation: veil-in 0.28s ease;
 }
 
+.card-zoom-back.raised {
+  z-index: 90;
+}
+
 .card-zoom-back.out {
   animation: veil-out 0.24s ease forwards;
 }
@@ -1230,6 +1234,16 @@ button {
   place-items: center;
   padding: 24px;
   background: rgba(8, 12, 28, 0.78);
+  pointer-events: none;
+  animation: veil-in 0.32s ease;
+}
+
+.chapter-reader.armed {
+  pointer-events: auto;
+}
+
+.chapter-reader.out {
+  animation: veil-out 0.24s ease forwards;
 }
 
 .chapter-reader-panel {
@@ -1252,6 +1266,11 @@ button {
     0 0 0 4px #3d2918,
     0 28px 60px rgba(8, 6, 4, 0.45),
     inset 0 0 0 1px rgba(255, 244, 214, 0.42);
+  animation: veil-in 0.36s ease;
+}
+
+.chapter-reader-panel.out {
+  animation: veil-out 0.24s ease forwards;
 }
 
 .chapter-reader-close {
@@ -1295,6 +1314,19 @@ button {
   gap: 4px;
 }
 
+.chapter-cast-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 .chapter-cast img {
   width: 100%;
   aspect-ratio: 3 / 4;
@@ -1302,6 +1334,13 @@ button {
   object-position: top center;
   border-radius: 8px;
   box-shadow: 0 0 0 1px #c4a15a, 0 8px 18px rgba(8, 12, 28, 0.25);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.chapter-cast-btn:hover img,
+.chapter-cast-btn:focus-visible img {
+  transform: scale(1.02);
+  box-shadow: 0 0 0 2px #c4a15a, 0 10px 22px rgba(8, 12, 28, 0.32);
 }
 
 .chapter-cast span {
@@ -1530,7 +1569,7 @@ button {
 .art-lightbox-back {
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: 100;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -6828,6 +6867,8 @@ p.muted.tight {
   .drop-list,
   .card-zoom-back,
   .card-zoom-panel,
+  .chapter-reader,
+  .chapter-reader-panel,
   .art-lightbox-back,
   .art-lightbox,
   .quest-card,
