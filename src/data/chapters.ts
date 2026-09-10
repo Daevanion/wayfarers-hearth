@@ -80,6 +80,18 @@ export const CHAPTERS: ChapterDef[] = [
       "A week-long walk to a rotting shack, a direwolf at heel, and a father already saying goodbye. Take the detour, and the page will open.",
     art: BACKGROUNDS.corruptionEdge,
   },
+  {
+    id: "the-task",
+    title: "The Task",
+    location: "Sunspear",
+    map: { left: "18%", top: "40%" },
+    cardIds: ["sylas-duskwalker", "leona-stormrage", "freya"],
+    body: CHAPTER_BODIES["the-task"],
+    questFlavor: "A snippet into the past of Sylas Duskwalker, Leona Stormrage, and Freya. Complete to unlock the chapter.",
+    questLore:
+      "The cathedral garden still holds a mopped hallway, a missing sigil, and a smile that did not last. Walk that courtyard again, and the page will open.",
+    art: BACKGROUNDS.brokenChapel,
+  },
 ];
 
 export const CHAPTER_BY_ID = Object.fromEntries(CHAPTERS.map((chapter) => [chapter.id, chapter])) as Record<

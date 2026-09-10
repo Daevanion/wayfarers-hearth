@@ -11,6 +11,9 @@ import fenric from "../Assets/cards/portraits/fenric_1.jpg";
 import eva from "../Assets/cards/portraits/eva_1.jpg";
 import elowen from "../Assets/cards/portraits/elowen_1.jpg";
 import evander from "../Assets/cards/portraits/evamder_1.jpg";
+import sylas from "../Assets/cards/portraits/sylas_1.jpg";
+import leona from "../Assets/cards/portraits/leona_1.jpg";
+import freya from "../Assets/cards/portraits/freya_1.jpg";
 
 export const STORY_PORTRAITS: Record<string, string> = {
   "alden-hollowgarth": alden,
@@ -26,4 +29,7 @@ export const STORY_PORTRAITS: Record<string, string> = {
   "eva-hearthgale": eva,
   "elowen-wolfcrag": elowen,
   "evander-wolfcrag": evander,
+  "sylas-duskwalker": sylas,
+  "leona-stormrage": leona,
+  freya,
 };

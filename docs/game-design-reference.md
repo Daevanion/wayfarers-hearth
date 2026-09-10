@@ -401,11 +401,11 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 
 | ID | Name | Title | Pwr | L5 Pwr | Element | Role | Combat | Rarity | Traits |
 |----|------|-------|-----|--------|---------|------|--------|--------|--------|
-| `rin-blackheart` | Rin Blackheart | The Obsidian Ember | 75 | 79 | fire | warrior | melee | epic | kindhearted, loyal, distrustful |
+| `rin-blackheart` | Rin Blackheart | The Obsidian Ember | 65 | 69 | fire | warrior | melee | epic | kindhearted, loyal, distrustful |
 | `alastor-blackheart` | Alastor Blackheart | Master of Darkness | 85 | 89 | earth | warrior | melee + magic | epic | legendary, wise, reclusive |
 | `freya-blackheart` | Freya Blackheart | The Great Cold | 65 | 69 | dark | berserker | melee | epic | mighty, battlehungry, scheming |
 
-**Set total:** L1 = 225 | L5 = 237
+**Set total:** L1 = 215 | L5 = 227
 
 **Note:** `obtain: "quest"`. Full catalogue only — never tavern. No obtain-quest yet. This is **not** church Freya (`freya` / Penitent Order). Portrait file is `freya_alter.jpg`. Sheet element for Alastor is Earth, Fire; stored as `earth` (first listed). Fire is lore-highlighted only.
 
@@ -418,7 +418,7 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 | Common | 25 | Hera, Caelan, Cedric, Yvaine, Elowen |
 | Uncommon | 30–40 | Leona (35), Kaelen (40), Gall (40), Elanor (30), Alden (30), Eamon (35) |
 | Rare | 30–50 | Lysandra (50), Sylas (50), Freya (45), Fenric (45), Seraphina (30), Evander (50), Eva (45) |
-| Epic | 65–85 | Freya Blackheart (65), Corvus (65), Aurora (70), Rin (75), Morrigan (75), Serilla (75), Alastor (85) |
+| Epic | 65–85 | Freya Blackheart (65), Rin (65), Corvus (65), Aurora (70), Morrigan (75), Serilla (75), Alastor (85) |
 | Legendary | 90–100 | Reinhart (90), Bran (90), Samara (95), Odin (100), Marpha (100) |
 
 ---
@@ -435,9 +435,9 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 | Kaelen / Gall | 40 | 41 | 42 | 43 | 44 |
 | Freya / Fenric / Eva | 45 | 46 | 47 | 48 | 49 |
 | Sylas / Lysandra / Evander | 50 | 51 | 52 | 53 | 54 |
-| Corvus / Freya Blackheart | 65 | 66 | 67 | 68 | 69 |
+| Corvus / Freya Blackheart / Rin | 65 | 66 | 67 | 68 | 69 |
 | Aurora | 70 | 71 | 72 | 73 | 74 |
-| Morrigan / Serilla / Rin | 75 | 76 | 77 | 78 | 79 |
+| Morrigan / Serilla | 75 | 76 | 77 | 78 | 79 |
 | Alastor | 85 | 86 | 87 | 88 | 89 |
 | Reinhart / Bran | 90 | 91 | 92 | 93 | 94 |
 | Samara | 95 | 96 | 97 | 98 | 99 |
@@ -506,7 +506,7 @@ Low quests are 1–3 seats. Mid/High/Extreme need more power (and High/Extreme m
 | `moonlight-scripture` | Moonlight Scripture | Aurora, Corvus, Serilla | 210 | 222 | When all 3 dispatched |
 | `wolfcrag-exile` | Wolfcrag Exile | Elowen, Evander, Eva | 120 | 132 | When all 3 dispatched |
 | `calamity-seal` | Calamity Seal | Bran, Marpha, Samara | 285 | 297 | Catalogue only — no set crit yet |
-| `blackheart-kin` | Blackheart Kin | Rin, Alastor, Freya Blackheart | 225 | 237 | Catalogue only — no set crit yet |
+| `blackheart-kin` | Blackheart Kin | Rin, Alastor, Freya Blackheart | 215 | 227 | Catalogue only — no set crit yet |
 
 ### Set-Specific Crit Quests (existing)
 
@@ -640,7 +640,7 @@ Pool in `src/data/quests.ts`. Each template has `flavor` (card hook), `lore` (2�
 
 World tier is typed; **zero templates** until prerequisites are specified.
 
-### Special Orders (5 secret chapters)
+### Special Orders (6 secret chapters)
 
 From `World Lore.docx`, wired in `src/data/chapters.ts`. Not drawn on the daily board. Appear on **Special Orders** once every named character is owned. Named company only; each card needs **shown level 2**. Duration interpolates from company power: 60 → 3 minutes, 120 → 15 minutes, 250+ → 50 minutes. Always succeeds. Completing unseals that chapter on each named dossier (4 slots per card; unused stay `???`).
 
@@ -651,6 +651,7 @@ From `World Lore.docx`, wired in `src/data/chapters.ts`. Not drawn on the daily 
 | `a-lesson-in-the-dark` | A Lesson in the Dark | Lysandra, Kaelan | Dark forest |
 | `the-silence-of-the-hollow-blade` | The Silence of the Hollow Blade | Corvus, Aurora, Serilla | Dark Glade |
 | `the-beastmasters-detour` | The Beastmaster's Detour | Eva, Elowen, Evander | Dark forest |
+| `the-task` | The Task | Sylas, Leona, Freya | Sunspear · `broken_chapel.jpg` |
 
 Alastor, Rin, Freya Blackheart, and Samara are catalogue / quest-bound cards — not tavern-obtainable, no recruit quests yet. Whereabouts of General Alastor remains Extreme fiction.
 
@@ -1028,4 +1029,4 @@ Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary"
 
 ---
 
-*Document version: save v13, 30 cards, 10 sets of 3, 49 quest templates, 51 traits. Update the counts in this line whenever they change.*
+*Document version: save v14, 30 cards, 10 sets of 3, 49 daily quest templates, 6 secret chapters, 51 traits. Update the counts in this line whenever they change.*

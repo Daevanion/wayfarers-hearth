@@ -466,7 +466,7 @@ export const CARDS: CardTemplate[] = [
     element: "fire",
     role: "warrior",
     combat: ["melee"],
-    power: 75,
+    power: 65,
     rarity: "epic",
     traits: ["kindhearted", "loyal", "distrustful"],
     setId: "blackheart-kin",
