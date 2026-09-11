@@ -30,7 +30,7 @@ export const CHAPTERS: ChapterDef[] = [
     questFlavor: "A snippet into the past of Alden Hollowgarth, Yvaine Ashcroft, and Eamon Stoneseeker. Complete to unlock the chapter.",
     questLore:
       "The outer woods of the Citadel still remember a troll, a niece who would not yield, and a scout who named his price. Walk that road again and the page will open.",
-    art: BACKGROUNDS.merchantRoad,
+    art: BACKGROUNDS.loreSixtyPercent,
   },
   {
     id: "a-lesson-in-the-dark",
@@ -42,7 +42,7 @@ export const CHAPTERS: ChapterDef[] = [
     questFlavor: "A snippet into the past of Lysandra Silverleaf and Kaelan Duskwalker. Complete to unlock the chapter.",
     questLore:
       "A shack at the forest's edge, a child's temper, and a guardian who answers without raising her voice. Return there, and the lesson waits.",
-    art: BACKGROUNDS.corruptionEdge,
+    art: BACKGROUNDS.loreLessonDark,
   },
   {
     id: "the-silence-of-the-hollow-blade",
@@ -54,7 +54,7 @@ export const CHAPTERS: ChapterDef[] = [
     questFlavor: "A snippet into the past of Corvus Grim, Aurora Starling, and Serilla. Complete to unlock the chapter.",
     questLore:
       "The Glade keeps a third twilight when a child stood watch and the vanguard learned a quieter fear. Complete the order to unseal that night.",
-    art: BACKGROUNDS.abyss,
+    art: BACKGROUNDS.loreHollowBlade,
   },
   {
     id: "the-faithless-shield",
@@ -66,7 +66,7 @@ export const CHAPTERS: ChapterDef[] = [
     questFlavor: "A snippet into the past of Fenric Valerand and Seraphina Aurora. Complete to unlock the chapter.",
     questLore:
       "The Cathedral of Enlightenment still holds the morning Fenric swore his ruined life to the woman who dragged him back from death. Walk the garden again.",
-    art: BACKGROUNDS.faithlessShield,
+    art: BACKGROUNDS.loreFaithlessShield,
   },
   {
     id: "the-beastmasters-detour",
@@ -78,7 +78,7 @@ export const CHAPTERS: ChapterDef[] = [
     questFlavor: "A snippet into the past of Eva Hearthgale, Elowen Wolfcrag, and Evander Wolfcrag. Complete to unlock the chapter.",
     questLore:
       "A week-long walk to a rotting shack, a direwolf at heel, and a father already saying goodbye. Take the detour, and the page will open.",
-    art: BACKGROUNDS.corruptionEdge,
+    art: BACKGROUNDS.loreBeastmastersDetour,
   },
   {
     id: "the-task",
@@ -90,7 +90,7 @@ export const CHAPTERS: ChapterDef[] = [
     questFlavor: "A snippet into the past of Sylas Duskwalker, Leona Stormrage, and Freya. Complete to unlock the chapter.",
     questLore:
       "The cathedral garden still holds a mopped hallway, a missing sigil, and a smile that did not last. Walk that courtyard again, and the page will open.",
-    art: BACKGROUNDS.brokenChapel,
+    art: BACKGROUNDS.loreTask,
   },
 ];
 

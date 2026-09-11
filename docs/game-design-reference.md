@@ -642,16 +642,16 @@ World tier is typed; **zero templates** until prerequisites are specified.
 
 ### Special Orders (6 secret chapters)
 
-From `World Lore.docx`, wired in `src/data/chapters.ts`. Not drawn on the daily board. Appear on **Special Orders** once every named character is owned. Named company only; each card needs **shown level 2**. Duration interpolates from company power: 60 → 3 minutes, 120 → 15 minutes, 250+ → 50 minutes. Always succeeds. Completing unseals that chapter on each named dossier (4 slots per card; unused stay `???`).
+From `World Lore.docx`, wired in `src/data/chapters.ts`. Not drawn on the daily board. Appear on **Special Orders** once every named character is owned. Named company only; each card needs **shown level 2**. Duration interpolates from company power: 60 → 3 minutes, 120 → 15 minutes, 250+ → 50 minutes. Always succeeds. Completing unseals that chapter on each named dossier (4 slots per card; unused stay `???`). Every order has a dedicated scene in `src/Assets/bg/lore/`; the same art is used on its quest card, dispatch/report flow, underway view, and Lorebook card.
 
-| ID | Title | Company | Map |
-|----|-------|---------|-----|
-| `the-faithless-shield` | The Faithless Shield | Seraphina, Fenric | Lightspear · `faithless_shield_bg.jpg` |
-| `sixty-percent-of-a-hero` | Sixty Percent of a Hero | Alden, Yvaine, Eamon | East Silver Gale |
-| `a-lesson-in-the-dark` | A Lesson in the Dark | Lysandra, Kaelan | Dark forest |
-| `the-silence-of-the-hollow-blade` | The Silence of the Hollow Blade | Corvus, Aurora, Serilla | Dark Glade |
-| `the-beastmasters-detour` | The Beastmaster's Detour | Eva, Elowen, Evander | Dark forest |
-| `the-task` | The Task | Sylas, Leona, Freya | Sunspear · `broken_chapel.jpg` |
+| ID | Title | Company | Map | Art |
+|----|-------|---------|-----|-----|
+| `the-faithless-shield` | The Faithless Shield | Seraphina, Fenric | Lightspear | `the_faithless_shield.png` |
+| `sixty-percent-of-a-hero` | Sixty Percent of a Hero | Alden, Yvaine, Eamon | East Silver Gale | `sixty_percent_of_a_hero.png` |
+| `a-lesson-in-the-dark` | A Lesson in the Dark | Lysandra, Kaelan | Dark forest | `a_lesson_in_the_dark.png` |
+| `the-silence-of-the-hollow-blade` | The Silence of the Hollow Blade | Corvus, Aurora, Serilla | Dark Glade | `the_silence_of_the_hollow_blade.png` |
+| `the-beastmasters-detour` | The Beastmaster's Detour | Eva, Elowen, Evander | Dark forest | `the_beastmasters_detour.png` |
+| `the-task` | The Task | Sylas, Leona, Freya | Sunspear | `the_task.png` |
 
 Alastor, Rin, Freya Blackheart, and Samara are catalogue / quest-bound cards — not tavern-obtainable, no recruit quests yet. Whereabouts of General Alastor remains Extreme fiction.
 
