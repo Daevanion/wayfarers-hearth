@@ -1788,6 +1788,54 @@ button {
   filter: saturate(0.55);
 }
 
+.portrait-card.is-resting .portrait-frame > img {
+  filter: grayscale(0.72) contrast(0.96) brightness(0.9);
+}
+
+.portrait-card.is-recovering .portrait-frame > img {
+  filter: grayscale(0.28) sepia(0.85) hue-rotate(-22deg) saturate(1.55) brightness(0.9);
+}
+
+.duty-ribbon {
+  position: absolute;
+  top: auto;
+  bottom: 22px;
+  left: 0;
+  z-index: 5;
+  padding: 3px 11px 3px 7px;
+  font-family: Cinzel, serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.duty-ribbon.resting {
+  background: linear-gradient(90deg, #4e535c, #8b9098);
+  color: #f3f4f6;
+}
+
+.duty-ribbon.recovering {
+  background: linear-gradient(90deg, #c45a16, #e8942a);
+  color: #fff7ea;
+}
+
+.duty-ribbon.marching {
+  background: linear-gradient(90deg, #1a4d9c, #3d7de0);
+  color: #eef5ff;
+}
+
+.portrait-card.size-compact .duty-ribbon {
+  bottom: 16px;
+  padding: 2px 8px 2px 6px;
+  font-size: 0.46rem;
+  letter-spacing: 0.08em;
+}
+
 .portrait-card.unknown .portrait-frame img {
   filter: none;
 }
@@ -3825,7 +3873,7 @@ p.muted.tight {
 
 .mission-ribbons {
   position: absolute;
-  top: 36px;
+  top: 64px;
   left: 0;
   right: 0;
   z-index: 10;

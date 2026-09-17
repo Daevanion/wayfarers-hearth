@@ -408,6 +408,21 @@ export function isExhausted(state: GameState, cardId: string, now: number): bool
   return Boolean(owned && owned.exhaustedUntil > now);
 }
 
+export type CardDuty = "marching" | "resting" | "recovering";
+
+export const DUTY_LABEL: Record<CardDuty, string> = {
+  marching: "Marching",
+  resting: "Resting",
+  recovering: "Recovering",
+};
+
+export function cardDuty(state: GameState, cardId: string, now: number): CardDuty | null {
+  if (isBusy(state, cardId)) return "marching";
+  const owned = ownedById(state, cardId);
+  if (!owned || owned.exhaustedUntil <= now) return null;
+  return owned.restKind === "recover" ? "recovering" : "resting";
+}
+
 export function dispatchQuest(
   state: GameState,
   key: string,
@@ -494,7 +509,7 @@ export function resolveQuest(
       toLevel: card.level,
       toXp: card.xp,
     });
-    return { ...card, exhaustedUntil: now + restMs };
+    return { ...card, exhaustedUntil: now + restMs, restKind: won ? ("rest" as const) : ("recover" as const) };
   });
 
   let next: GameState = patchBoard(

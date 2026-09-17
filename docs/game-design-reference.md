@@ -32,6 +32,7 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 - Dispatch loadout uses the quest painting as the header with time, power needed, team size, and favor on it, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
 - HUD: Gold, Tokens, Tavern, Collection, Full catalogue, Full Lorebook
 - Collection and Full catalogue are the same bound volume: parchment page, `The Ledger` kicker, All / Set chips plus dropdowns for Element, Role, and Status (Collection) or Obtain (Catalogue). Filter plaques match Chronicle: opaque dark gold-edged, larger type. Set view is fellowship rows of three
+- Owned portraits show a status ribbon while unavailable: **Marching** (blue) on a bounty, **Resting** (grey tint) after a win, **Recovering** (orange ribbon, red tint) after a fail
 - Toasts and the Chronicle log sit at the bottom center; the log opens above the Chronicle button
 - Collection = owned company. Catalogue = every face, owned or not. Quest-only cards caption **Quest-bound**
 - Collection hides empty quest-only sets until a member is owned
@@ -125,9 +126,9 @@ The live game is a **daily bounty board** system. Players dispatch teams of owne
 | Team size | Range per quest: Low 1–3, Mid 2–3, High 3–4, Extreme 4 |
 | Parallel quests | Unlimited (different cards) |
 | Roster cap | None |
-| Card rest (win) | `duration × 0.5` |
-| Card rest (fail) | `duration × 2` |
-| Busy cards | Cannot dispatch while on an active quest |
+| Card rest (win) | `duration × 0.5` — **Resting** grey ribbon + grey tint |
+| Card rest (fail) | `duration × 2` — **Recovering** orange ribbon + red tint |
+| Busy cards | Cannot dispatch while on an active quest — **Marching** blue ribbon |
 | Exhausted cards | Cannot dispatch until `exhaustedUntil` passes |
 
 ### Daily Board

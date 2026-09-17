@@ -2,6 +2,7 @@ import { useState, type CSSProperties, type MouseEvent } from "react";
 import { ELEMENT_ICON, ELEMENT_LABEL, ROLE_LABEL } from "../data/icons";
 import { CARD_BACK } from "../data/portraits";
 import { shownLevel } from "../game/formulas";
+import { cardDuty, DUTY_LABEL } from "../game/quests";
 import { useGame } from "../store/GameContext";
 import type { CardTemplate } from "../types";
 import { CardDossier } from "./CardDossier";
@@ -35,7 +36,7 @@ export function PortraitCard({
   onClick?: () => void;
   onHover?: (active: boolean) => void;
 }) {
-  const { state } = useGame();
+  const { state, now } = useGame();
   const [tilt, setTilt] = useState({ rx: 0, ry: 0, x: 50, y: 50, on: false });
   const [dossierOpen, setDossierOpen] = useState(false);
   const shown = Boolean(owned) || Boolean(reveal);
@@ -44,6 +45,7 @@ export function PortraitCard({
   const shownPower = power ?? template.power;
   const elementIcon = ELEMENT_ICON[template.element];
   const clickable = Boolean(onClick || dossier);
+  const duty = shown ? cardDuty(state, template.id, now) : null;
 
   function move(e: MouseEvent<HTMLElement>) {
     if (dossierOpen) return;
@@ -87,7 +89,7 @@ export function PortraitCard({
     tilt.on ? "lit" : "",
     selected ? "selected" : "",
     dimmed ? "dimmed" : "",
-    exhausted ? "injured" : "",
+    duty ? `is-${duty}` : exhausted ? "injured" : "",
     shown ? "known" : "unknown",
     reveal && !owned ? "ledger" : "",
     clickable ? "clickable" : "",
@@ -113,6 +115,9 @@ export function PortraitCard({
             </span>
           ) : null}
         </>
+      ) : null}
+      {duty ? (
+        <span className={`duty-ribbon ${duty}`}>{DUTY_LABEL[duty]}</span>
       ) : null}
       <span className="portrait-shine" aria-hidden />
     </div>

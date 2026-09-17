@@ -19,6 +19,8 @@ import {
   critLabel,
   isBusy,
   isExhausted,
+  cardDuty,
+  DUTY_LABEL,
   questDurationMs,
   seatsLabel,
   TIER_LABEL,
@@ -546,10 +548,22 @@ function LoadoutChoice({
   teamFull: boolean;
   onOpen: () => void;
 }) {
+  const { state, now } = useGame();
   const t = CARD_BY_ID[owned.id];
   if (!t) return null;
   const locked = busy || exhausted || (teamFull && !picked);
   const mark = relevanceMark(t, quest);
+  const duty = cardDuty(state, owned.id, now);
+  const wait = formatDuration(restLeft);
+  const meta = picked
+    ? "Chosen"
+    : duty === "marching"
+      ? DUTY_LABEL.marching
+      : duty === "recovering"
+        ? `Recovers ${wait}`
+        : duty === "resting"
+          ? `Rests ${wait}`
+          : `Power ${cardPower(owned)}`;
   return (
     <button type="button" className={`loadout-choice ${picked ? "on" : ""} ${locked ? "hurt" : ""}`} onClick={onOpen}>
       <PortraitCard
@@ -561,10 +575,8 @@ function LoadoutChoice({
         dimmed={locked && !picked}
         size="guild"
       />
-      {mark ? <span className={`loadout-mark ${mark.tone}`}>{mark.label}</span> : null}
-      <p className="assign-meta">
-        {busy ? "Out on a bounty" : exhausted ? `Rests ${formatDuration(restLeft)}` : picked ? "Chosen" : `Power ${cardPower(owned)}`}
-      </p>
+      {mark && !duty ? <span className={`loadout-mark ${mark.tone}`}>{mark.label}</span> : null}
+      <p className="assign-meta">{meta}</p>
     </button>
   );
 }
@@ -593,15 +605,18 @@ function LoadoutPick({
   if (!t) return null;
   const busy = isBusy(state, owned.id);
   const exhausted = isExhausted(state, owned.id, now);
+  const duty = cardDuty(state, owned.id, now);
   const canAct = picked || (!busy && !exhausted && !teamFull);
   const action = picked ? "Remove" : "Choose";
   const reason = busy
     ? "Already on a bounty"
-    : exhausted
-      ? "Needs rest"
-      : teamFull && !picked
-        ? "The company is full"
-        : `Power ${cardPower(owned)}`;
+    : duty === "recovering"
+      ? "Still recovering"
+      : exhausted
+        ? "Needs rest"
+        : teamFull && !picked
+          ? "The company is full"
+          : `Power ${cardPower(owned)}`;
 
   return (
     <div

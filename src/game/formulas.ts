@@ -18,6 +18,7 @@ export function normalizeOwned(card: OwnedCard): OwnedCard {
     ...card,
     duplicates: card.duplicates ?? 0,
     duplicateXp: card.duplicateXp ?? 0,
+    restKind: card.restKind === "recover" ? "recover" : card.restKind === "rest" ? "rest" : undefined,
   };
 }
 

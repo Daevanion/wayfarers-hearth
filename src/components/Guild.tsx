@@ -3,7 +3,7 @@ import { CARD_BY_ID, visibleRoles } from "../data/cards";
 import { ELEMENT_LABEL, ELEMENT_ORDER, ROLE_LABEL } from "../data/icons";
 import { SETS } from "../data/sets";
 import { canSpendDuplicates, cardPower, formatDuration, shownLevel } from "../game/formulas";
-import { isBusy, isExhausted } from "../game/quests";
+import { cardDuty, DUTY_LABEL, isBusy, isExhausted } from "../game/quests";
 import { useGame } from "../store/GameContext";
 import type { ElementId, OwnedCard, RoleId } from "../types";
 import { CardDossier } from "./CardDossier";
@@ -114,7 +114,6 @@ export function Guild() {
                           key={owned.id}
                           owned={owned}
                           selected={ui.inspecting === owned.id}
-                          busy={isBusy(state, owned.id)}
                           resting={isExhausted(state, owned.id, now)}
                           now={now}
                           onInspect={() => inspect(owned.id)}
@@ -146,7 +145,6 @@ export function Guild() {
                                   key={owned.id}
                                   owned={owned}
                                   selected={ui.inspecting === owned.id}
-                                  busy={isBusy(state, owned.id)}
                                   resting={isExhausted(state, owned.id, now)}
                                   now={now}
                                   onInspect={() => inspect(owned.id)}
@@ -182,20 +180,29 @@ export function Guild() {
 function CompanyCard({
   owned,
   selected,
-  busy,
   resting,
   now,
   onInspect,
 }: {
   owned: OwnedCard;
   selected: boolean;
-  busy: boolean;
   resting: boolean;
   now: number;
   onInspect: () => void;
 }) {
+  const { state } = useGame();
   const t = CARD_BY_ID[owned.id];
   if (!t) return null;
+  const duty = cardDuty(state, owned.id, now);
+  const wait = formatDuration(owned.exhaustedUntil - now);
+  const status =
+    duty === "marching"
+      ? DUTY_LABEL.marching
+      : duty === "recovering"
+        ? `Recovers ${wait}`
+        : duty === "resting"
+          ? `Rests ${wait}`
+          : "Ready";
   return (
     <div className="collection-card">
       {canSpendDuplicates(owned) ? (
@@ -212,7 +219,7 @@ function CompanyCard({
       />
       <p className="assign-meta">
         {shownLevel(owned.level) > 0 ? `Level ${shownLevel(owned.level)} · ` : ""}
-        {busy ? "On a bounty" : resting ? `Rests ${formatDuration(owned.exhaustedUntil - now)}` : "Ready"}
+        {status}
       </p>
     </div>
   );

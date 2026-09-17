@@ -67,11 +67,15 @@ export interface SetDef {
   obtain?: ObtainId;
 }
 
+export type RestKind = "rest" | "recover";
+
 export interface OwnedCard {
   id: string;
   level: number;
   xp: number;
   exhaustedUntil: number;
+  /** Win rest vs fail recovery. Ignored once exhaustedUntil has passed. */
+  restKind?: RestKind;
   duplicates: number;
   duplicateXp: number;
 }
