@@ -559,7 +559,9 @@ function LoadoutChoice({
     ? "Chosen"
     : duty === "marching"
       ? DUTY_LABEL.marching
-      : duty === "recovering"
+      : duty === "delving"
+        ? DUTY_LABEL.delving
+        : duty === "recovering"
         ? `Recovers ${wait}`
         : duty === "resting"
           ? `Rests ${wait}`
@@ -609,7 +611,9 @@ function LoadoutPick({
   const canAct = picked || (!busy && !exhausted && !teamFull);
   const action = picked ? "Remove" : "Choose";
   const reason = busy
-    ? "Already on a bounty"
+    ? duty === "delving"
+      ? "On the Hearthroads"
+      : "Already on a bounty"
     : duty === "recovering"
       ? "Still recovering"
       : exhausted

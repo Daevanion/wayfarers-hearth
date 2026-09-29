@@ -2,6 +2,7 @@ import { GameProvider, useGame } from "./store/GameContext";
 import { TitleScreen } from "./components/TitleScreen";
 import { HUD } from "./components/HUD";
 import { Plaza } from "./components/Plaza";
+import { Hearthroads } from "./components/Hearthroads";
 import { Guild } from "./components/Guild";
 import { Catalogue } from "./components/Catalogue";
 import { TavernShop } from "./components/TavernShop";
@@ -30,7 +31,7 @@ function Shell() {
   return (
     <div className="app map-app">
       <HUD />
-      <Plaza />
+      {ui.screen === "hearthroads" ? <Hearthroads /> : <Plaza />}
       {ui.intro ? <OpeningDraw /> : null}
       {ui.guildOpen ? <Guild /> : null}
       {ui.catalogueOpen ? <Catalogue /> : null}

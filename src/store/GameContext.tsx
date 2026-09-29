@@ -9,6 +9,19 @@ import {
   type ReactNode,
 } from "react";
 import { CARD_BY_ID } from "../data/cards";
+import {
+  abandonDelve,
+  chooseDelveNode,
+  continueDelve,
+  craftTokenFromShards,
+  debugGrantRoadReady,
+  delveAct,
+  ensureDelveOffers,
+  finishDelve,
+  resolveDelveEvent,
+  selectDelveBlessing,
+  startDelve,
+} from "../game/delve";
 import { spendDuplicateXp } from "../game/formulas";
 import {
   buyPacks,
@@ -21,7 +34,7 @@ import {
   rolloverBoard,
 } from "../game/quests";
 import { createNewGame, loadSave, persist, clearSave } from "../game/save";
-import type { GameState, PackResult, Toast, UiState } from "../types";
+import type { DelveActionId, GameState, PackResult, Toast, UiState } from "../types";
 
 interface GameApi {
   state: GameState;
@@ -49,6 +62,17 @@ interface GameApi {
   startVn: (sceneId: string) => void;
   endVn: () => void;
   dismissToast: (id: string) => void;
+  openHearthroads: (open: boolean) => void;
+  startDelveRun: (offerKey: string, team: string[]) => string | null;
+  chooseRoadNode: (nodeId: string) => string | null;
+  actOnRoad: (actorId: string, action: DelveActionId, targetId?: string) => string | null;
+  continueRoad: () => string | null;
+  resolveRoadEvent: (choiceId: string) => string | null;
+  pickRoadBlessing: (blessingId: string) => string | null;
+  abandonRoad: () => string | null;
+  finishRoad: () => string | null;
+  craftShards: () => string | null;
+  debugGrantRoads: () => void;
 }
 
 const GameContext = createContext<GameApi | null>(null);
@@ -91,7 +115,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const id = window.setInterval(() => {
       const t = Date.now();
       setNow(t);
-      setState((prev) => (prev ? rolloverBoard(prev, t) : prev));
+      setState((prev) => (prev ? ensureDelveOffers(rolloverBoard(prev, t)) : prev));
     }, 250);
     return () => window.clearInterval(id);
   }, []);
@@ -249,7 +273,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       grantDebugFunds: () => {
         setState((prev) => {
           if (!prev) return prev;
-          return { ...prev, gold: prev.gold + 1000, tokens: prev.tokens + 100 };
+          return { ...prev, gold: prev.gold + 1000, tokens: prev.tokens + 100, tokenShards: (prev.tokenShards ?? 0) + 16 };
         });
       },
       debugRedrawBoard: () => {
@@ -273,6 +297,104 @@ export function GameProvider({ children }: { children: ReactNode }) {
         })),
       endVn: () => setUi((u) => ({ ...u, vnScene: null })),
       dismissToast: (id) => setUi((u) => ({ ...u, toasts: u.toasts.filter((t) => t.id !== id) })),
+      openHearthroads: (open) => {
+        if (open) setState((prev) => (prev ? ensureDelveOffers(prev) : prev));
+        setUi((u) => ({
+          ...u,
+          screen: open ? "hearthroads" : "plaza",
+          guildOpen: false,
+          catalogueOpen: false,
+          tavernOpen: false,
+          lorebookOpen: false,
+          questBoardOpen: false,
+        }));
+      },
+      startDelveRun: (offerKey, team) => {
+        const result = startDelve(current(), offerKey, team, Date.now());
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        return null;
+      },
+      chooseRoadNode: (nodeId) => {
+        const result = chooseDelveNode(current(), nodeId);
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        return null;
+      },
+      actOnRoad: (actorId, action, targetId) => {
+        const result = delveAct(current(), actorId, action, targetId);
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        return null;
+      },
+      continueRoad: () => {
+        const result = continueDelve(current());
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        return null;
+      },
+      resolveRoadEvent: (choiceId) => {
+        const result = resolveDelveEvent(current(), choiceId);
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        return null;
+      },
+      pickRoadBlessing: (blessingId) => {
+        const result = selectDelveBlessing(current(), blessingId);
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        return null;
+      },
+      abandonRoad: () => {
+        const result = abandonDelve(current());
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        return null;
+      },
+      finishRoad: () => {
+        const result = finishDelve(current(), Date.now());
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        setUi((u) => ({ ...u, screen: "plaza" }));
+        return null;
+      },
+      craftShards: () => {
+        const result = craftTokenFromShards(current());
+        if (result.error) {
+          pushToast(result.error, "fail");
+          return result.error;
+        }
+        setState(result.state);
+        pushToast("A recruitment token is struck from shard-glass.", "recruit");
+        return null;
+      },
+      debugGrantRoads: () => {
+        setState((prev) => (prev ? debugGrantRoadReady(prev) : prev));
+      },
     };
   }, [state, ui, now, pushToast]);
 

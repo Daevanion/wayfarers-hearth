@@ -84,7 +84,7 @@ export function QuestResult() {
               </ul>
             ) : (
               <p className="result-loot-empty">
-                No gold or tokens. A little was learned all the same (+{outcome.xpEach} XP each). They take double rest.
+                No gold this time. A little was learned all the same (+{outcome.xpEach} XP each). They take double rest.
               </p>
             )}
           </section>

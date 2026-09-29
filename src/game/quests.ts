@@ -126,7 +126,7 @@ export const DUPE_XP_TOKEN = 80;
 
 // ————— board generation —————
 
-function hashSeed(text: string): number {
+export function hashSeed(text: string): number {
   let h = 2166136261;
   for (let i = 0; i < text.length; i++) {
     h ^= text.charCodeAt(i);
@@ -135,7 +135,7 @@ function hashSeed(text: string): number {
   return h >>> 0;
 }
 
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   let a = seed;
   return () => {
     a |= 0;
@@ -400,6 +400,7 @@ function log(state: GameState, kind: JournalEntry["kind"], text: string): GameSt
 // ————— dispatch / resolve —————
 
 export function isBusy(state: GameState, cardId: string): boolean {
+  if (state.activeDelve && !state.activeDelve.end && state.activeDelve.team.includes(cardId)) return true;
   return allQuests(state).some((q) => q.status === "underway" && q.team.includes(cardId));
 }
 
@@ -408,15 +409,17 @@ export function isExhausted(state: GameState, cardId: string, now: number): bool
   return Boolean(owned && owned.exhaustedUntil > now);
 }
 
-export type CardDuty = "marching" | "resting" | "recovering";
+export type CardDuty = "marching" | "resting" | "recovering" | "delving";
 
 export const DUTY_LABEL: Record<CardDuty, string> = {
   marching: "Marching",
   resting: "Resting",
   recovering: "Recovering",
+  delving: "On the road",
 };
 
 export function cardDuty(state: GameState, cardId: string, now: number): CardDuty | null {
+  if (state.activeDelve && !state.activeDelve.end && state.activeDelve.team.includes(cardId)) return "delving";
   if (isBusy(state, cardId)) return "marching";
   const owned = ownedById(state, cardId);
   if (!owned || owned.exhaustedUntil <= now) return null;
@@ -491,7 +494,7 @@ export function resolveQuest(
 
   let gold = won ? template.gold : 0;
   if (won && quest.critMatched) gold = Math.round(gold * CRIT_LOOT_MULT);
-  const tokens = result === "crit" ? critTokens(template.tier) : 0;
+  const tokens = result === "crit" && template.rewardTokens ? template.rewardTokens : 0;
   const xpEach = won ? template.xp : Math.max(1, Math.round(template.xp * 0.25));
   const restMs = (quest.endsAt - quest.startedAt) * (won ? 0.5 : 2);
 

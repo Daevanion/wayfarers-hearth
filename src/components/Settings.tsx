@@ -3,7 +3,7 @@ import { loadBgmSettings, saveBgmSettings, startMenuBgm, type BgmSettings } from
 import { useGame } from "../store/GameContext";
 
 export function Settings() {
-  const { ui, grantDebugFunds, debugRedrawBoard, debugCompleteQuests, debugUnlockLore, startVn } = useGame();
+  const { ui, grantDebugFunds, debugRedrawBoard, debugCompleteQuests, debugUnlockLore, debugGrantRoads, startVn } = useGame();
   const [open, setOpen] = useState(false);
   const [bgm, setBgm] = useState<BgmSettings>(() => loadBgmSettings());
   const box = useRef<HTMLDivElement>(null);
@@ -54,15 +54,23 @@ export function Settings() {
           <button
             type="button"
             className="settings-debug"
-            disabled={ui.screen !== "plaza"}
+            disabled={ui.screen === "title"}
             onClick={grantDebugFunds}
           >
-            Debug: +1000 gold, +100 tokens
+            Debug: +1000 gold, +100 tokens, +16 shards
           </button>
           <button
             type="button"
             className="settings-debug"
-            disabled={ui.screen !== "plaza"}
+            disabled={ui.screen === "title"}
+            onClick={debugGrantRoads}
+          >
+            Debug: ready the Hearthroads
+          </button>
+          <button
+            type="button"
+            className="settings-debug"
+            disabled={ui.screen === "title"}
             onClick={debugRedrawBoard}
           >
             Get new quest
@@ -70,7 +78,7 @@ export function Settings() {
           <button
             type="button"
             className="settings-debug"
-            disabled={ui.screen !== "plaza"}
+            disabled={ui.screen === "title"}
             onClick={debugCompleteQuests}
           >
             Complete quests
@@ -78,7 +86,7 @@ export function Settings() {
           <button
             type="button"
             className="settings-debug"
-            disabled={ui.screen !== "plaza"}
+            disabled={ui.screen === "title"}
             onClick={debugUnlockLore}
           >
             Unlock lore

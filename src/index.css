@@ -1829,6 +1829,15 @@ button {
   color: #eef5ff;
 }
 
+.duty-ribbon.delving {
+  background: linear-gradient(90deg, #5a2d86, #c9a227);
+  color: #fff4d6;
+}
+
+.portrait-card.is-delving .portrait-frame > img {
+  filter: sepia(0.25) hue-rotate(18deg) saturate(1.15) brightness(0.92);
+}
+
 .portrait-card.size-compact .duty-ribbon {
   bottom: 16px;
   padding: 2px 8px 2px 6px;
@@ -3320,6 +3329,10 @@ p.muted.tight {
 /* Full-bleed town3 stage */
 .map-app {
   background: #0b1018;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .map-frame {
@@ -3448,6 +3461,13 @@ p.muted.tight {
   font-size: 1.05rem;
   line-height: 1;
   color: #7ec8ff;
+}
+
+.hud-resources .shard-mark {
+  font-size: 1.05rem;
+  line-height: 1;
+  color: #d4b45a;
+  text-shadow: 0 0 8px rgba(212, 180, 90, 0.45);
 }
 
 .hud-resources strong {
@@ -6977,5 +6997,434 @@ p.muted.tight {
   .drop-list button:hover,
   .portrait-card:hover {
     transform: none;
+  }
+}
+
+.hearthroads-plaque {
+  position: absolute;
+  left: 18px;
+  bottom: 28px;
+  z-index: 11;
+  min-width: 220px;
+  border: 1px solid var(--gold-deep);
+  border-radius: 2px;
+  background: rgba(12, 16, 32, 0.9);
+  color: var(--gold);
+  font-family: Cinzel, serif;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  padding: 12px 18px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+
+.hearthroads-plaque:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: rgba(16, 20, 36, 0.96);
+}
+
+.hearthroads-plaque.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hearthroads {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--parchment, #efe6d4);
+}
+
+.hearthroads-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hearthroads-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  filter: saturate(0.92) brightness(0.62);
+}
+
+.hearthroads-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8, 10, 18, 0.55) 0%, rgba(8, 10, 18, 0.28) 28%, rgba(8, 10, 18, 0.62) 100%);
+}
+
+.hearthroads-bar,
+.hearthroads-body {
+  position: relative;
+  z-index: 2;
+}
+
+.hearthroads-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-end;
+  flex: 0 0 auto;
+  padding: 78px 20px 8px;
+}
+
+.hearthroads-bar h2 {
+  margin: 0;
+  font-family: Cinzel, serif;
+  font-size: clamp(1.15rem, 2vw, 1.6rem);
+  color: var(--gold);
+  text-shadow: 0 2px 8px #000;
+}
+
+.hearthroads-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.hearthroads-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 4px 18px 18px;
+}
+
+.hearthroads-locked {
+  max-width: 520px;
+  font-size: 1.05rem;
+}
+
+.delve-contracts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 1080px;
+}
+
+.delve-contract {
+  position: relative;
+  aspect-ratio: 3 / 3.4;
+  height: auto;
+  max-height: 42vh;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.delve-contract-page {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+.delve-contract-inner {
+  position: absolute;
+  inset: 12% 11% 12%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.delve-contract-art {
+  width: 100%;
+  flex: 1 1 40%;
+  min-height: 0;
+  max-height: 38%;
+  object-fit: cover;
+  border: 1px solid rgba(90, 70, 51, 0.35);
+}
+
+.delve-contract.on .delve-contract-art {
+  box-shadow: 0 0 0 2px var(--gold);
+}
+
+.delve-contract strong {
+  font-family: Cinzel, serif;
+  font-size: 0.95rem;
+  line-height: 1.15;
+  color: #3a2a18;
+}
+
+.delve-contract em,
+.delve-contract span {
+  color: #4a3a28;
+  font-style: normal;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.delve-contract-inner > span:not(.delve-contract-threat) {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.delve-contract-threat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.delve-contract-threat img {
+  width: 18px;
+  height: 18px;
+}
+
+.delve-party {
+  margin-top: 12px;
+}
+
+.delve-party h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: var(--gold);
+  text-shadow: 0 2px 8px #000;
+}
+
+.delve-party-row,
+.delve-party-combat,
+.result-team {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.delve-party-row .portrait-card,
+.delve-party-combat .portrait-card,
+.delve-result-card .portrait-card,
+.delve-fighter .portrait-card {
+  width: 112px;
+  flex: 0 0 112px;
+}
+
+.hearthroads .muted {
+  color: #efe6d4;
+  text-shadow: 0 1px 4px #000;
+}
+
+.delve-map {
+  width: min(100%, 980px);
+  height: auto;
+  display: block;
+  margin: 8px auto;
+}
+
+.delve-map-meta {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.delve-map-meta img {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.delve-edge {
+  stroke: rgba(212, 180, 90, 0.35);
+  stroke-width: 3;
+}
+
+.delve-edge.walked {
+  stroke: rgba(212, 180, 90, 0.85);
+}
+
+.delve-node {
+  cursor: default;
+}
+
+.delve-node circle {
+  fill: rgba(18, 22, 34, 0.92);
+  stroke: rgba(212, 180, 90, 0.45);
+  stroke-width: 2;
+}
+
+.delve-node text {
+  fill: #efe6d4;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.delve-node.reachable {
+  cursor: pointer;
+}
+
+.delve-node.reachable circle {
+  stroke: var(--gold);
+  fill: rgba(72, 52, 18, 0.95);
+}
+
+.delve-node.current circle {
+  stroke: #fff4d6;
+}
+
+.delve-node.visited circle {
+  opacity: 0.72;
+}
+
+.delve-combat {
+  display: grid;
+  gap: 16px;
+}
+
+.delve-foes {
+  display: flex;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.delve-foe {
+  width: 180px;
+  padding: 0;
+  border: 1px solid var(--gold-deep);
+  background: rgba(12, 16, 32, 0.82);
+  color: inherit;
+  text-align: left;
+}
+
+.delve-foe img {
+  width: 100%;
+  height: 88px;
+  object-fit: cover;
+}
+
+.delve-foe-el {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.delve-foe strong,
+.delve-foe em,
+.delve-hp {
+  display: block;
+  padding: 4px 8px;
+}
+
+.delve-foe.targetable {
+  box-shadow: 0 0 0 2px var(--gold);
+}
+
+.delve-foe.dead {
+  opacity: 0.45;
+}
+
+.delve-log {
+  list-style: none;
+  margin: 0;
+  padding: 10px 14px;
+  background: rgba(12, 16, 32, 0.72);
+  border: 1px solid rgba(212, 180, 90, 0.28);
+  max-width: 640px;
+}
+
+.delve-fighter.acted,
+.delve-fighter.down {
+  opacity: 0.62;
+}
+
+.delve-verbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.delve-event {
+  max-width: 640px;
+  background: rgba(12, 16, 32, 0.78);
+  border: 1px solid var(--gold-deep);
+  padding: 16px 18px;
+}
+
+.delve-event-art {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.delve-choices {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.delve-choices .menu-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.delve-blessings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.delve-blessing {
+  min-height: 140px;
+  padding: 18px;
+  border: 1px solid var(--gold-deep);
+  background: rgba(12, 16, 32, 0.86);
+  color: var(--gold);
+  text-align: left;
+}
+
+.delve-blessing span {
+  display: block;
+  margin-top: 8px;
+  color: var(--parchment, #efe6d4);
+}
+
+.delve-result {
+  max-width: 720px;
+}
+
+.tavern-craft {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 8px 0 14px;
+}
+
+@media (max-width: 980px) {
+  .delve-contracts,
+  .delve-blessings {
+    grid-template-columns: 1fr;
+  }
+
+  .delve-contract {
+    max-height: none;
+    aspect-ratio: 3 / 2.4;
   }
 }

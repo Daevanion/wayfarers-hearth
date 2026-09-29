@@ -29,8 +29,15 @@ export function HUD() {
           <span>Tokens</span>
           <strong>{state.tokens}</strong>
         </li>
+        <li>
+          <span className="shard-mark" aria-hidden>
+            ◆
+          </span>
+          <span>Shards</span>
+          <strong>{state.tokenShards ?? 0}</strong>
+        </li>
       </ul>
-      <div className={`hud-day ${ui.questBoardOpen ? "is-hidden" : ""}`} aria-hidden={ui.questBoardOpen}>
+      <div className={`hud-day ${ui.questBoardOpen || ui.screen === "hearthroads" ? "is-hidden" : ""}`} aria-hidden={ui.questBoardOpen || ui.screen === "hearthroads"}>
         <span className="quest-label">Today's bounties</span>
         <span className="quest-time">
           {underway.length === 0
@@ -55,21 +62,23 @@ export function HUD() {
           Full Lorebook
         </button>
       </div>
-      <div className="hud-questboard">
-        <button
-          type="button"
-          className={`questboard-btn ${ui.questBoardOpen ? "on" : ""}`}
-          data-sfx="board"
-          aria-label="Quest Board"
-          aria-expanded={ui.questBoardOpen}
-          onClick={toggleBoard}
-        >
-          <img src={HUD_ICONS.questboard} alt="" />
-        </button>
-        <span className="hud-bubble" role="tooltip">
-          Quest Board
-        </span>
-      </div>
+      {ui.screen === "hearthroads" ? null : (
+        <div className="hud-questboard">
+          <button
+            type="button"
+            className={`questboard-btn ${ui.questBoardOpen ? "on" : ""}`}
+            data-sfx="board"
+            aria-label="Quest Board"
+            aria-expanded={ui.questBoardOpen}
+            onClick={toggleBoard}
+          >
+            <img src={HUD_ICONS.questboard} alt="" />
+          </button>
+          <span className="hud-bubble" role="tooltip">
+            Quest Board
+          </span>
+        </div>
+      )}
     </header>
   );
 }

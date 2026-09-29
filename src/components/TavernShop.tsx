@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from "react";
 import { HUD_ICONS } from "../data/hud";
 import { CARD_BACK } from "../data/portraits";
+import { SHARDS_PER_TOKEN } from "../game/delve";
 import { GOLD_PACK_COST, TOKEN_PACK_COST } from "../game/quests";
 import { useGame } from "../store/GameContext";
 import type { PackResult } from "../types";
@@ -10,7 +11,7 @@ import { PackOpening } from "./PackOpening";
 type PackCount = 1 | 3 | 10;
 
 export function TavernShop() {
-  const { state, buyCardPack, openTavern, openGuild, inspect } = useGame();
+  const { state, buyCardPack, openTavern, openGuild, inspect, craftShards } = useGame();
   const [opening, setOpening] = useState<PackResult[] | null>(null);
   const [count, setCount] = useState<PackCount>(1);
 
@@ -42,7 +43,21 @@ export function TavernShop() {
         <div className="tavern-shop">
           <p className="muted tight tavern-blurb">
             New faces drift through with the road dust. Gold buys a chance; a token buys a name you don't have.
+            Hearthroads shard-glass strikes a token at eight to one.
           </p>
+          <div className="tavern-craft">
+            <p>
+              Shards on the ledger: <strong>{state.tokenShards ?? 0}</strong>
+            </p>
+            <button
+              type="button"
+              className="menu-btn"
+              disabled={(state.tokenShards ?? 0) < SHARDS_PER_TOKEN}
+              onClick={() => craftShards()}
+            >
+              Strike a token · {SHARDS_PER_TOKEN} shards
+            </button>
+          </div>
 
           <div className="tavern-stage">
             <p className="muted pull-hint">Buy a pack to see who walks in.</p>

@@ -2,11 +2,11 @@
 
 > Read this before changing cards, traits, quests, or balance. It is the session handoff for both humans and the agent.
 >
-> **Code truth:** `src/data/cards.ts`, `src/data/traits.ts`, `src/data/sets.ts`, `src/data/quests.ts`, `src/data/lore.ts`, `src/game/formulas.ts`, `src/game/quests.ts`
+> **Code truth:** `src/data/cards.ts`, `src/data/traits.ts`, `src/data/sets.ts`, `src/data/quests.ts`, `src/data/lore.ts`, `src/data/delveContracts.ts`, `src/data/delveEncounters.ts`, `src/data/delveEvents.ts`, `src/data/delveBlessings.ts`, `src/game/formulas.ts`, `src/game/quests.ts`, `src/game/delve.ts`
 >
 > **Writer truth:** `c:\Users\daeva\Desktop\lores.xlsx` (outside the repo). Columns: `name | title | element | role | power | combat | lore`. Sets of **3** are separated by a repeated header row.
 >
-> **Repo:** https://github.com/Daevanion/wayfarers-hearth — save key `wayfarers-hearth-board-v1`, **SAVE_VERSION 14**. Adding cards does **not** require a version bump. Bump if `GameState` shape or daily board template IDs change (old boards would fade). v13 saves migrate (secret board / chapters).
+> **Repo:** https://github.com/Daevanion/wayfarers-hearth — save key `wayfarers-hearth-board-v1`, **SAVE_VERSION 15**. Adding cards does **not** require a version bump. Bump if `GameState` shape or daily board template IDs change (old boards would fade). v13 and v14 saves migrate (secret board / chapters / Hearthroads defaults).
 >
 > After any roster or quest change, **update this document** (counts, tables, unused-trait list) so the next session starts accurate.
 
@@ -16,7 +16,7 @@
 
 ### What the live game is
 
-A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 against a success %, earn gold / tokens / XP, recruit from the Tavern. The 10-night town season is gone. Legacy Crossroads / Blacksmith / Church / `engine.ts` are **not wired** — do not revive them unless asked.
+A **daily bounty board** plus an unlocked **Hearthroads** delve. Dispatch owned cards to timed quests, roll 1–100 against a success %, earn gold / XP, recruit from the Tavern. Ordinary bounty crits no longer grant tokens; token shards drop on Hearthroads and craft 8→1 token. The 10-night town season is gone. Legacy Crossroads / Blacksmith / Church / `engine.ts` are **not wired** — do not revive them unless asked.
 
 ### What the player sees
 
@@ -30,9 +30,10 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 - Companies on the road appear as a **left-hand progress rail** (art, name, timer bar). Click for a near-full-screen view of the quest painting, lore, and **Party Members**. Returned companies offer **Hear the report**.
 - The report uses the Collection ledger frame. Loot is the large gold / token / XP piles. Each party card shows an XP bar toward the next rank; hover 1.5s or click opens the dossier.
 - Dispatch loadout uses the quest painting as the header with time, power needed, team size, and favor on it, large advantage/hazard/crit panels, All/Set plus element/role/combat filters, and a zoomed Choose/Remove card.
-- HUD: Gold, Tokens, Tavern, Collection, Full catalogue, Full Lorebook
+- HUD: Gold, Tokens, Shards, Tavern, Collection, Full catalogue, Full Lorebook
 - Collection and Full catalogue are the same bound volume: parchment page, `The Ledger` kicker, All / Set chips plus dropdowns for Element, Role, and Status (Collection) or Obtain (Catalogue). Filter plaques match Chronicle: opaque dark gold-edged, larger type. Set view is fellowship rows of three
-- Owned portraits show a status ribbon while unavailable: **Marching** (blue) on a bounty, **Resting** (grey tint) after a win, **Recovering** (orange ribbon, red tint) after a fail
+- Owned portraits show a status ribbon while unavailable: **Marching** (blue) on a bounty, **On the road** (purple/gold) on Hearthroads, **Resting** (grey tint) after a win, **Recovering** (orange ribbon, red tint) after a fail
+- Plaza plaque **Hearthroads** (unlock at 5 owned names; **Resume the Hearthroads** if a run is saved)
 - Toasts and the Chronicle log sit at the bottom center; the log opens above the Chronicle button
 - Collection = owned company. Catalogue = every face, owned or not. Quest-only cards caption **Quest-bound**
 - Collection hides empty quest-only sets until a member is owned
@@ -42,8 +43,8 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 - Hover 1.5s on dossier art → full-size visual zoom (dim only; zoom 1× / 1.25× / 1.5×)
 - Opening draw: **Hearthbound trio** (Hera, Caelan, Cedric)
 - Visual novel: arrival scene (Hera / Cedric idle sprites, parchment box). Sprites stand on the bottom edge of the game display. Triggered from Settings for now; 2s lock before a line can be skipped
-- Settings debug (plaza): +gold/tokens, **Get new quest** (redraw daily board, underway kept), **Complete quests** (underway return now), **Unlock lore** (all chapters)
-- Tavern pack: Open 3 / Open 10 toggles buy that many if the purse can pay. Fade in `pack_open3.mp4` (Skip jumps to the last 2s). After the clip, a sealed card on blurred `tavern3.jpg`. One pack shows name/title/traits; 3 or 10 fan like the opening draw. Back to Tavern / Go to Collection
+- Settings debug: +gold/tokens/shards, **ready the Hearthroads** (extra tavern faces + shards), **Get new quest** (redraw daily board, underway kept), **Complete quests** (underway return now), **Unlock lore** (all chapters)
+- Tavern: strike **8 shards → 1 token**. Pack Open 3 / Open 10 toggles buy that many if the purse can pay. Fade in `pack_open3.mp4` (Skip jumps to the last 2s). After the clip, a sealed card on blurred `tavern3.jpg`. One pack shows name/title/traits; 3 or 10 fan like the opening draw. Back to Tavern / Go to Collection
 - BGM: `src/Assets/sfx/thepire.mp3` then `src/Assets/sfx/whispering_elven_woods.mp3` then `src/Assets/sfx/village_dance.mp3`, looping
 
 ### File map (content work)
@@ -61,6 +62,9 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 | Secret chapters / Special Orders | `src/data/chapters.ts`, `src/data/chapterBodies.ts` (`World Lore.docx`) |
 | Story portraits / map | `src/data/storyPortraits.ts` + `src/Assets/cards/portraits/*` + `worldmap2_small.jpg` |
 | Success math, board, packs | `src/game/quests.ts` |
+| Hearthroads engine | `src/game/delve.ts` |
+| Hearthroads contracts / foes / events / blessings | `src/data/delveContracts.ts`, `src/data/delveEncounters.ts`, `src/data/delveEvents.ts`, `src/data/delveBlessings.ts` |
+| Hearthroads UI | `src/components/Hearthroads.tsx`, `src/components/delve/*` |
 | XP / power per level | `src/game/formulas.ts` |
 | Icons (element / combat) | `src/data/icons.ts` + `src/Assets/bg/{fire,water,earth,air,light,dark,melee,ranged,magic}.png` |
 | This snapshot | `docs/game-design-reference.md` |
@@ -95,18 +99,20 @@ A **daily bounty board**. Dispatch owned cards to timed quests, roll 1–100 aga
 11. [Unimplemented Assets & Future Characters](#11-unimplemented-assets--future-characters)
 12. [Legacy System (Not Wired)](#12-legacy-system-not-wired)
 13. [Character Intake Pipeline](#13-character-intake-pipeline)
+14. [Hearthroads Delve](#14-hearthroads-delve)
 
 ---
 
 ## 1. Active Game Loop
 
-The live game is a **daily bounty board** system. Players dispatch teams of owned character cards to timed quests, roll for success/crit, earn gold/tokens/XP, and recruit via tavern packs.
+The live game is a **daily bounty board** plus an unlocked **Hearthroads** delve. Players dispatch teams of owned character cards to timed quests, roll for success/crit, earn gold/XP, and recruit via tavern packs. Tokens come from Hearthroads shards (8→1), not ordinary bounty crits.
 
 | Phase | Description |
 |-------|-------------|
 | **Title** | New game or load save |
 | **Opening Draw** | Fixed reveal of 3 starter cards (Hearthbound set) |
-| **Plaza** | Daily bounty board — dispatch, resolve, shop |
+| **Plaza** | Daily bounty board — dispatch, resolve, shop; Hearthroads plaque at 5 owned names |
+| **Hearthroads** | Seeded contracts, branching map, tactical combat, events, blessings, shard payout |
 | **Modals** | Collection (Guild), Catalogue, Tavern packs, Quest results |
 
 ### Starting State
@@ -115,8 +121,10 @@ The live game is a **daily bounty board** system. Players dispatch teams of owne
 |----------|-------|
 | Gold | 30 |
 | Tokens | 0 |
+| Token shards | 0 |
 | Cards | Hera Starfall, Caelan Featherfoot, Cedric Oakmont (all L1) |
 | Daily quests | 7: 3 Low + 2 Mid + 1 High + 1 Extreme (from 48 templates) |
+| Hearthroads offers | 3 contracts keyed to `boardDate` (patrol / standard / deep) |
 
 ### Limits
 
@@ -128,8 +136,11 @@ The live game is a **daily bounty board** system. Players dispatch teams of owne
 | Roster cap | None |
 | Card rest (win) | `duration × 0.5` — **Resting** grey ribbon + grey tint |
 | Card rest (fail) | `duration × 2` — **Recovering** orange ribbon + red tint |
-| Busy cards | Cannot dispatch while on an active quest — **Marching** blue ribbon |
+| Busy cards | Cannot dispatch while on an active quest — **Marching** blue ribbon — or on an unfinished Hearthroads run — **On the road** |
 | Exhausted cards | Cannot dispatch until `exhaustedUntil` passes |
+| Hearthroads unlock | 5 owned characters |
+| Hearthroads party | Idle only; 2 / 3 / 4 seats by contract |
+| Hearthroads rest (win / abandon / loss) | 90s rest / 180s recover / 240s recover |
 
 ### Daily Board
 
@@ -244,7 +255,9 @@ Crit is checked **first** (low rolls = triumph).
 
 ### Tokens
 
-- Earned on **crit rolls only**: 1 (Low/Mid), 2 (High), 3 (Extreme)
+- Ordinary bounty crits **do not** grant tokens
+- Optional `rewardTokens` on a quest template still pays on crit (for future specials)
+- Hearthroads pays **token shards**; Tavern crafts **8 shards → 1 token**
 - Spent on Sealed Letter pack (prefers unowned cards): **1 token**
 
 ### Duplicate XP (pack pulls)
@@ -729,10 +742,10 @@ Alastor, Rin, Freya Blackheart, and Samara are catalogue / quest-bound cards —
 
 | Tier | Gold | XP | Duration | Crit tokens |
 |------|------|-----|----------|-------------|
-| Low | 14–36 | 20–44 | 90s–8m | 1 |
-| Mid | 55–92 | 58–94 | 12–40m | 1 |
-| High | 125–170 | 108–145 | 50m–2h | 2 |
-| Extreme | 220–270 | 180–225 | 2.5–4h | 3 |
+| Low | 14–36 | 20–44 | 90s–8m | none (unless `rewardTokens`) |
+| Mid | 55–92 | 58–94 | 12–40m | none (unless `rewardTokens`) |
+| High | 125–170 | 108–145 | 50m–2h | none (unless `rewardTokens`) |
+| Extreme | 220–270 | 180–225 | 2.5–4h | none (unless `rewardTokens`) |
 
 ---
 
@@ -758,10 +771,11 @@ Alastor, Rin, Freya Blackheart, and Samara are catalogue / quest-bound cards —
   crit?: { type: "element"|"role"|"set", id: string, note: string },
   gold: number,
   xp: number,
+  rewardTokens?: number,     // optional; ordinary crits pay 0
 }
 ```
 
-Crit tokens: Low/Mid **1**, High **2**, Extreme **3**. Dispatch accepts any team size in `[teamMin, teamMax]`.
+Crit tokens: none on ordinary bounties. Set `rewardTokens` on a template to pay on crit. Dispatch accepts any team size in `[teamMin, teamMax]`.
 
 ### Recommended Power Targets
 
@@ -1018,6 +1032,48 @@ Then in the running app: Catalogue All + Set views, click-dossier lore highlight
 
 ---
 
+## 14. Hearthroads Delve
+
+Unlocked at **5 owned characters**. One active run. Party must be idle (not marching, resting, recovering, or already delving). Return to the plaza without losing the save; the plaza plaque reads **Resume the Hearthroads**.
+
+### Contracts (3 daily offers, seeded by `boardDate`)
+
+| ID | Name | Seats | Layers | Shard bonus |
+|----|------|-------|--------|-------------|
+| `patrol` | Road Patrol | 2 | 5 `[1,2,2,2,1]` | 0 |
+| `standard` | The Hearthroads | 3 | 7 `[1,2,3,2,3,2,1]` | 1 |
+| `deep` | Deep Contract | 4 | 8 `[1,2,3,3,2,3,2,1]` | 2 |
+
+Start node is a fight; last node is a boss. Middles mix fights, elites, events, and camps (at least one event and one rest).
+
+### Combat
+
+- Character-as-hand: **one action per living name per round**, then enemies act
+- HP ≈ `cardPower × 4`
+- Strike damage ≈ `power / 3`, ×1.25 if the card's element matches the contract threat (`wild` always matches)
+- Role verbs: Guard; Mend (healer/cleric); Bolt (mage/archmage); Pierce (ranger/scout); Cleave (berserker); Drain (soulharvester); tanks/paladins get extra Guard
+- Enemy intents: striking / guarding / sapping
+- Camp nodes heal ~40% missing HP
+- Blessings are run-only (8 pool, pick 3 after elite / camp / boss)
+
+### Shards
+
+| Node | Shards |
+|------|--------|
+| Fight | 2 + contract bonus |
+| Elite | 4 + bonus |
+| Boss | 8 + bonus |
+| Event | 0–5 by choice |
+| Loss / abandon | half of earned (floored) |
+
+Craft in the Tavern: **8 shards → 1 token**.
+
+### Persistence
+
+`GameState` v15 adds `tokenShards`, `delveOffers`, `activeDelve`. v13/v14 migrate with zeros and a fresh offer board.
+
+---
+
 ## Quick Reference: Type Definitions
 
 ```typescript
@@ -1030,4 +1086,4 @@ Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary"
 
 ---
 
-*Document version: save v14, 30 cards, 10 sets of 3, 49 daily quest templates, 6 secret chapters, 51 traits. Update the counts in this line whenever they change.*
+*Document version: save v15, 30 cards, 10 sets of 3, 49 daily quest templates, 6 secret chapters, 51 traits, Hearthroads (3 contracts, 12 encounters, 8 events, 8 blessings). Update the counts in this line whenever they change.*

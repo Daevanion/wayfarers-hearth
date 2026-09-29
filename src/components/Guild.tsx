@@ -198,7 +198,9 @@ function CompanyCard({
   const status =
     duty === "marching"
       ? DUTY_LABEL.marching
-      : duty === "recovering"
+      : duty === "delving"
+        ? DUTY_LABEL.delving
+        : duty === "recovering"
         ? `Recovers ${wait}`
         : duty === "resting"
           ? `Rests ${wait}`

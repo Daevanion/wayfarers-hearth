@@ -24,6 +24,7 @@ import abyss from "../Assets/bg/abyss.jpg";
 import bridgeGang from "../Assets/bg/bridge_gang.jpg";
 import faithlessShield from "../Assets/bg/faithless_shield_bg.jpg";
 import worldmapSmall from "../Assets/bg/worldmap2_small.jpg";
+import worldmap from "../Assets/bg/worldmap2.jpg";
 import loreSixtyPercent from "../Assets/bg/lore/sixty_percent_of_a_hero.png";
 import loreLessonDark from "../Assets/bg/lore/a_lesson_in_the_dark.png";
 import loreHollowBlade from "../Assets/bg/lore/the_silence_of_the_hollow_blade.png";
@@ -58,6 +59,7 @@ export const BACKGROUNDS = {
   bridgeGang,
   faithlessShield,
   worldmapSmall,
+  worldmap,
   loreSixtyPercent,
   loreLessonDark,
   loreHollowBlade,

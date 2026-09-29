@@ -11,7 +11,7 @@ import { DispatchModal } from "./DispatchModal";
 import { QuestTrack } from "./QuestTrack";
 
 export function Plaza() {
-  const { state, now, resolve, ui, openQuestBoard } = useGame();
+  const { state, now, resolve, ui, openQuestBoard, openHearthroads } = useGame();
   const sway = usePointerSway(14);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [pickerOut, setPickerOut] = useState(false);
@@ -68,7 +68,14 @@ export function Plaza() {
 
       {ui.intro ? null : <QuestTrack hidden={Boolean(openKey)} />}
       {ui.intro || ui.questBoardOpen || ui.guildOpen || ui.catalogueOpen || ui.tavernOpen || ui.lorebookOpen ? null : (
-        <SecretNotices notices={notices} />
+        <>
+          <SecretNotices notices={notices} />
+          <HearthroadsPlaque
+            unlocked={state.cards.length >= 5}
+            resume={Boolean(state.activeDelve)}
+            onOpen={() => openHearthroads(true)}
+          />
+        </>
       )}
 
       <div
@@ -282,6 +289,27 @@ function QuestCard({
         </span>
       </button>
     </article>
+  );
+}
+
+function HearthroadsPlaque({
+  unlocked,
+  resume,
+  onOpen,
+}: {
+  unlocked: boolean;
+  resume: boolean;
+  onOpen: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`hearthroads-plaque ${unlocked ? "" : "locked"}`}
+      disabled={!unlocked}
+      onClick={onOpen}
+    >
+      {unlocked ? (resume ? "Resume the Hearthroads" : "Hearthroads") : "Hearthroads · five names"}
+    </button>
   );
 }
 
